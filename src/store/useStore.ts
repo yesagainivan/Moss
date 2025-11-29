@@ -28,7 +28,7 @@ const pendingSaves = new Map<string, string>();
 
 // Debounced save functions per note (2 second debounce)
 // Debounced save functions per note (2 second debounce)
-const debouncedSaveByNote = new Map<string, ReturnType<typeof debounce>>();
+const debouncedSaveByNote = new Map<string, { debouncer: ReturnType<typeof debounce>, delay: number }>();
 
 // ============================================================================
 // File Tree Helpers (Incremental Updates)
@@ -137,6 +137,8 @@ interface AppState {
     hasUncommittedChanges: boolean; // Whether there are uncommitted changes
     scrollPositions: Record<string, number>; // Track scroll position per note
     revealTrigger: number; // Trigger for scrolling to note in sidebar
+    vaultStatus: 'idle' | 'snapshotting' | 'success' | 'error';
+    vaultStatusMessage: string | null;
 
     // Actions
     initialize: () => Promise<void>;
@@ -220,6 +222,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     hasUncommittedChanges: false,
     scrollPositions: {},
     revealTrigger: 0,
+    vaultStatus: 'idle',
+    vaultStatusMessage: null,
 
     initialize: async () => {
         set({ isVaultLoading: true });
@@ -879,8 +883,20 @@ export const useAppStore = create<AppState>((set, get) => ({
                     ? { ...t, isDirty, isPreview: isDirty ? false : t.isPreview } // Convert to permanent when dirty
                     : t
             );
+
+            // Sync dirtyNoteIds immediately for UI responsiveness
+            const tab = state.tabs.find(t => t.id === tabId);
+            let newDirtyIds = state.dirtyNoteIds;
+
+            if (tab && isDirty) {
+                newDirtyIds = new Set(state.dirtyNoteIds);
+                newDirtyIds.add(tab.noteId);
+            }
+            // Note: We don't remove from dirtyNoteIds here when isDirty is false,
+            // because that usually happens after a successful save in saveNote.
+
             persistTabsDebounced(newTabs, state.activeTabId);
-            return { tabs: newTabs };
+            return { tabs: newTabs, dirtyNoteIds: newDirtyIds };
         });
     },
 
@@ -904,7 +920,9 @@ export const useAppStore = create<AppState>((set, get) => ({
                     saveStates: {}, // Clear save states
                     selectedFolderPath: null, // Clear selected folder
                     vaultGeneration: prevGeneration + 1, // Increment generation to invalidate in-flight operations
-                    expandedPaths: new Set() // Clear expanded paths for new vault
+                    expandedPaths: new Set(), // Clear expanded paths for new vault
+                    vaultStatus: 'idle',
+                    vaultStatusMessage: null
                 });
 
                 // Clear localStorage to prevent stale tabs from being restored
@@ -1059,7 +1077,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
         if (note) {
             // Cancel any pending debounced save
-            debouncedSaveByNote.get(noteId)?.cancel();
+            debouncedSaveByNote.get(noteId)?.debouncer.cancel();
             // Save immediately
             await saveNote(noteId, note.content);
 
@@ -1323,6 +1341,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         if (!vaultPath || !gitEnabled) return;
 
         try {
+            set({ vaultStatus: 'snapshotting', vaultStatusMessage: 'Snapshotting vault...' });
+
             const { invoke } = await import('@tauri-apps/api/core');
             const timestamp = new Date().toLocaleString();
             const message = `Vault snapshot: ${timestamp}`;
@@ -1335,9 +1355,23 @@ export const useAppStore = create<AppState>((set, get) => ({
             // Refresh status
             await get().checkGitStatus();
 
+            set({ vaultStatus: 'success', vaultStatusMessage: 'Vault snapshot saved' });
             console.log('Vault snapshot saved:', message);
+
+            // Reset after delay
+            setTimeout(() => {
+                set({ vaultStatus: 'idle', vaultStatusMessage: null });
+            }, 3000);
+
         } catch (error) {
             console.error('Failed to snapshot vault:', error);
+            set({ vaultStatus: 'error', vaultStatusMessage: 'Failed to snapshot vault' });
+
+            // Reset error after delay
+            setTimeout(() => {
+                set({ vaultStatus: 'idle', vaultStatusMessage: null });
+            }, 5000);
+
             throw error;
         }
     },
@@ -1433,14 +1467,31 @@ export const useSaveState = (noteId: string) => useAppStore(
     state => state.saveStates[noteId] ?? DEFAULT_SAVE_STATE
 );
 
+export const useVaultStatus = () => {
+    const status = useAppStore(state => state.vaultStatus);
+    const message = useAppStore(state => state.vaultStatusMessage);
+    return { status, message };
+};
+
 // ============================================================================
 // Debounced Save Helper (called from Editor)
 // ============================================================================
 
 export const debouncedSaveNote = (noteId: string, content: string) => {
-    // Get or create debounced save function for this note
-    if (!debouncedSaveByNote.has(noteId)) {
-        debouncedSaveByNote.set(noteId, debounce(async (id: string, cnt: string) => {
+    const settings = useSettingsStore.getState().settings;
+    const delay = settings.autoSaveDelay;
+
+    // Get existing debouncer entry
+    const existing = debouncedSaveByNote.get(noteId);
+
+    // If no debouncer exists, or the delay has changed, create a new one
+    if (!existing || existing.delay !== delay) {
+        // Cancel existing if it exists
+        if (existing) {
+            existing.debouncer.cancel();
+        }
+
+        const newDebouncer = debounce(async (id: string, cnt: string) => {
             // Get fresh store reference inside debounced function
             const store = useAppStore.getState();
             await store.saveNote(id, cnt);
@@ -1452,11 +1503,14 @@ export const debouncedSaveNote = (noteId: string, content: string) => {
             if (activeTab && freshStore.saveStates[id]?.status === 'saved') {
                 freshStore.setTabDirty(activeTab.id, false);
             }
-        }, 2000)); // 2 second debounce
-    }
+        }, delay);
 
-    const debouncedFn = debouncedSaveByNote.get(noteId)!;
-    debouncedFn(noteId, content);
+        debouncedSaveByNote.set(noteId, { debouncer: newDebouncer, delay });
+        newDebouncer(noteId, content);
+    } else {
+        // Use existing debouncer
+        existing.debouncer(noteId, content);
+    }
 };
 
 // ============================================================================

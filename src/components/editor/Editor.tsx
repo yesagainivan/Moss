@@ -120,7 +120,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
         const markdown = editor.getMarkdown();
         updateNote(noteId, markdown);
         debouncedSaveNote(noteId, markdown);
-    }, 1000), [updateNote, debouncedSaveNote]);
+    }, 300), [updateNote, debouncedSaveNote]);
 
     // Handle scroll position saving
     const handleScroll = useMemo(() => debounce((e: React.UIEvent<HTMLDivElement>) => {
@@ -426,7 +426,8 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
         content: '', // Initialize with empty, will be updated via useEffect
         editorProps: {
             attributes: {
-                class: 'prose prose-lg max-w-none focus:outline-none p-8 pb-32 prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-accent prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-a:text-accent prose-blockquote:border-l-accent',
+                class: 'prose max-w-none focus:outline-none p-8 pb-32 prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-accent prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-a:text-accent prose-blockquote:border-l-accent',
+                style: `font-size: ${settings.fontSize}px; line-height: ${settings.lineHeight};`,
             },
             handleClick: (_view, _pos, event) => {
                 const target = event.target as HTMLElement;
@@ -1104,7 +1105,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
                         value={sourceContent}
                         onChange={handleSourceChange}
                         onKeyDown={handleSourceKeyDown}
-                        className="w-full h-full p-8 pb-32 bg-transparent resize-none focus:outline-none font-mono text-sm"
+                        className="w-full h-full p-8 pb-32 bg-transparent resize-none focus:outline-none font-mono"
                         spellCheck={settings.spellCheck}
                     />
                 ) : (
