@@ -344,6 +344,9 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
             TaskList,
             TaskItem.configure({
                 nested: true,
+                HTMLAttributes: {
+                    'data-type': 'taskItem',
+                },
             }),
             Markdown,  // Markdown MUST come after TaskList/TaskItem so it knows about them
             Wikilink.configure({

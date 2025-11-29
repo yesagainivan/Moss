@@ -692,6 +692,37 @@
   color: var(--border);
 }
 
+
+/* Task List Styles */
+ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+
+li[data-type="taskItem"] {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+li[data-type="taskItem"]>label {
+  margin-right: 0.5rem;
+  user-select: none;
+  transform: translateY(-0.15em);
+  /* align-self: center; */
+  /* margin-top: 0.35em;  */
+}
+
+li[data-type="taskItem"]>div {
+  flex: 1;
+}
+
+/* Fix: Ensure paragraphs inside task items don't have extra margins */
+li[data-type="taskItem"]>div>p {
+  margin: 0;
+}
+
 .tableWrapper {
   overflow-x: auto;
 }

@@ -19,6 +19,34 @@ marked.use({
             const titleAttr = title ? ` title="${title}"` : '';
             const targetAttr = isHashLink ? '' : ' target="_blank" rel="noopener noreferrer nofollow"';
             return `<a href="${href}"${titleAttr}${targetAttr}>${text}</a>`;
+        },
+        // Custom renderer for task lists to match Tiptap's expectations
+        list(token) {
+            const type = token.ordered ? 'ol' : 'ul';
+            const start = token.ordered && token.start !== 1 ? ` start="${token.start}"` : '';
+            // Check if any item is a task
+            const isTask = token.items.some((item) => item.task);
+            const listClass = isTask ? ' data-type="taskList"' : '';
+
+            const body = token.items.map((item) => this.listitem(item)).join('');
+
+            return `<${type}${listClass}${start}>\n${body}</${type}>\n`;
+        },
+        listitem(token) {
+            // Use parser.parse instead of parseInline to handle all token types (including paragraphs)
+            // This fixes the "Token with 'paragraph' type was not found" error
+            let content = this.parser.parse(token.tokens);
+            // Remove wrapping <p> tags if present (list items shouldn't have them)
+            content = content.replace(/^<p>(.*)<\/p>\n$/s, '$1');
+
+            if (token.task) {
+                const checked = token.checked ? 'true' : 'false';
+                return `<li data-type="taskItem" data-checked="${checked}">
+<label><input type="checkbox" ${token.checked ? 'checked' : ''} disabled><span></span></label>
+<div>${content}</div>
+</li>\n`;
+            }
+            return `<li>${content}</li>\n`;
         }
     }
 });
