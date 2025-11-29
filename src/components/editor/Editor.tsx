@@ -10,6 +10,7 @@ import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import { TaskList } from '@tiptap/extension-list/task-list';
 import { TaskItem } from '@tiptap/extension-list/task-item';
+import { ImageWithMarkdown } from './extensions/ImageWithMarkdown';
 import { useAppStore, debouncedSaveNote } from '../../store/useStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useAIStore } from '../../store/useAIStore';
@@ -411,6 +412,10 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
                 },
             }),
             Callout,
+            ImageWithMarkdown.configure({
+                inline: false, // Block mode for note-taking (like Obsidian/Notion)
+                allowBase64: false, // Only allow URL-based images for now
+            }),
             Table.configure({
                 resizable: true,
             }),
