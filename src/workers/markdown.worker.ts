@@ -20,6 +20,20 @@ marked.use({
             const targetAttr = isHashLink ? '' : ' target="_blank" rel="noopener noreferrer nofollow"';
             return `<a href="${href}"${titleAttr}${targetAttr}>${text}</a>`;
         },
+        // Custom paragraph renderer to handle standalone images as block nodes
+        paragraph({ tokens }) {
+            // Check if paragraph contains only an image token
+            if (tokens.length === 1 && tokens[0].type === 'image') {
+                // Render image directly without wrapping in <p> tag
+                const img = tokens[0] as any;
+                const altText = img.text || '';
+                const titleAttr = img.title ? ` title="${img.title}"` : '';
+                return `<img src="${img.href}" alt="${altText}"${titleAttr}>\n`;
+            }
+            // Otherwise, render as normal paragraph
+            const text = this.parser.parseInline(tokens);
+            return `<p>${text}</p>\n`;
+        },
         // Custom renderer for task lists to match Tiptap's expectations
         list(token) {
             const type = token.ordered ? 'ol' : 'ul';
