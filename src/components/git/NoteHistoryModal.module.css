@@ -1,0 +1,298 @@
+/* Version History Diff Styling */
+
+/* ============================================
+   VERSION HISTORY MODAL - All customizable styles
+   ============================================ */
+
+/* Modal Container */
+.modalPanel {
+    /* background: var(--background); */
+    /* background: color-mix(in srgb, var(--background), transparent 10%); */
+    background-color: color-mix(in srgb, var(--background), transparent 30%);
+    backdrop-filter: blur(20px);
+    position: relative;
+    width: 90vw;
+    height: 85vh;
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Animation */
+    animation: modalIn 0.2s ease-out;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+.modalPanelExit {
+    animation: modalOut 0.2s ease-in;
+}
+
+/* Header */
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    background-color: color-mix(in srgb, var(--background), transparent 90%);
+}
+
+.headerIcon {
+    padding: 0.5rem;
+    background-color: color-mix(in srgb, var(--accent), transparent 90%);
+    border-radius: 0.5rem;
+}
+
+.headerTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.headerSubtitle {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    font-family: ui-monospace, monospace;
+}
+
+.closeButton {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+}
+
+.closeButton:hover {
+    background: var(--background);
+}
+
+/* Sidebar: Commit List */
+.sidebar {
+    width: 20rem;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    background-color: color-mix(in srgb, var(--background), transparent 90%);
+}
+
+.commitButton {
+    width: 100%;
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--border), transparent 50%);
+    border-left: 4px solid transparent;
+    transition: background-color 0.15s;
+}
+
+.commitButton:hover {
+    background-color: color-mix(in srgb, var(--background), transparent 50%);
+}
+
+.commitButtonSelected {
+    background-color: color-mix(in srgb, var(--background), transparent 90%);
+    border-left-color: var(--accent);
+}
+
+.commitAuthor {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+}
+
+.commitAuthorAmbre {
+    background-color: color-mix(in srgb, #a855f7, transparent 90%);
+    color: #a855f7;
+}
+
+.commitAuthorUser {
+    background-color: color-mix(in srgb, #3b82f6, transparent 90%);
+    color: #3b82f6;
+}
+
+.commitDate {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+.commitMessage {
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+    color: var(--foreground);
+}
+
+.commitOid {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    font-family: ui-monospace, monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.7;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.viewModeToggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: color-mix(in srgb, var(--border), transparent 80%);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+}
+
+.viewModeButton {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: all 0.15s;
+    color: var(--muted-foreground);
+}
+
+.viewModeButton:hover {
+    color: var(--foreground);
+}
+
+.viewModeButtonActive {
+    background: var(--background);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    color: var(--foreground);
+}
+
+.restoreButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: background-color 0.15s;
+}
+
+.restoreButton:hover {
+    background-color: color-mix(in srgb, var(--primary), transparent 10%);
+}
+
+/* Content Area */
+.contentArea {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    font-family: ui-monospace, monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.sourceView {
+    padding: 1.5rem;
+}
+
+.sourceView pre {
+    white-space: pre-wrap;
+}
+
+/* Diff View */
+.diffContainer {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.diffLine {
+    display: flex;
+    padding: 0.125rem 1rem;
+    white-space: pre-wrap;
+    border-left-width: 2px;
+}
+
+.diffLineAdded {
+    display: flex;
+    padding: 0.125rem 1rem;
+    white-space: pre-wrap;
+    border-left-width: 2px;
+    background-color: color-mix(in srgb, #10b981, transparent 90%);
+    color: #065f46;
+    border-left-color: #10b981;
+}
+
+.dark .diffLineAdded {
+    color: #6ee7b7;
+}
+
+.diffLineRemoved {
+    display: flex;
+    padding: 0.125rem 1rem;
+    white-space: pre-wrap;
+    border-left-width: 2px;
+    background-color: color-mix(in srgb, #ef4444, transparent 90%);
+    color: #991b1b;
+    border-left-color: #ef4444;
+}
+
+.dark .diffLineRemoved {
+    color: #fca5a5;
+}
+
+.diffLineUnchanged {
+    display: flex;
+    padding: 0.125rem 1rem;
+    white-space: pre-wrap;
+    border-left-width: 2px;
+    color: var(--muted-foreground);
+    border-left-color: transparent;
+    transition: background-color 0.15s;
+}
+
+.diffLineUnchanged:hover {
+    background-color: color-mix(in srgb, var(--border), transparent 70%);
+}
+
+.diffPrefix {
+    display: inline-block;
+    width: 1rem;
+    opacity: 0.5;
+    user-select: none;
+    margin-right: 0.5rem;
+    text-align: center;
+}

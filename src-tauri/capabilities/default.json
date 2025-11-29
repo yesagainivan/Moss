@@ -1,0 +1,58 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-set-focus",
+    "core:window:allow-show",
+    "opener:default",
+    "fs:default",
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
+    "fs:allow-read-dir",
+    "fs:allow-rename",
+    "fs:allow-create",
+    "fs:allow-remove",
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
+    "fs:allow-exists",
+    "dialog:default",
+    "window-state:default",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    }
+  ]
+}

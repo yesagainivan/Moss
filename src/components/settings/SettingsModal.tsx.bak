@@ -1,0 +1,1111 @@
+```
+import { X, Check, AlertCircle, Loader2, Github, LogOut } from 'lucide-react';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { useThemeStore } from '../../store/useThemeStore';
+import { useAIStore, AIProvider, DEFAULT_PERSONA } from '../../store/useAIStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+import { useAppStore } from '../../store/useStore';
+import { VaultHistory } from '../git/VaultHistory';
+
+interface SettingsModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+type Tab = 'editor' | 'ai' | 'git';
+
+export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
+    const { settings, updateSettings } = useSettingsStore();
+    const {
+        selectedProvider,
+        selectedModel,
+        models,
+        setProvider,
+        setModel,
+        systemPrompt,
+        setSystemPrompt,
+        useDefaultSystemPrompt,
+        setUseDefaultSystemPrompt,
+        customPrompts,
+        addCustomPrompt,
+        updateCustomPrompt,
+        deleteCustomPrompt,
+    } = useAIStore();
+    const { isAuthenticated, user, login, logout, isLoading } = useAuthStore();
+
+    const [activeTab, setActiveTab] = useState<Tab>('editor');
+    const [apiKey, setApiKey] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
+    const [isTesting, setIsTesting] = useState(false);
+    const [testStatus, setTestStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [newPromptName, setNewPromptName] = useState('');
+    const [newPromptInstruction, setNewPromptInstruction] = useState('');
+    const [editingPromptId, setEditingPromptId] = useState<string | null>(null);
+    const [isIndexing, setIsIndexing] = useState(false);
+    const [indexStatus, setIndexStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [indexMessage, setIndexMessage] = useState('');
+    const { gitEnabled, checkGitStatus, requestConfirmation } = useAppStore();
+    const [isInitializingGit, setIsInitializingGit] = useState(false);
+    const [gitMessage, setGitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [isClosing, setIsClosing] = useState(false);
+
+    // Handle close with animation
+    const handleClose = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setIsClosing(false);
+            onClose();
+        }, 50); // Match animation duration
+    };
+
+    // Load API key when provider changes
+    useEffect(() => {
+        const loadApiKey = async () => {
+            if (selectedProvider) {
+                try {
+                    const key = await invoke<string>('get_api_key', { provider: selectedProvider });
+                    setApiKey(key);
+                } catch (e) {
+                    // No key found or error, clear input
+                    setApiKey('');
+                }
+            } else {
+                setApiKey('');
+            }
+            setTestStatus('idle');
+            setErrorMessage('');
+        };
+
+        if (isOpen) {
+            loadApiKey();
+        }
+    }, [selectedProvider, isOpen]);
+
+    // Check Git status when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            checkGitStatus();
+        }
+    }, [isOpen, checkGitStatus]);
+
+    const handleSaveKey = async () => {
+        if (!selectedProvider) return;
+
+        setIsSaving(true);
+        try {
+            if (apiKey.trim()) {
+                await invoke('save_api_key', { provider: selectedProvider, key: apiKey });
+            } else {
+                await invoke('delete_api_key', { provider: selectedProvider });
+            }
+            setTestStatus('idle');
+        } catch (e) {
+            console.error('Failed to save key:', e);
+            setErrorMessage('Failed to save API key');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleTestConnection = async () => {
+        if (!selectedProvider) return;
+
+        setIsTesting(true);
+        setTestStatus('idle');
+        setErrorMessage('');
+
+        try {
+            // Ensure key is saved first if it was just typed
+            if (apiKey.trim()) {
+                await invoke('save_api_key', { provider: selectedProvider, key: apiKey });
+            }
+
+            const success = await invoke<boolean>('test_ai_connection', { provider: selectedProvider });
+            if (success) {
+                setTestStatus('success');
+            } else {
+                setTestStatus('error');
+                setErrorMessage('Connection failed. Please check your API key.');
+            }
+        } catch (e) {
+            setTestStatus('error');
+            setErrorMessage(typeof e === 'string' ? e : 'Connection failed');
+        } finally {
+            setIsTesting(false);
+        }
+    };
+
+    // Close on Escape key
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) {
+                e.preventDefault();
+                handleClose();
+            }
+        };
+        window.addEventListener('keydown', handleEscape);
+        return () => window.removeEventListener('keydown', handleEscape);
+    }, [isOpen]);
+
+    if (!isOpen && !isClosing) return null;
+
+    return (
+        <>
+            {/* Backdrop */}
+            <div
+                className="modal-backdrop"
+                onClick={handleClose}
+            >
+                {/* Modal */}
+                <div
+                    className={`${ isClosing ? 'modal-exit' : 'modal-appear' } bg - background border border - border rounded - 2xl shadow - lg max - w - 2xl w - full mx - 4 max - h - [80vh] overflow - hidden flex flex - col`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {/* Header */}
+                    <div className="flex items-center justify-between p-6 border-b border-border">
+                        <h2 className="text-xl font-semibold text-foreground">Settings</h2>
+                        <button
+                            onClick={handleClose}
+                            className="p-1 hover:bg-accent/10 rounded-md transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    {/* Tabs */}
+                    <div className="flex gap-4 border-b border-border mb-6 mt-4 px-6">
+                        <button
+                            onClick={() => setActiveTab('editor')}
+                            className={`pb - 3 px - 1 text - sm font - medium border - b - 2 transition - colors ${
+    activeTab === 'editor'
+    ? 'border-accent text-accent'
+    : 'border-transparent text-muted-foreground hover:text-foreground'
+} `}
+                        >
+                            Editor
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('ai')}
+                            className={`pb - 3 px - 1 text - sm font - medium border - b - 2 transition - colors ${
+    activeTab === 'ai'
+    ? 'border-accent text-accent'
+    : 'border-transparent text-muted-foreground hover:text-foreground'
+} `}
+                        >
+                            AI
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('git')}
+                            className={`pb - 3 px - 1 text - sm font - medium border - b - 2 transition - colors ${
+    activeTab === 'git'
+    ? 'border-accent text-accent'
+    : 'border-transparent text-muted-foreground hover:text-foreground'
+} `}
+                        >
+                            Version Control
+                        </button>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 overflow-y-auto">
+                        {activeTab === 'editor' && (
+                            <div className="space-y-6 px-6">
+                                {/* Editor Section */}
+                                <div>
+                                    <h3 className="text-lg font-medium text-foreground mb-4">Theme Library</h3>
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-1 gap-2">
+                                            <button
+                                                onClick={() => useThemeStore.getState().setActiveTheme(null)}
+                                                className={`p - 3 rounded - lg border text - left transition - all ${
+    !useThemeStore.getState().activeThemeId
+    ? 'border-accent bg-accent/10'
+    : 'border-border hover:bg-secondary/50'
+} `}
+                                            >
+                                                <div className="font-medium text-sm">Default Theme</div>
+                                                <div className="text-xs text-muted-foreground">The classic Amber experience</div>
+                                            </button>
+
+                                            {useThemeStore.getState().themes.map(theme => (
+                                                <button
+                                                    key={theme.name}
+                                                    onClick={() => useThemeStore.getState().setActiveTheme(theme.name)}
+                                                    className={`p - 3 rounded - lg border text - left transition - all ${
+    useThemeStore.getState().activeThemeId === theme.name
+    ? 'border-accent bg-accent/10'
+    : 'border-border hover:bg-secondary/50'
+} `}
+                                                >
+                                                    <div className="font-medium text-sm">{theme.name}</div>
+                                                    <div className="text-xs text-muted-foreground">{theme.description}</div>
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => useThemeStore.getState().loadThemes()}
+                                                className="px-3 py-2 text-xs font-medium bg-border hover:bg-border/80 rounded-md transition-colors"
+                                            >
+                                                Reload Themes
+                                            </button>
+                                            {/* TODO: Add Open Folder button when Opener plugin is ready */}
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">
+                                            Place .yaml theme files in your app data directory to add custom themes.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-border my-6"></div>
+
+                                <div>
+                                    <h3 className="text-lg font-medium text-foreground mb-4">Editor Appearance</h3>
+                                    <div className="space-y-4">
+                                        {/* Theme Selection */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Theme
+                                            </label>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {(['light', 'dark', 'system'] as const).map((theme) => (
+                                                    <button
+                                                        key={theme}
+                                                        onClick={() => updateSettings({ theme })}
+                                                        className={`px - 3 py - 2 text - sm font - medium rounded - md border transition - all ${
+    settings.theme === theme
+    ? 'bg-accent text-background border-accent'
+    : 'bg-background text-foreground border-input hover:bg-secondary/50'
+} `}
+                                                    >
+                                                        {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Knowledge Graph Section */}
+                                        <div>
+                                            <h3 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">
+                                                Knowledge Graph
+                                            </h3>
+                                            <div className="space-y-4">
+                                                {/* Graph Position */}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Position
+                                                    </label>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <button
+                                                            onClick={() => updateSettings({ graphPosition: 'center' })}
+                                                            className={`px - 3 py - 2 text - sm font - medium rounded - md border transition - all ${
+    settings.graphPosition === 'center'
+    ? 'bg-accent text-background border-accent'
+    : 'bg-background text-foreground border-input hover:bg-secondary/50'
+} `}
+                                                        >
+                                                            Center (Split)
+                                                        </button>
+                                                        <button
+                                                            onClick={() => updateSettings({ graphPosition: 'sidebar' })}
+                                                            className={`px - 3 py - 2 text - sm font - medium rounded - md border transition - all ${
+    settings.graphPosition === 'sidebar'
+    ? 'bg-accent text-background border-accent'
+    : 'bg-background text-foreground border-input hover:bg-secondary/50'
+} `}
+                                                        >
+                                                            Sidebar (Stacked)
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Graph Particles */}
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <label className="text-sm font-medium text-foreground">
+                                                            Link Particles
+                                                        </label>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Show animated dots moving along links.
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => updateSettings({ graphShowParticles: !settings.graphShowParticles })}
+                                                        className={`relative inline - flex h - 6 w - 11 items - center rounded - full transition - colors focus: outline - none focus: ring - 2 focus: ring - accent focus: ring - offset - 2 ${
+    settings.graphShowParticles ? 'bg-accent' : 'bg-input'
+} `}
+                                                    >
+                                                        <span
+                                                            className={`inline - block h - 4 w - 4 transform rounded - full bg - white transition - transform ${
+    settings.graphShowParticles ? 'translate-x-6' : 'translate-x-1'
+} `}
+                                                        />
+                                                    </button>
+                                                </div>
+
+                                                {/* Graph Labels */}
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <label className="text-sm font-medium text-foreground">
+                                                            Node Labels
+                                                        </label>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Show text labels for notes. Hiding them improves performance.
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => updateSettings({ graphShowLabels: !settings.graphShowLabels })}
+                                                        className={`relative inline - flex h - 6 w - 11 items - center rounded - full transition - colors focus: outline - none focus: ring - 2 focus: ring - accent focus: ring - offset - 2 ${
+    settings.graphShowLabels ? 'bg-accent' : 'bg-input'
+} `}
+                                                    >
+                                                        <span
+                                                            className={`inline - block h - 4 w - 4 transform rounded - full bg - white transition - transform ${
+    settings.graphShowLabels ? 'translate-x-6' : 'translate-x-1'
+} `}
+                                                        />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="w-full h-[1px] bg-border my-2"></div>
+
+                                        {/* Font Size */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Font Size: {settings.fontSize}px
+                                            </label>
+                                            <input
+                                                type="range"
+                                                min="12"
+                                                max="20"
+                                                step="1"
+                                                value={settings.fontSize}
+                                                onChange={(e) =>
+                                                    updateSettings({ fontSize: parseInt(e.target.value) })
+                                                }
+                                                className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                                            />
+                                            <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                                                <span>12px</span>
+                                                <span>20px</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Line Height */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Line Height: {settings.lineHeight.toFixed(1)}
+                                            </label>
+                                            <input
+                                                type="range"
+                                                min="1.4"
+                                                max="2.0"
+                                                step="0.1"
+                                                value={settings.lineHeight}
+                                                onChange={(e) =>
+                                                    updateSettings({ lineHeight: parseFloat(e.target.value) })
+                                                }
+                                                className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                                            />
+                                            <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                                                <span>Compact</span>
+                                                <span>Spacious</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Readable Line Length (Max Width) */}
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="text-sm font-medium text-foreground">
+                                                    Readable Line Length
+                                                </label>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Limit editor width for comfortable reading on wide screens.
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => updateSettings({ enableMaxWidth: !settings.enableMaxWidth })}
+                                                className={`relative inline - flex h - 6 w - 11 items - center rounded - full transition - colors ${
+    settings.enableMaxWidth ? 'bg-accent' : 'bg-secondary'
+} `}
+                                            >
+                                                <span
+                                                    className={`inline - block h - 4 w - 4 transform rounded - full bg - white transition - transform ${
+    settings.enableMaxWidth ? 'translate-x-6' : 'translate-x-1'
+} `}
+                                                />
+                                            </button>
+                                        </div>
+
+                                        {settings.enableMaxWidth && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-foreground mb-2">
+                                                    Max Width: {settings.maxWidth}px
+                                                </label>
+                                                <input
+                                                    type="range"
+                                                    min="600"
+                                                    max="1200"
+                                                    step="50"
+                                                    value={settings.maxWidth}
+                                                    onChange={(e) =>
+                                                        updateSettings({ maxWidth: parseInt(e.target.value) })
+                                                    }
+                                                    className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                                                />
+                                                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                                                    <span>Narrow</span>
+                                                    <span>Wide</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+
+                                        {/* Auto-save Delay */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Auto-save Delay: {settings.autoSaveDelay === 0 ? 'Instant' : `${ settings.autoSaveDelay / 1000 } s`}
+                                            </label>
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="5000"
+                                                step="500"
+                                                value={settings.autoSaveDelay}
+                                                onChange={(e) =>
+                                                    updateSettings({ autoSaveDelay: parseInt(e.target.value) })
+                                                }
+                                                className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                                            />
+                                            <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                                                <span>Instant</span>
+                                                <span>5 seconds</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Spell Check */}
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-sm font-medium text-foreground">
+                                                Spell Check
+                                            </label>
+                                            <button
+                                                onClick={() => updateSettings({ spellCheck: !settings.spellCheck })}
+                                                className={`relative inline - flex h - 6 w - 11 items - center rounded - full transition - colors ${
+    settings.spellCheck ? 'bg-accent' : 'bg-secondary'
+} `}
+                                            >
+                                                <span
+                                                    className={`inline - block h - 4 w - 4 transform rounded - full bg - white transition - transform ${
+    settings.spellCheck ? 'translate-x-6' : 'translate-x-1'
+} `}
+                                                />
+                                            </button>
+                                        </div>
+
+                                        {/* Show Diff Panel */}
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <label className="text-sm font-medium text-foreground">
+                                                    Show AI Diff Panel
+                                                </label>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    Preview AI changes in a diff view before accepting (when off, changes stream directly)
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => updateSettings({ showDiffPanel: !settings.showDiffPanel })}
+                                                className={`relative inline - flex h - 6 w - 11 items - center rounded - full transition - colors ${
+    settings.showDiffPanel ? 'bg-accent' : 'bg-secondary'
+} `}
+                                            >
+                                                <span
+                                                    className={`inline - block h - 4 w - 4 transform rounded - full bg - white transition - transform ${
+    settings.showDiffPanel ? 'translate-x-6' : 'translate-x-1'
+} `}
+                                                />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-border my-6"></div>
+
+                                {/* GitHub Integration */}
+                                <div>
+                                    <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
+                                        <Github className="w-5 h-5" />
+                                        GitHub Sync
+                                    </h3>
+                                    <div className="p-4 border border-border rounded-lg">
+                                        {isAuthenticated && user ? (
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <img
+                                                        src={user.avatar_url}
+                                                        alt={user.login}
+                                                        className="w-10 h-10 rounded-full border border-border"
+                                                    />
+                                                    <div>
+                                                        <p className="font-medium text-foreground">{user.name || user.login}</p>
+                                                        <p className="text-sm text-muted-foreground">Connected as {user.login}</p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => logout()}
+                                                    className="p-2 hover:bg-destructive/10 text-destructive rounded-md transition-colors"
+                                                    title="Disconnect"
+                                                >
+                                                    <LogOut className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col gap-3">
+                                                <p className="text-sm text-muted-foreground">
+                                                    Connect your GitHub account to sync your notes across devices and backup your vault.
+                                                </p>
+                                                <button
+                                                    onClick={() => login()}
+                                                    disabled={isLoading}
+                                                    className="flex items-center justify-center gap-2 bg-[#24292F] hover:bg-[#24292F]/90 text-white px-4 py-2 rounded-md transition-colors disabled:opacity-50"
+                                                >
+                                                    <Github className="w-4 h-4" />
+                                                    {isLoading ? 'Connecting...' : 'Connect GitHub'}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* AI Tab */}
+                        {activeTab === 'ai' && (
+                            <div className="space-y-6 px-6">
+                                <div>
+                                    <h3 className="text-lg font-medium text-foreground mb-4">AI Provider</h3>
+                                    <div className="space-y-4">
+                                        {/* Provider Selection */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Provider
+                                            </label>
+                                            <select
+                                                value={selectedProvider || ''}
+                                                onChange={(e) => setProvider(e.target.value as AIProvider || null)}
+                                                className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                                            >
+                                                <option value="">Select a provider...</option>
+                                                <option value="gemini">Google Gemini (Free Tier Available)</option>
+                                                <option value="cerebras">Cerebras (Fast Inference)</option>
+                                                <option value="openrouter">OpenRouter (Claude, GPT-4, etc.)</option>
+                                            </select>
+                                        </div>
+
+                                        {selectedProvider && (
+                                            <>
+                                                {/* Model Selection */}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Model
+                                                    </label>
+                                                    <div className="flex gap-2">
+                                                        <select
+                                                            value={selectedModel || ''}
+                                                            onChange={(e) => setModel(e.target.value)}
+                                                            className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                                                        >
+                                                            {models[selectedProvider].map(model => (
+                                                                <option key={model} value={model}>{model}</option>
+                                                            ))}
+                                                        </select>
+                                                        <button
+                                                            onClick={() => {
+                                                                if (selectedProvider && selectedModel) {
+                                                                    if (confirm(`Are you sure you want to remove ${ selectedModel }?`)) {
+                                                                        useAIStore.getState().removeModel(selectedProvider, selectedModel);
+                                                                    }
+                                                                }
+                                                            }}
+                                                            disabled={!selectedModel}
+                                                            className="px-3 py-2 bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                            title="Remove selected model"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Add New Model */}
+                                                    <div className="mt-2 flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Add new model ID (e.g. gpt-4-turbo)"
+                                                            className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    const input = e.currentTarget;
+                                                                    const val = input.value.trim();
+                                                                    if (val && selectedProvider) {
+                                                                        useAIStore.getState().addModel(selectedProvider, val);
+                                                                        input.value = '';
+                                                                    }
+                                                                }
+                                                            }}
+                                                        />
+                                                        <button
+                                                            onClick={() => {
+                                                                if (selectedProvider) {
+                                                                    useAIStore.getState().resetModels(selectedProvider);
+                                                                }
+                                                            }}
+                                                            className="px-3 py-2 text-xs text-muted-foreground hover:text-foreground underline"
+                                                        >
+                                                            Reset Defaults
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* API Key */}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        API Key
+                                                    </label>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="password"
+                                                            value={apiKey}
+                                                            onChange={(e) => setApiKey(e.target.value)}
+                                                            placeholder={`Enter your ${ selectedProvider === 'gemini' ? 'Gemini' : selectedProvider === 'cerebras' ? 'Cerebras' : 'OpenRouter' } API Key`}
+                                                            className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                                                        />
+                                                        <button
+                                                            onClick={handleSaveKey}
+                                                            disabled={isSaving}
+                                                            className="px-4 py-2 bg-primary hover:bg-primary/80 text-background rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                        >
+                                                            {isSaving ? 'Saving...' : 'Save'}
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground mt-2">
+                                                        Your API key is stored securely in your system's keychain.
+                                                    </p>
+                                                </div>
+
+                                                {/* System Prompt Configuration */}
+                                                <div>
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <label className="block text-sm font-medium text-foreground">
+                                                            Agent Persona
+                                                        </label>
+                                                        <div className="flex items-center gap-2 bg-secondary/50 p-1 rounded-lg">
+                                                            <button
+                                                                onClick={() => setUseDefaultSystemPrompt(true)}
+                                                                className={`px - 2 py - 1 text - xs font - medium rounded - md transition - all ${
+    useDefaultSystemPrompt
+        ? 'bg-background shadow-sm text-foreground'
+        : 'text-muted-foreground hover:text-foreground'
+} `}
+                                                            >
+                                                                Default
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setUseDefaultSystemPrompt(false)}
+                                                                className={`px - 2 py - 1 text - xs font - medium rounded - md transition - all ${
+    !useDefaultSystemPrompt
+    ? 'bg-background shadow-sm text-foreground'
+    : 'text-muted-foreground hover:text-foreground'
+} `}
+                                                            >
+                                                                Custom
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <textarea
+                                                        value={useDefaultSystemPrompt ? DEFAULT_PERSONA : systemPrompt}
+                                                        onChange={(e) => !useDefaultSystemPrompt && setSystemPrompt(e.target.value)}
+                                                        readOnly={useDefaultSystemPrompt}
+                                                        placeholder="You are a helpful writing assistant..."
+                                                        className={`w - full bg - background border border - input rounded - md px - 3 py - 2 text - sm focus: outline - none focus: ring - 2 focus: ring - accent min - h - [150px] resize - y ${
+    useDefaultSystemPrompt ? 'opacity-70 cursor-not-allowed' : ''
+} `}
+                                                    />
+                                                    <p className="text-xs text-muted-foreground mt-2">
+                                                        {useDefaultSystemPrompt
+                                                            ? "Using the built-in Ambre persona. Switch to 'Custom' to define your own."
+                                                            : "Define the personality and voice of the AI assistant. Core tool instructions will be automatically appended."}
+                                                    </p>
+                                                </div>
+
+                                                {/* Editor Actions */}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Editor Actions
+                                                    </label>
+                                                    <div className="space-y-3">
+                                                        {customPrompts.map((prompt) => (
+                                                            <div
+                                                                key={prompt.id}
+                                                                className="border border-input rounded-md p-3 space-y-2"
+                                                            >
+                                                                {editingPromptId === prompt.id ? (
+                                                                    <>
+                                                                        <input
+                                                                            type="text"
+                                                                            defaultValue={prompt.name}
+                                                                            placeholder="Prompt Name"
+                                                                            className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                                                                            onBlur={(e) => {
+                                                                                const newName = e.target.value.trim();
+                                                                                const textareaValue = e.target.parentElement?.querySelector('textarea')?.value.trim();
+                                                                                if (newName && textareaValue) {
+                                                                                    updateCustomPrompt(prompt.id, newName, textareaValue);
+                                                                                }
+                                                                                setEditingPromptId(null);
+                                                                            }}
+                                                                        />
+                                                                        <textarea
+                                                                            defaultValue={prompt.instruction}
+                                                                            placeholder="Instruction"
+                                                                            className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent min-h-[60px] resize-y"
+                                                                        />
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <div className="flex items-start justify-between">
+                                                                            <div className="flex-1">
+                                                                                <h4 className="font-medium text-sm">{prompt.name}</h4>
+                                                                                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                                                                    {prompt.instruction}
+                                                                                </p>
+                                                                            </div>
+                                                                            <div className="flex gap-2 ml-3">
+                                                                                <button
+                                                                                    onClick={() => setEditingPromptId(prompt.id)}
+                                                                                    className="text-xs px-2 py-1 bg-primary hover:bg-primary/80 text-background rounded transition-colors"
+                                                                                >
+                                                                                    Edit
+                                                                                </button>
+                                                                                {!prompt.isDefault && (
+                                                                                    <button
+                                                                                        onClick={() => deleteCustomPrompt(prompt.id)}
+                                                                                        className="text-xs px-2 py-1 bg-destructive/10 text-destructive hover:bg-destructive/20 rounded transition-colors"
+                                                                                    >
+                                                                                        Delete
+                                                                                    </button>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        ))}
+
+                                                        {/* Add New Prompt */}
+                                                        <div className="border border-dashed border-input rounded-md p-3 space-y-2">
+                                                            <input
+                                                                type="text"
+                                                                value={newPromptName}
+                                                                onChange={(e) => setNewPromptName(e.target.value)}
+                                                                placeholder="Prompt Name (e.g., Translate)"
+                                                                className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-muted-foreground"
+                                                            />
+                                                            <textarea
+                                                                value={newPromptInstruction}
+                                                                onChange={(e) => setNewPromptInstruction(e.target.value)}
+                                                                placeholder="Instruction (e.g., Translate the following text to Spanish)"
+                                                                className="w-full bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent min-h-[60px] resize-y placeholder:text-muted-foreground"
+                                                            />
+                                                            <button
+                                                                onClick={() => {
+                                                                    if (newPromptName.trim() && newPromptInstruction.trim()) {
+                                                                        addCustomPrompt(newPromptName.trim(), newPromptInstruction.trim());
+                                                                        setNewPromptName('');
+                                                                        setNewPromptInstruction('');
+                                                                    }
+                                                                }}
+                                                                disabled={!newPromptName.trim() || !newPromptInstruction.trim()}
+                                                                className="w-full px-4 py-2 bg-accent text-white hover:bg-accent/90 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            >
+                                                                Add Prompt
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground mt-2">
+                                                        Create custom AI commands for the "Rewrite" feature. These appear in the editor's AI menu.
+                                                    </p>
+                                                </div>
+
+                                                {/* Test Connection */}
+                                                <div className="pt-2">
+                                                    <button
+                                                        onClick={handleTestConnection}
+                                                        disabled={isTesting || !apiKey}
+                                                        className="flex items-center gap-2 px-4 py-2 bg-accent text-white hover:bg-accent/90 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                    >
+                                                        {isTesting ? (
+                                                            <>
+                                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                                Testing...
+                                                            </>
+                                                        ) : (
+                                                            'Test Connection'
+                                                        )}
+                                                    </button>
+
+                                                    {testStatus === 'success' && (
+                                                        <div className="flex items-center gap-2 mt-3 text-sm text-success">
+                                                            <Check className="w-4 h-4" />
+                                                            Connection successful!
+                                                        </div>
+                                                    )}
+
+                                                    {testStatus === 'error' && (
+                                                        <div className="flex items-center gap-2 mt-3 text-sm text-destructive">
+                                                            <AlertCircle className="w-4 h-4" />
+                                                            {errorMessage || 'Connection failed'}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Vector Search Section */}
+                                <div className="border-t border-border my-6"></div>
+                                <div className="py-4">
+                                    <h3 className="text-lg font-medium text-foreground mb-2">Vector Search</h3>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        Enable semantic search by indexing your vault. This allows Ambre to understand concepts and find notes by meaning, not just keywords.
+                                    </p>
+
+                                    {selectedProvider === 'openrouter' && (
+                                        <div className="mb-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-md flex items-start gap-3">
+                                            <AlertCircle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                                            <div className="text-sm text-yellow-500">
+                                                <p className="font-medium">Backend Dependency Warning</p>
+                                                <p className="mt-1 opacity-90">
+                                                    Semantic Search currently requires a <strong>Google Gemini API Key</strong> to generate embeddings in the backend, even if you are using OpenRouter for the agent. Please ensure you have a Gemini key saved if you wish to use this feature.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={async () => {
+                                            const vaultPath = useAppStore.getState().vaultPath;
+                                            if (!vaultPath) {
+                                                setIndexStatus('error');
+                                                setIndexMessage('No vault is currently open');
+                                                return;
+                                            }
+                                            setIsIndexing(true);
+                                            setIndexStatus('idle');
+                                            setIndexMessage('');
+                                            try {
+                                                await invoke('trigger_indexing', { vaultPath });
+                                                setIndexStatus('success');
+                                                setIndexMessage('Vault indexed successfully! Ambre can now use semantic search.');
+                                            } catch (e) {
+                                                setIndexStatus('error');
+                                                setIndexMessage(typeof e === 'string' ? e : 'Indexing failed');
+                                            } finally {
+                                                setIsIndexing(false);
+                                            }
+                                        }}
+                                        disabled={isIndexing}
+                                        className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/80 text-background rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                    >
+                                        {isIndexing ? (
+                                            <>
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                Indexing...
+                                            </>
+                                        ) : (
+                                            'Re-Index Vault'
+                                        )}
+                                    </button>
+
+                                    {indexStatus === 'success' && (
+                                        <div className="flex items-center gap-2 mt-3 text-sm text-success">
+                                            <Check className="w-4 h-4" />
+                                            {indexMessage}
+                                        </div>
+                                    )}
+
+                                    {indexStatus === 'error' && (
+                                        <div className="flex items-center gap-2 mt-3 text-sm text-destructive">
+                                            <AlertCircle className="w-4 h-4" />
+                                            {indexMessage || 'Indexing failed'}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Git Version Control Tab */}
+                        {activeTab === 'git' && (
+                            <div className="p-6 pt-0">
+                                <h3 className="text-lg font-medium text-foreground mb-2">Version Control</h3>
+                                <p className="text-sm text-muted-foreground mb-6">
+                                    Enable Git version control to automatically track Ambre's changes and undo them if needed.
+                                </p>
+
+                                <div className="space-y-4">
+                                    {/* Status Display */}
+                                    <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-lg">
+                                        <div>
+                                            <p className="text-sm font-medium text-foreground">Git Status</p>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                                {gitEnabled
+                                                    ? 'Version control is active. Ambre\'s changes are tracked.'
+                                                    : 'Version control is not enabled for this vault.'}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {gitEnabled ? (
+                                                <span className="flex items-center gap-2 text-sm text-success">
+                                                    <Check className="w-4 h-4" />
+                                                    Enabled
+                                                </span>
+                                            ) : (
+                                                <span className="text-sm text-muted-foreground">Disabled</span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Enable Git Button */}
+                                    {!gitEnabled && (
+                                        <div>
+                                            <button
+                                                onClick={async () => {
+                                                    const { vaultPath } = useAppStore.getState();
+                                                    if (!vaultPath) {
+                                                        setGitMessage({ type: 'error', text: 'No vault is open' });
+                                                        return;
+                                                    }
+
+                                                    const confirmed = await requestConfirmation(
+                                                        'Initialize Git repository in this vault? This will create a .git folder and enable version control.'
+                                                    );
+                                                    if (!confirmed) return;
+
+                                                    setIsInitializingGit(true);
+                                                    setGitMessage(null); // Clear previous messages
+                                                    try {
+                                                        await invoke('init_git_repository', { vaultPath });
+                                                        await checkGitStatus();
+                                                        setGitMessage({ type: 'success', text: 'Git repository initialized! Version control is now enabled.' });
+                                                    } catch (e) {
+                                                        console.error('Failed to initialize Git:', e);
+                                                        setGitMessage({ type: 'error', text: `Failed to initialize Git: ${ e } ` });
+                                                    } finally {
+                                                        setIsInitializingGit(false);
+                                                    }
+                                                }}
+                                                disabled={isInitializingGit}
+                                                className="px-4 py-2 bg-accent text-accent-foreground rounded-md hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                            >
+                                                {isInitializingGit ? (
+                                                    <>
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        Initializing...
+                                                    </>
+                                                ) : (
+                                                    'Enable Version Control'
+                                                )}
+                                            </button>
+                                            <p className="text-xs text-muted-foreground mt-2">
+                                                This will run <code className="px-1 py-0.5 bg-primary rounded text-xs text-background">git init</code> in your vault folder.
+                                            </p>
+
+                                            {/* Success/Error Messages */}
+                                            {gitMessage && (
+                                                <div className={`mt - 3 p - 3 rounded - md flex items - start gap - 2 ${
+    gitMessage.type === 'success'
+    ? 'bg-success/10 border border-success/20 text-success'
+    : 'bg-destructive/10 border border-destructive/20 text-destructive'
+} `}>
+                                                    {gitMessage.type === 'success' ? (
+                                                        <Check className="w-4 h-4 shrink-0 mt-0.5" />
+                                                    ) : (
+                                                        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                                                    )}
+                                                    <p className="text-sm">{gitMessage.text}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Info for Git-enabled vaults */}
+                                    {gitEnabled && (
+                                        <div className="p-4 bg-secondary/30 rounded-lg">
+                                            <p className="text-sm text-foreground mb-2">
+                                                <strong>Features enabled:</strong>
+                                            </p>
+                                            <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                                                <li>Auto-commits after Ambre creates or updates notes</li>
+                                                <li>Undo button (↶) in toolbar to revert Ambre's last change</li>
+                                                <li>Full Git history available via command line</li>
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {/* Snapshot Vault Button */}
+                                    {gitEnabled && (
+                                        <div className="pt-4 border-t border-border">
+                                            <h4 className="text-sm font-medium text-foreground mb-2">Manual Snapshot</h4>
+                                            <p className="text-xs text-muted-foreground mb-3">
+                                                Create a commit for all changes in the vault. Useful for saving a checkpoint of your entire workspace.
+                                            </p>
+                                            <button
+                                                onClick={async () => {
+                                                    const confirmed = await requestConfirmation(
+                                                        'Create a snapshot of the entire vault? This will commit all changes in all files.'
+                                                    );
+                                                    if (!confirmed) return;
+
+                                                    try {
+                                                        await useAppStore.getState().snapshotVault();
+                                                        setGitMessage({ type: 'success', text: 'Vault snapshot created successfully!' });
+                                                    } catch (e) {
+                                                        console.error('Failed to snapshot vault:', e);
+                                                        setGitMessage({ type: 'error', text: `Failed to snapshot vault: ${ e } ` });
+                                                    }
+                                                }}
+                                                className="px-3 py-1.5 bg-primary hover:bg-primary/80 text-background rounded-md text-xs font-medium transition-colors flex items-center gap-2"
+                                            >
+                                                <Check className="w-3 h-3" />
+                                                Snapshot Entire Vault
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* Vault History */}
+                                    {gitEnabled && <VaultHistory requestConfirmation={requestConfirmation} setGitMessage={setGitMessage} />}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-end gap-3 p-6 border-t border-border">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 text-sm font-medium text-foreground bg-accent/10 hover:bg-accent/20 rounded-md transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
+```

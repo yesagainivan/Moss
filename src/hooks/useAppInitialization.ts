@@ -1,0 +1,162 @@
+import { useEffect, useRef } from 'react';
+import { invoke } from '@tauri-apps/api/core';
+import { listen } from '@tauri-apps/api/event';
+import { useAppStore } from '../store/useStore';
+
+export const useAppInitialization = () => {
+    const initialize = useAppStore(state => state.initialize);
+    const refreshFileTree = useAppStore(state => state.refreshFileTree);
+    const vaultPath = useAppStore(state => state.vaultPath);
+
+    useEffect(() => {
+        initialize();
+    }, [initialize]);
+
+    // Refresh file tree on window focus to catch external changes
+    const isInitialMount = useRef(true);
+
+    useEffect(() => {
+        const handleFocus = () => {
+            // Skip the very first focus event which happens on mount/startup
+            // This prevents double refresh since initialize() already loads the data
+            if (isInitialMount.current) {
+                isInitialMount.current = false;
+                return;
+            }
+            refreshFileTree();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
+    }, [refreshFileTree]);
+
+    // File Watcher
+    useEffect(() => {
+        if (!vaultPath) return;
+
+        let unlistenFn: (() => void) | undefined;
+        let isMounted = true;
+        let debounceTimer: NodeJS.Timeout | null = null;
+
+        const setupWatcher = async () => {
+            try {
+                // Start watching the vault
+                await invoke('watch_vault', { vaultPath });
+
+                // Debounced refresh handler - batches multiple rapid file-changed events
+                const debouncedRefresh = () => {
+                    if (debounceTimer) clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        // console.log('[WATCHER] Executing debounced refresh');
+                        refreshFileTree();
+                    }, 500); // 500ms debounce - captures events that arrive with delays
+                };
+
+                // Listen for changes
+                const unlisten = await listen('file-changed', () => {
+                    // console.log('[WATCHER] file-changed event received');
+                    debouncedRefresh();
+                });
+
+                if (isMounted) {
+                    unlistenFn = unlisten;
+                } else {
+                    unlisten();
+                }
+            } catch (error) {
+                console.error('Failed to setup file watcher:', error);
+            }
+        };
+
+        setupWatcher();
+
+        return () => {
+            isMounted = false;
+            if (debounceTimer) clearTimeout(debounceTimer);
+            if (unlistenFn) unlistenFn();
+        };
+    }, [vaultPath, refreshFileTree]);
+
+    // Safety net: Reset cursor and user-select on window blur to prevent stuck states
+    useEffect(() => {
+        const handleBlur = () => {
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        };
+        window.addEventListener('blur', handleBlur);
+        return () => window.removeEventListener('blur', handleBlur);
+    }, []);
+
+    // PRODUCTION FIX: Transparent windows on macOS with WebKit have a known issue
+    // where cursor hover states don't update properly. This is a WebKit + macOS bug.
+    // Solution: Force DOM reflow and explicitly set cursor styles on text elements.
+    const forceCursorUpdate = () => {
+        // Reset global cursor styles
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+
+        // Force a DOM reflow by reading offsetHeight (forces browser to recalculate layout)
+        void document.body.offsetHeight;
+
+        // Explicitly set cursor on all text-editable elements
+        // This bypasses WebKit's broken hover detection in transparent windows
+        const textElements = document.querySelectorAll('.ProseMirror, [contenteditable="true"], textarea, input[type="text"]');
+        textElements.forEach((el) => {
+            if (el instanceof HTMLElement) {
+                el.style.cursor = 'text';
+            }
+        });
+
+        // Force cursor update on next animation frame to ensure it takes effect
+        requestAnimationFrame(() => {
+            // Dispatch a low-level mouse event to nudge WebKit's cursor detection
+            const rect = document.body.getBoundingClientRect();
+            const event = new MouseEvent('mouseover', {
+                bubbles: true,
+                cancelable: true,
+                view: window,
+                clientX: rect.width / 2,
+                clientY: rect.height / 2,
+            });
+            document.body.dispatchEvent(event);
+        });
+    };
+
+    // Force focus and cursor reset on startup to fix "stuck" state
+    useEffect(() => {
+        const initWindow = async () => {
+            try {
+                const { getCurrentWindow } = await import('@tauri-apps/api/window');
+                const win = getCurrentWindow();
+
+                // Focus first
+                await win.setFocus();
+
+                // Force cursor update
+                setTimeout(() => {
+                    forceCursorUpdate();
+                }, 100);
+
+                // Show window after a slight delay to ensure webview is ready
+                // This prevents the "stuck cursor" issue on startup
+                setTimeout(async () => {
+                    await win.show();
+                    await win.setFocus(); // Focus again to be sure
+                }, 150);
+            } catch (e) {
+                console.error('Failed to focus window:', e);
+            }
+        };
+        initWindow();
+    }, []);
+
+    // Listen for vault switch and force cursor update
+    useEffect(() => {
+        const handleCursorUpdate = () => {
+            forceCursorUpdate();
+        };
+
+        window.addEventListener('force-cursor-update', handleCursorUpdate);
+        return () => window.removeEventListener('force-cursor-update', handleCursorUpdate);
+    }, []);
+};

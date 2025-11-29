@@ -1,0 +1,90 @@
+/**
+ * One-time migration from Amber to Moss localStorage keys
+ * 
+ * This migration runs automatically on app startup and transfers all
+ * amber-* localStorage keys to their moss-* equivalents, preserving
+ * user settings, tabs, themes, and other state.
+ */
+
+const MIGRATION_FLAG = 'moss-migration-completed';
+
+const KEY_MAPPINGS: Record<string, string> = {
+    'amber-tabs': 'moss-tabs',
+    'amber-active-tab': 'moss-active-tab',
+    'amber-expanded-paths': 'moss-expanded-paths',
+    'amber-vault-path': 'moss-vault-path',
+    'amber-settings': 'moss-settings',
+    'amber-active-theme': 'moss-active-theme',
+    'amber-custom-theme-css': 'moss-custom-theme-css',
+    'amber-sidebar-width': 'moss-sidebar-width',
+    'amber-agent-width': 'moss-agent-width',
+    'amber-graph-height': 'moss-graph-height',
+    'amber-graph-width': 'moss-graph-width',
+};
+
+/**
+ * Migrate all amber-github-sync-* keys to moss-github-sync-* keys
+ */
+function migrateGitHubSyncKeys(): void {
+    const keys = Object.keys(localStorage);
+    const githubSyncKeys = keys.filter(key => key.startsWith('amber-github-sync-'));
+
+    githubSyncKeys.forEach(oldKey => {
+        const vaultPath = oldKey.replace('amber-github-sync-', '');
+        const newKey = `moss-github-sync-${vaultPath}`;
+        const value = localStorage.getItem(oldKey);
+
+        if (value) {
+            localStorage.setItem(newKey, value);
+            console.log(`✓ Migrated ${oldKey} → ${newKey}`);
+        }
+    });
+}
+
+/**
+ * Main migration function
+ */
+export function migrateLegacyStorage(): void {
+    // Check if migration has already been completed
+    if (localStorage.getItem(MIGRATION_FLAG)) {
+        return;
+    }
+
+    console.log('🔄 Starting Amber → Moss migration...');
+
+    let migratedCount = 0;
+    let skippedCount = 0;
+
+    // Migrate standard keys
+    Object.entries(KEY_MAPPINGS).forEach(([oldKey, newKey]) => {
+        const value = localStorage.getItem(oldKey);
+
+        if (value) {
+            localStorage.setItem(newKey, value);
+            console.log(`✓ Migrated ${oldKey} → ${newKey}`);
+            migratedCount++;
+        } else {
+            skippedCount++;
+        }
+    });
+
+    // Migrate github sync keys (dynamic keys based on vault path)
+    migrateGitHubSyncKeys();
+
+    // Clean up old keys after successful migration
+    Object.keys(KEY_MAPPINGS).forEach(oldKey => {
+        localStorage.removeItem(oldKey);
+    });
+
+    // Clean up old github sync keys
+    const keys = Object.keys(localStorage);
+    const oldGithubSyncKeys = keys.filter(key => key.startsWith('amber-github-sync-'));
+    oldGithubSyncKeys.forEach(oldKey => {
+        localStorage.removeItem(oldKey);
+    });
+
+    // Mark migration as completed
+    localStorage.setItem(MIGRATION_FLAG, 'true');
+
+    console.log(`✅ Migration completed: ${migratedCount} keys migrated, ${skippedCount} keys skipped`);
+}

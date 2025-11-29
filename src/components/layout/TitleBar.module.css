@@ -1,0 +1,81 @@
+.titleBar {
+    height: 2rem;
+    /* h-8 */
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    border-top-left-radius: 0.75rem;
+    /* rounded-t-xl */
+    border-top-right-radius: 0.75rem;
+    border: 1px solid var(--border);
+    padding-left: 0.5rem;
+    /* px-2 */
+    padding-right: 0.5rem;
+}
+
+.trafficLights {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* gap-2 */
+}
+
+.trafficLight {
+    width: 0.75rem;
+    /* w-3 */
+    height: 0.75rem;
+    /* h-3 */
+    border-radius: 9999px;
+    /* rounded-full */
+    transition: all 0.15s ease;
+}
+
+.trafficLight:hover {
+    filter: brightness(0.9);
+}
+
+.title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    /* text-xs */
+    font-weight: 500;
+    /* font-medium */
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    /* tracking-wider */
+    pointer-events: none;
+}
+
+.rightSection {
+    width: 60px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.profileIcon {
+    width: 1rem;
+    /* w-6 */
+    height: 1rem;
+    /* h-6 */
+    border-radius: 9999px;
+    /* rounded-full */
+    cursor: pointer;
+    transition: opacity 0.2s;
+    border: 1px solid var(--border);
+}
+
+.profileIcon:hover {
+    opacity: 0.8;
+}

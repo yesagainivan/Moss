@@ -1,0 +1,71 @@
+version: "2.0"
+name: "Lavender"
+description: "A soothing theme with soft purples and calming tones."
+
+colors:
+  # Primary: Soft Lavender
+  primary: "#B5A0D9"
+  primary_dark: "#9A82C4"
+
+  # Secondary: Pale Lilac
+  secondary: "#DCD0F0"
+  secondary_dark: "#C4B3E0"
+
+  # Accent: Gentle Pink
+  accent: "#E0A0B0"
+  accent_dark: "#C48292"
+
+  # Backgrounds (Light)
+  background: "#FAF8FC"
+  background_subtle: "#F5F2F9"
+  
+  # Surfaces
+  surface: "#F0EBF7"
+  surface_highlight: "#EBE4F4"
+  elevated_surface: "#FFFFFF"
+
+  # Text & Borders
+  foreground: "#4A4055"
+  subtle_foreground: "#857894"
+  outline: "#D6CDE0"
+  outline_subtle: "#E6DEEE"
+
+utility:
+  alert:
+    background: "#D97E8E"
+    foreground: "#FFFFFF"
+    border: "#C46474"
+    subtle_background: "rgba(217, 126, 142, 0.1)"
+  success:
+    background: "#86C4A0"
+    foreground: "#FFFFFF"
+    border: "#6AB086"
+    subtle_background: "rgba(134, 196, 160, 0.1)"
+  warning:
+    background: "#D9C47E"
+    foreground: "#4A4055"
+    border: "#C4B064"
+    subtle_background: "rgba(217, 196, 126, 0.1)"
+  info:
+    background: "#A0B5D9"
+    foreground: "#FFFFFF"
+    border: "#829AC4"
+    subtle_background: "rgba(160, 181, 217, 0.1)"
+
+dark:
+  background: "#26222C"
+  background_subtle: "#1F1C24"
+  
+  surface: "#302B38"
+  surface_highlight: "#3A3444"
+  elevated_surface: "#4A4055"
+
+  foreground: "#F0EBF7"
+  subtle_foreground: "#B5A8C4"
+  
+  outline: "#4A4055"
+  outline_subtle: "#302B38"
+
+  primary: "#DCD0F0"
+  secondary: "#EBE4F4"
+  accent: "#F0C0D0"
