@@ -234,8 +234,8 @@ export const CommandPalette = () => {
                                             <Command.Item
                                                 key={cmd.id}
                                                 value={cmd.label}
-                                                onSelect={() => {
-                                                    cmd.action();
+                                                onSelect={async () => {
+                                                    await cmd.action();
                                                     handleClose();
                                                 }}
                                                 className="command-palette-item command-palette-command-item"

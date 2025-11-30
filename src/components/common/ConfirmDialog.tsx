@@ -23,6 +23,27 @@ export const ConfirmDialog = ({
     variant = 'warning'
 }: ConfirmDialogProps) => {
     const [isClosing, setIsClosing] = useState(false);
+    const [isReady, setIsReady] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            // 1. Wait for Key Release (fast typists/holding key)
+            const handleKeyUp = (e: KeyboardEvent) => {
+                if (e.key === 'Enter') setIsReady(true);
+            };
+            window.addEventListener('keyup', handleKeyUp);
+
+            // 2. Fallback Timer (mouse users / missed events)
+            const timer = setTimeout(() => setIsReady(true), 400);
+
+            return () => {
+                window.removeEventListener('keyup', handleKeyUp);
+                clearTimeout(timer);
+            };
+        } else {
+            setIsReady(false);
+        }
+    }, [isOpen]);
 
     // Handle close with animation
     const handleClose = () => {
@@ -39,8 +60,10 @@ export const ConfirmDialog = ({
             if (!isOpen) return;
 
             if (e.key === 'Enter') {
-                e.preventDefault();
-                onConfirm();
+                if (isReady && !e.repeat) {
+                    e.preventDefault();
+                    onConfirm();
+                }
             } else if (e.key === 'Escape') {
                 e.preventDefault();
                 handleClose();
@@ -49,7 +72,7 @@ export const ConfirmDialog = ({
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, onConfirm]);
+    }, [isOpen, isReady, onConfirm]);
 
     if (!isOpen && !isClosing) return null;
 

@@ -126,8 +126,16 @@ export const useCommandRegistry = (): Command[] => {
                 category: CommandCategory.Files,
                 action: async () => {
                     if (currentNoteId) {
-                        // Could add confirmation dialog here
-                        await deleteNote(currentNoteId);
+                        const note = useAppStore.getState().notes[currentNoteId];
+                        const noteName = note?.title || currentNoteId.split('/').pop() || 'this note';
+
+                        const confirmed = await useAppStore.getState().requestConfirmation(
+                            `Are you sure you want to delete "${noteName}"? This action cannot be undone.`
+                        );
+
+                        if (confirmed) {
+                            await deleteNote(currentNoteId);
+                        }
                     }
                 },
                 condition: () => !!currentNoteId,
