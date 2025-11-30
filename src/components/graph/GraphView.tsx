@@ -2,12 +2,14 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { useAppStore } from '../../store/useStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
+import { useThemeStore } from '../../store/useThemeStore';
 import { getGraphData } from '../../lib/fs';
 
 interface GraphNode {
     id: string;
     name: string;
     val: number;
+    __bckgDimensions?: number[]; // Cache for text dimensions
 }
 
 interface GraphLink {
@@ -28,6 +30,23 @@ const GraphView: React.FC = () => {
     const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
     const containerRef = useRef<HTMLDivElement>(null);
     const fgRef = useRef<any>(null);
+
+    const { settings } = useSettingsStore();
+    const activeThemeId = useThemeStore(state => state.activeThemeId);
+
+    // Helper to get theme colors from CSS variables
+    const getThemeColor = useCallback((varName: string) => {
+        const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        return value.startsWith('hsl') ? `hsl(${value})` : value || (varName === '--background' ? '#000000' : '#ffffff');
+    }, []);
+
+    // Theme colors state - using state instead of refs to ensure re-renders when colors change
+    const [themeColors, setThemeColors] = useState(() => ({
+        background: getThemeColor('--background'),
+        accent: getThemeColor('--accent'),
+        border: getThemeColor('--border'),
+        foreground: getThemeColor('--foreground')
+    }));
 
     // Handle resize with ResizeObserver
     useEffect(() => {
@@ -50,11 +69,9 @@ const GraphView: React.FC = () => {
     useEffect(() => {
         const loadGraph = async () => {
             if (vaultPath) {
-                // console.log('[GRAPH] Loading graph data, fileTreeGeneration:', fileTreeGeneration);
                 try {
                     const graphData = await getGraphData(vaultPath);
                     setData(graphData);
-                    // console.log('[GRAPH] Graph loaded successfully');
                 } catch (e) {
                     console.error('Failed to load graph data:', e);
                 }
@@ -64,59 +81,72 @@ const GraphView: React.FC = () => {
         loadGraph();
     }, [vaultPath, fileTreeGeneration]);
 
+    // Update theme colors when theme settings change
+    useEffect(() => {
+        // Small delay to ensure CSS variables are updated after theme change
+        const timer = setTimeout(() => {
+            setThemeColors({
+                background: getThemeColor('--background'),
+                accent: getThemeColor('--accent'),
+                border: getThemeColor('--border'),
+                foreground: getThemeColor('--foreground')
+            });
+        }, 60);
+
+        return () => clearTimeout(timer);
+    }, [settings.theme, settings.grainLevel, activeThemeId, getThemeColor]);
+
     const handleNodeClick = useCallback((node: any) => {
         if (node && node.id) {
             openNote(node.id);
-            // Center graph on node?
-            // fgRef.current?.centerAt(node.x, node.y, 1000);
-            // fgRef.current?.zoom(8, 2000);
         }
     }, [openNote]);
 
-    // Get colors from CSS variables (theme system)
-    const getThemeColor = (varName: string) => {
-        const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-        // CSS variables are in hsl format, convert to hex if needed, or return as-is
-        return value.startsWith('hsl') ? `hsl(${value})` : value;
-    };
+    // Memoize color accessors
+    const nodeColorFn = useCallback(() => themeColors.accent, [themeColors.accent]);
+    const linkColorFn = useCallback(() => themeColors.border, [themeColors.border]);
 
-    const { settings } = useSettingsStore();
-    const bgColor = getThemeColor('--background');
-    const nodeColor = getThemeColor('--accent');
-    const linkColor = getThemeColor('--border');
-    const textColor = getThemeColor('--foreground');
-
-    const nodeColorFn = useCallback(() => nodeColor, [nodeColor]);
-    const linkColorFn = useCallback(() => linkColor, [linkColor]);
+    // Cache font string
+    const fontCache = useRef<string>('');
+    const lastScale = useRef<number>(0);
 
     const nodeCanvasObject = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
         const label = node.name;
-        const fontSize = 12 / globalScale;
-        ctx.font = `${fontSize}px Sans-Serif`;
+
+        // Only update font string if scale changes significantly
+        if (Math.abs(globalScale - lastScale.current) > 0.1 || !fontCache.current) {
+            const fontSize = 12 / globalScale;
+            fontCache.current = `${fontSize}px Sans-Serif`;
+            lastScale.current = globalScale;
+        }
+
+        ctx.font = fontCache.current;
+        const fontSize = 12 / globalScale; // Still need this for padding calc
 
         // Draw node circle
         ctx.beginPath();
         ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false);
-        ctx.fillStyle = nodeColor;
+        ctx.fillStyle = themeColors.accent;
         ctx.fill();
 
         if (settings.graphShowLabels) {
-            const textWidth = ctx.measureText(label).width;
-            const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+            // Use cached dimensions if available
+            let bckgDimensions = node.__bckgDimensions;
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.0)'; // Transparent bg
-            // ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
+            if (!bckgDimensions) {
+                const textWidth = ctx.measureText(label).width;
+                bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
+                node.__bckgDimensions = bckgDimensions;
+            }
 
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
             // Draw text below node
-            ctx.fillStyle = textColor;
+            ctx.fillStyle = themeColors.foreground;
             ctx.fillText(label, node.x, node.y + 8);
-
-            node.__bckgDimensions = bckgDimensions; // to re-use in nodePointerAreaPaint
         }
-    }, [nodeColor, textColor, settings.graphShowLabels]);
+    }, [settings.graphShowLabels]);
 
     return (
         <div className="w-full h-full flex flex-col overflow-hidden bg-background">
@@ -137,7 +167,7 @@ const GraphView: React.FC = () => {
                     nodeLabel="name"
                     nodeColor={nodeColorFn}
                     linkColor={linkColorFn}
-                    backgroundColor={bgColor}
+                    backgroundColor={themeColors.background}
                     onNodeClick={handleNodeClick}
                     nodeRelSize={6}
                     linkWidth={1}

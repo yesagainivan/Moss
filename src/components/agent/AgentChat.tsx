@@ -4,6 +4,7 @@ import { useAgentStore } from '../../store/useAgentStore';
 import { runAgentLoop } from '../../lib/agent/loop';
 import { AgentMessageItem } from './AgentMessage';
 import { AgentMessage } from '../../lib/agent/types';
+import { logger } from '../../lib/logger';
 
 export const AgentChat: React.FC = () => {
     const {
@@ -173,9 +174,9 @@ export const AgentChat: React.FC = () => {
         } catch (error) {
             if (controller.signal.aborted) {
                 // User cancelled - don't show error
-                console.log('Generation cancelled by user');
+                logger.debug('Generation cancelled by user');
             } else {
-                console.error('Agent failed:', error);
+                logger.debug('Agent failed:', error);
                 addMessage({
                     id: crypto.randomUUID(),
                     role: 'assistant',

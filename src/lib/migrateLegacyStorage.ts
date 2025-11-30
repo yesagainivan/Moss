@@ -5,6 +5,7 @@
  * amber-* localStorage keys to their moss-* equivalents, preserving
  * user settings, tabs, themes, and other state.
  */
+import { logger } from './logger';
 
 const MIGRATION_FLAG = 'moss-migration-completed';
 
@@ -36,7 +37,7 @@ function migrateGitHubSyncKeys(): void {
 
         if (value) {
             localStorage.setItem(newKey, value);
-            console.log(`✓ Migrated ${oldKey} → ${newKey}`);
+            logger.migration(`✓ Migrated ${oldKey} → ${newKey}`);
         }
     });
 }
@@ -44,25 +45,33 @@ function migrateGitHubSyncKeys(): void {
 /**
  * Main migration function
  */
-export function migrateLegacyStorage(): void {
+export function migrateLegacyStorage() {
     // Check if migration has already been completed
     if (localStorage.getItem(MIGRATION_FLAG)) {
         return;
     }
 
-    console.log('🔄 Starting Amber → Moss migration...');
+    logger.migration('🔄 Starting Amber → Moss migration...');
 
     let migratedCount = 0;
     let skippedCount = 0;
 
     // Migrate standard keys
     Object.entries(KEY_MAPPINGS).forEach(([oldKey, newKey]) => {
-        const value = localStorage.getItem(oldKey);
+        const oldValue = localStorage.getItem(oldKey);
 
-        if (value) {
-            localStorage.setItem(newKey, value);
-            console.log(`✓ Migrated ${oldKey} → ${newKey}`);
-            migratedCount++;
+        if (oldValue) {
+            // Only migrate if the new key doesn't already exist, to avoid overwriting
+            // potentially newer settings if a partial migration happened or user manually set it.
+            const newValue = localStorage.getItem(newKey);
+            if (!newValue) {
+                localStorage.setItem(newKey, oldValue);
+                logger.migration(`✓ Migrated ${oldKey} → ${newKey}`);
+                migratedCount++;
+            } else {
+                logger.migration(`ℹ️ Skipped ${oldKey} → ${newKey} (new key already exists)`);
+                skippedCount++;
+            }
         } else {
             skippedCount++;
         }
@@ -86,5 +95,5 @@ export function migrateLegacyStorage(): void {
     // Mark migration as completed
     localStorage.setItem(MIGRATION_FLAG, 'true');
 
-    console.log(`✅ Migration completed: ${migratedCount} keys migrated, ${skippedCount} keys skipped`);
+    logger.migration(`✅ Migration completed: ${migratedCount} keys migrated, ${skippedCount} keys skipped`);
 }

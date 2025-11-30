@@ -39,12 +39,27 @@ const markdownCache = new LRUCache<string, string>(100);
 let lastNavigationTime = 0;
 
 export const Editor = ({ noteId, initialContent }: EditorProps) => {
-    const { updateNote, setTabDirty, tabs, activeTabId, forceSaveNote, setScrollPosition, scrollPositions, navigateBack, navigateForward, canNavigateBack, canNavigateForward } = useAppStore();
-    const { settings } = useSettingsStore();
-    const { selectedProvider, setStreaming, setStreamedText, appendStreamedText } = useAIStore();
+    const updateNote = useAppStore(state => state.updateNote);
+    const setTabDirty = useAppStore(state => state.setTabDirty);
+    const forceSaveNote = useAppStore(state => state.forceSaveNote);
+    const setScrollPosition = useAppStore(state => state.setScrollPosition);
+    const navigateBack = useAppStore(state => state.navigateBack);
+    const navigateForward = useAppStore(state => state.navigateForward);
+    const canNavigateBack = useAppStore(state => state.canNavigateBack);
+    const canNavigateForward = useAppStore(state => state.canNavigateForward);
+
+    const activeTab = useAppStore(state => state.tabs.find(t => t.id === state.activeTabId));
+    const savedScrollPosition = useAppStore(state => state.scrollPositions[noteId]);
+
+    const settings = useSettingsStore(state => state.settings);
+
+    const selectedProvider = useAIStore(state => state.selectedProvider);
+    const setStreaming = useAIStore(state => state.setStreaming);
+    const setStreamedText = useAIStore(state => state.setStreamedText);
+    const appendStreamedText = useAIStore(state => state.appendStreamedText);
+
     const streamedText = useAIStore((state) => state.streamedText);
     const isStreaming = useAIStore((state) => state.isStreaming);
-    const activeTab = tabs.find(t => t.id === activeTabId);
     const streamStartPos = useRef<number | null>(null);
 
     // Worker hook
@@ -581,9 +596,8 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
 
             // Restore scroll position
             if (containerRef.current) {
-                const savedPosition = scrollPositions[noteId];
-                if (savedPosition !== undefined) {
-                    containerRef.current.scrollTop = savedPosition;
+                if (savedScrollPosition !== undefined) {
+                    containerRef.current.scrollTop = savedScrollPosition;
                 } else {
                     containerRef.current.scrollTop = 0;
                 }
@@ -594,7 +608,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
                 window.dispatchEvent(new CustomEvent('force-cursor-update'));
             }, 50);
         }
-    }, [noteId, initialHtml, editor, scrollPositions]);
+    }, [noteId, initialHtml, editor, savedScrollPosition]);
 
     // Listen for external updates (e.g. from Agent)
     useEffect(() => {

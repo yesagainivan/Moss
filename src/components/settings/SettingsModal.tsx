@@ -251,7 +251,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                             >
                                                 Reload Themes
                                             </button>
-                                            {/* TODO: Add Open Folder button when Opener plugin is ready */}
+                                            {/* Open Folder button placeholder */}
                                         </div>
                                         <p className="text-xs text-muted-foreground">
                                             Place .yaml theme files in your app data directory to add custom themes.

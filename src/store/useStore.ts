@@ -4,6 +4,7 @@ import { useSettingsStore } from './useSettingsStore';
 import { v4 as uuidv4 } from 'uuid';
 import { openVault, readVault, loadNoteContent, saveNoteContent, createFile, renameFile, renameNote, createFolder as createFolderFS, deleteFile, deleteFolder as deleteFolderFS } from '../lib/fs';
 import { debounce } from 'lodash-es';
+import { logger } from '../lib/logger';
 
 // Debounced helper to persist tabs to localStorage (only non-preview tabs)
 const persistTabsDebounced = debounce((tabs: Tab[], activeTabId: string | null) => {
@@ -1103,7 +1104,7 @@ export const useAppStore = create<AppState>((set, get) => ({
             // Refresh Git status
             await get().checkGitStatus();
 
-            console.log('Vault restored to commit:', commitOid);
+            logger.success('Vault restored to commit:', commitOid);
         } catch (error) {
             console.error('Failed to restore vault:', error);
             throw error;
@@ -1296,7 +1297,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                 }));
             }, 3000);
 
-            console.log('Snapshot saved:', message);
+            logger.success('Snapshot saved:', message);
         } catch (error) {
             console.error('Failed to snapshot note:', error);
             throw error;
@@ -1330,8 +1331,9 @@ export const useAppStore = create<AppState>((set, get) => ({
                 set({ vaultStatus: 'idle', vaultStatusMessage: null });
             }, 3000);
 
+            logger.success('Vault snapshot saved:', message);
         } catch (error) {
-            console.error('Failed to snapshot vault:', error);
+            logger.error('Failed to snapshot vault:', error);
             set({ vaultStatus: 'error', vaultStatusMessage: 'Failed to snapshot vault' });
 
             // Reset error after delay
