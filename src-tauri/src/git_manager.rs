@@ -66,6 +66,44 @@ pub fn init_repository(vault_path: &Path) -> Result<Repository, GitError> {
     Ok(repo)
 }
 
+/// Internal helper to create a commit
+fn create_commit_internal(
+    repo: &Repository,
+    message: &str,
+    tree: &git2::Tree,
+    author_name: &str,
+    author_email: &str,
+) -> Result<Oid, GitError> {
+    // Get HEAD commit (parent)
+    let parent_commit = match repo.head() {
+        Ok(head) => {
+            let oid = head
+                .target()
+                .ok_or_else(|| GitError::from_str("HEAD target is not valid"))?;
+            Some(repo.find_commit(oid)?)
+        }
+        Err(_) => None, // First commit
+    };
+
+    // Create signature
+    let signature = Signature::now(author_name, author_email)?;
+
+    // Create commit
+    if let Some(parent) = parent_commit {
+        repo.commit(
+            Some("HEAD"),
+            &signature,
+            &signature,
+            message,
+            tree,
+            &[&parent],
+        )
+    } else {
+        // Initial commit
+        repo.commit(Some("HEAD"), &signature, &signature, message, tree, &[])
+    }
+}
+
 // ============================================================================
 // Commit Operations
 // ============================================================================
@@ -94,47 +132,11 @@ pub fn auto_commit_ambre_changes(
     let tree_id = index.write_tree()?;
     let tree = repo.find_tree(tree_id)?;
 
-    // Get HEAD commit (parent)
-    let parent_commit = match repo.head() {
-        Ok(head) => {
-            let oid = head
-                .target()
-                .ok_or_else(|| GitError::from_str("HEAD target is not valid"))?;
-            Some(repo.find_commit(oid)?)
-        }
-        Err(_) => None, // First commit
-    };
-
-    // Create signature
-    let signature = Signature::now("Ambre", "ambre@amber-app.local")?;
-
     // Commit message with Ambre prefix and timestamp
     let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M").to_string();
     let full_message = format!("Ambre: {} ({})", message, timestamp);
 
-    // Create commit
-    let commit_oid = if let Some(parent) = parent_commit {
-        repo.commit(
-            Some("HEAD"),
-            &signature,
-            &signature,
-            &full_message,
-            &tree,
-            &[&parent],
-        )?
-    } else {
-        // Initial commit
-        repo.commit(
-            Some("HEAD"),
-            &signature,
-            &signature,
-            &full_message,
-            &tree,
-            &[],
-        )?
-    };
-
-    Ok(commit_oid)
+    create_commit_internal(repo, &full_message, &tree, "Ambre", "ambre@amber-app.local")
 }
 
 /// Create a manual commit for specific files
@@ -153,36 +155,7 @@ pub fn commit_file(repo: &Repository, message: &str, file_path: &Path) -> Result
     let tree_id = index.write_tree()?;
     let tree = repo.find_tree(tree_id)?;
 
-    // Get HEAD commit (parent)
-    let parent_commit = match repo.head() {
-        Ok(head) => {
-            let oid = head
-                .target()
-                .ok_or_else(|| GitError::from_str("HEAD target is not valid"))?;
-            Some(repo.find_commit(oid)?)
-        }
-        Err(_) => None, // First commit
-    };
-
-    // Create signature - Use "User" for manual commits
-    let signature = Signature::now("User", "user@amber-app.local")?;
-
-    // Create commit
-    let commit_oid = if let Some(parent) = parent_commit {
-        repo.commit(
-            Some("HEAD"),
-            &signature,
-            &signature,
-            message,
-            &tree,
-            &[&parent],
-        )?
-    } else {
-        // Initial commit
-        repo.commit(Some("HEAD"), &signature, &signature, message, &tree, &[])?
-    };
-
-    Ok(commit_oid)
+    create_commit_internal(repo, message, &tree, "User", "user@amber-app.local")
 }
 
 /// Create a manual commit for ALL changes in the vault
@@ -200,36 +173,7 @@ pub fn commit_all_changes(repo: &Repository, message: &str) -> Result<Oid, GitEr
     let tree_id = index.write_tree()?;
     let tree = repo.find_tree(tree_id)?;
 
-    // Get HEAD commit (parent)
-    let parent_commit = match repo.head() {
-        Ok(head) => {
-            let oid = head
-                .target()
-                .ok_or_else(|| GitError::from_str("HEAD target is not valid"))?;
-            Some(repo.find_commit(oid)?)
-        }
-        Err(_) => None, // First commit
-    };
-
-    // Create signature
-    let signature = Signature::now("User", "user@amber-app.local")?;
-
-    // Create commit
-    let commit_oid = if let Some(parent) = parent_commit {
-        repo.commit(
-            Some("HEAD"),
-            &signature,
-            &signature,
-            message,
-            &tree,
-            &[&parent],
-        )?
-    } else {
-        // Initial commit
-        repo.commit(Some("HEAD"), &signature, &signature, message, &tree, &[])?
-    };
-
-    Ok(commit_oid)
+    create_commit_internal(repo, message, &tree, "User", "user@amber-app.local")
 }
 
 /// Restore vault to a specific commit (safe, creates new commit)
@@ -569,7 +513,7 @@ pub fn configure_remote(repo: &Repository, url: &str) -> Result<(), GitError> {
 }
 
 /// Create credentials callback for GitHub authentication
-fn create_credentials_callback(token: &str) -> RemoteCallbacks {
+fn create_credentials_callback<'a>(token: &'a str) -> RemoteCallbacks<'a> {
     let token_clone = token.to_string();
     let mut callbacks = RemoteCallbacks::new();
 

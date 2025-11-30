@@ -41,7 +41,9 @@ struct AccessTokenRequest {
 enum AccessTokenResponse {
     Success {
         access_token: String,
+        #[allow(dead_code)]
         token_type: String,
+        #[allow(dead_code)]
         scope: String,
     },
     Pending {

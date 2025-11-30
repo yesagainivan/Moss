@@ -99,6 +99,36 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
     const swipeDirection = useRef<'left' | 'right' | null>(null);
     const commitmentCount = useRef(0);
 
+    // Helper to calculate prompt position
+    const calculatePromptPosition = (view: any, selection: any) => {
+        const { head, from } = selection;
+        const headCoords = view.coordsAtPos(head);
+        const fromCoords = view.coordsAtPos(from);
+
+        const isHeadVisible = headCoords.top >= 0 && headCoords.top <= window.innerHeight;
+        const isFromVisible = fromCoords.top >= 0 && fromCoords.top <= window.innerHeight;
+
+        let top, left;
+
+        if (isHeadVisible) {
+            top = headCoords.top - 80;
+            left = headCoords.left;
+        } else if (isFromVisible) {
+            top = fromCoords.top - 80;
+            left = fromCoords.left;
+        } else {
+            // Fallback to center
+            top = window.innerHeight / 2 - 100;
+            left = window.innerWidth / 2 - 200;
+        }
+
+        // Clamp to viewport
+        top = Math.max(20, Math.min(top, window.innerHeight - 150));
+        left = Math.max(20, Math.min(left, window.innerWidth - 420));
+
+        return { top, left };
+    };
+
     useEffect(() => {
         let isMounted = true;
         const parse = async () => {
@@ -529,30 +559,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
                     // Allow empty selection (cursor position) for generation
 
                     // Smart positioning logic
-                    const { head, from } = selection;
-                    const headCoords = view.coordsAtPos(head);
-                    const fromCoords = view.coordsAtPos(from);
-
-                    const isHeadVisible = headCoords.top >= 0 && headCoords.top <= window.innerHeight;
-                    const isFromVisible = fromCoords.top >= 0 && fromCoords.top <= window.innerHeight;
-
-                    let top, left;
-
-                    if (isHeadVisible) {
-                        top = headCoords.top - 80;
-                        left = headCoords.left;
-                    } else if (isFromVisible) {
-                        top = fromCoords.top - 80;
-                        left = fromCoords.left;
-                    } else {
-                        // Fallback to center
-                        top = window.innerHeight / 2 - 100;
-                        left = window.innerWidth / 2 - 200;
-                    }
-
-                    // Clamp to viewport
-                    top = Math.max(20, Math.min(top, window.innerHeight - 150));
-                    left = Math.max(20, Math.min(left, window.innerWidth - 420));
+                    const { top, left } = calculatePromptPosition(view, selection);
 
                     setPromptPosition({ top, left });
                     setShowInlinePrompt(true);
@@ -710,30 +717,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
             streamStartPos.current = selection.from;
 
             // Smart positioning logic
-            const { head, from } = selection;
-            const headCoords = editor.view.coordsAtPos(head);
-            const fromCoords = editor.view.coordsAtPos(from);
-
-            const isHeadVisible = headCoords.top >= 0 && headCoords.top <= window.innerHeight;
-            const isFromVisible = fromCoords.top >= 0 && fromCoords.top <= window.innerHeight;
-
-            let top, left;
-
-            if (isHeadVisible) {
-                top = headCoords.top - 80;
-                left = headCoords.left;
-            } else if (isFromVisible) {
-                top = fromCoords.top - 80;
-                left = fromCoords.left;
-            } else {
-                // Fallback to center
-                top = window.innerHeight / 2 - 100;
-                left = window.innerWidth / 2 - 200;
-            }
-
-            // Clamp to viewport
-            top = Math.max(20, Math.min(top, window.innerHeight - 150));
-            left = Math.max(20, Math.min(left, window.innerWidth - 420));
+            const { top, left } = calculatePromptPosition(editor.view, selection);
 
             setPromptPosition({ top, left });
 
