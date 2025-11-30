@@ -970,13 +970,19 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
     const [isSourceMode, setIsSourceMode] = useState(false);
     const [sourceContent, setSourceContent] = useState('');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const savedCursorPosition = useRef<number | null>(null);
 
     // Toggle Source Mode
     const toggleSourceMode = useCallback(async () => {
         if (!editor) return;
 
         if (isSourceMode) {
-            // Switch to WYSIWYG
+            // Switching: Source → Preview
+            // Save textarea cursor position before switching
+            if (textareaRef.current) {
+                savedCursorPosition.current = textareaRef.current.selectionStart;
+            }
+
             // Parse markdown to HTML
             const html = await parseMarkdown(sourceContent);
 
@@ -987,7 +993,11 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
 
             setIsSourceMode(false);
         } else {
-            // Switch to Source Mode
+            // Switching: Preview → Source
+            // Save editor cursor position before switching
+            const { from } = editor.state.selection;
+            savedCursorPosition.current = from;
+
             // @ts-ignore
             const markdown = editor.getMarkdown();
             setSourceContent(markdown);
@@ -995,20 +1005,33 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
         }
     }, [editor, isSourceMode, sourceContent, parseMarkdown]);
 
-    // Focus management for source mode toggle
+    // Focus and cursor position management for source mode toggle
     const prevSourceMode = useRef(isSourceMode);
     useEffect(() => {
         // Only focus if the mode has actually changed
         if (prevSourceMode.current !== isSourceMode) {
             if (!isSourceMode && editor) {
-                // Switched to WYSIWYG mode - focus the editor
+                // Switched to WYSIWYG mode - focus the editor and restore cursor
                 setTimeout(() => {
-                    editor.commands.focus();
+                    if (savedCursorPosition.current !== null) {
+                        // Clamp position to document length to prevent errors
+                        const maxPos = editor.state.doc.content.size;
+                        const safePos = Math.min(savedCursorPosition.current, maxPos - 1);
+                        editor.chain().focus().setTextSelection(safePos).run();
+                    } else {
+                        editor.commands.focus('start');
+                    }
                 }, 50);
             } else if (isSourceMode && textareaRef.current) {
-                // Switched to source mode - focus the textarea
+                // Switched to source mode - focus the textarea and restore cursor
                 setTimeout(() => {
                     textareaRef.current?.focus();
+                    if (savedCursorPosition.current !== null && textareaRef.current) {
+                        // Clamp position to content length
+                        const maxPos = textareaRef.current.value.length;
+                        const safePos = Math.min(savedCursorPosition.current, maxPos);
+                        textareaRef.current.selectionStart = textareaRef.current.selectionEnd = safePos;
+                    }
                 }, 50);
             }
             prevSourceMode.current = isSourceMode;
