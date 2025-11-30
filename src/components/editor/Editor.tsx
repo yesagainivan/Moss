@@ -24,6 +24,7 @@ import { ErrorDialog } from '../common/ErrorDialog';
 import { useMarkdownWorker } from '../../hooks/useMarkdownWorker';
 import { SwipeIndicator } from '../common/SwipeIndicator';
 import { slugify } from '../../lib/slugify';
+import { LRUCache } from '../../lib/LRUCache';
 
 interface EditorProps {
     noteId: string;
@@ -31,8 +32,8 @@ interface EditorProps {
 }
 
 // Cache for parsed markdown to speed up note switching
-// Maps markdown content string -> parsed HTML string
-const markdownCache = new Map<string, string>();
+// LRU cache with capacity of 100 to prevent unbounded memory growth
+const markdownCache = new LRUCache<string, string>(100);
 
 // Global cooldown for navigation to prevent momentum scrolling from triggering multiple navigations
 let lastNavigationTime = 0;
@@ -87,18 +88,16 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
         let isMounted = true;
         const parse = async () => {
             // Check cache first
-            if (markdownCache.has(initialContent)) {
-                if (isMounted) setInitialHtml(markdownCache.get(initialContent)!);
+            const cached = markdownCache.get(initialContent);
+            if (cached !== undefined) {
+                if (isMounted) setInitialHtml(cached);
                 return;
             }
 
             try {
                 const html = await parseMarkdown(initialContent);
 
-                // Simple LRU-like behavior: if cache gets too big, clear it
-                if (markdownCache.size > 100) {
-                    markdownCache.clear();
-                }
+                // LRU cache automatically handles eviction when capacity is exceeded
                 markdownCache.set(initialContent, html);
 
                 if (isMounted) setInitialHtml(html);
@@ -349,7 +348,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
                     'data-type': 'taskItem',
                 },
             }),
-            Markdown,  // Markdown MUST come after TaskList/TaskItem so it knows about them
+            Markdown,
             Wikilink.configure({
                 openNote: async (id, isCmdClick = false, fragment) => {
                     const { vaultPath, createNote, openNote } = useAppStore.getState();
@@ -427,7 +426,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
         editorProps: {
             attributes: {
                 class: 'prose max-w-none focus:outline-none p-8 pb-32 prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-accent prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-a:text-accent prose-blockquote:border-l-accent',
-                style: `font-size: ${settings.fontSize}px; line-height: ${settings.lineHeight};`,
+                style: `font-size: ${settings.fontSize * 1.2}px; line-height: ${settings.lineHeight};`,
             },
             handleClick: (_view, _pos, event) => {
                 const target = event.target as HTMLElement;
@@ -595,7 +594,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
                 window.dispatchEvent(new CustomEvent('force-cursor-update'));
             }, 50);
         }
-    }, [noteId, initialHtml, editor]);
+    }, [noteId, initialHtml, editor, scrollPositions]);
 
     // Listen for external updates (e.g. from Agent)
     useEffect(() => {

@@ -747,11 +747,19 @@ export const Sidebar = () => {
                         onRename={handleRowRename}
                         onDelete={handleRowDelete}
                         onNewNote={rowContextMenu.node.type === 'folder' ? () => {
-                            setCreatingState({ parentId: rowContextMenu.node.path!, type: 'note' });
+                            const path = rowContextMenu.node.path!;
+                            if (!expandedPaths.has(path)) {
+                                toggleFolder(path);
+                            }
+                            setCreatingState({ parentId: path, type: 'note' });
                             setRowContextMenu(null);
                         } : undefined}
                         onNewFolder={rowContextMenu.node.type === 'folder' ? () => {
-                            setCreatingState({ parentId: rowContextMenu.node.path!, type: 'folder' });
+                            const path = rowContextMenu.node.path!;
+                            if (!expandedPaths.has(path)) {
+                                toggleFolder(path);
+                            }
+                            setCreatingState({ parentId: path, type: 'folder' });
                             setRowContextMenu(null);
                         } : undefined}
                     />

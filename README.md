@@ -11,11 +11,13 @@ Moss is a powerful desktop application that combines the elegance of markdown wi
 
 ## ✨ Key Features
 
-### 📝 **Advanced Markdown Editor**
-- **TipTap-powered** rich text editing with live preview
-- **Wikilinks** support for easy note linking (`[[Note Name]]`, `[[Note#Heading]]`)
-- **Mathematics** via KaTeX (`$inline$` and `$$block$$` equations)
-- **Tables, GFM, and more** through TipTap extensions
+### ✍️ **Advanced Markdown Editor**
+- **TipTap-powered** rich text editing with full markdown support
+- **Wikilinks** for connecting notes (`[[Note Name]]`)
+- **Callouts** for highlighting important information
+- **Tables**, **task lists**, and **images**
+- **Backlinks** automatically tracked
+- **Focus mode** for distraction-free writing
 - **Swipe navigation** for note history (macOS trackpad gestures)
 - **Command palette** (`Cmd+P`) for quick file switching
 
@@ -30,7 +32,7 @@ Moss is a powerful desktop application that combines the elegance of markdown wi
 ### 🔗 **Knowledge Graph**
 - **Interactive visualization** of note relationships
 - **Automatic backlink tracking**
-- **Wikilink resolution** with fuzzy matching
+- **Wikilink resolution** with path-based matching
 - **Configurable layout** (center split or sidebar)
 
 ### 🔧 **Version Control**
@@ -64,17 +66,17 @@ Moss is a powerful desktop application that combines the elegance of markdown wi
 
 2. **Install dependencies**
    ```bash
-   pnpm install
+   npm install
    ```
 
 3. **Run in development mode**
    ```bash
-   pnpm tauri dev
+   npm run tauri dev
    ```
 
 4. **Build for production**
    ```bash
-   pnpm tauri build
+   npm run tauri build
    ```
 
 ## 🎯 Quick Start Guide
@@ -103,13 +105,16 @@ On first launch, Moss will prompt you to select a folder for your notes. This be
 
 | Shortcut | Action |
 |----------|--------|
-| `Cmd+N` | Create new note |
 | `Cmd+P` | Open command palette |
 | `Cmd+,` | Open settings |
 | `Cmd+K` | AI rewrite menu (with text selected) |
-| `Cmd+/` | Focus search |
 | `Cmd+[` / `Cmd+]` | Navigate back/forward |
-| `Cmd+\` | Toggle sidebar |
+| `Cmd+B` | Toggle sidebar |
+| `Cmd+W` | Close tab |
+| `Cmd+H` | Note history |
+| `Cmd+S` | Save note |
+| `Cmd+Shift+S` | Snapshot note |
+| `Cmd+Alt+S` | Snapshot vault |
 
 ## 🛠️ Tech Stack
 

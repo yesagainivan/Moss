@@ -34,87 +34,54 @@ const debouncedSaveByNote = new Map<string, { debouncer: ReturnType<typeof debou
 // File Tree Helpers (Incremental Updates)
 // ============================================================================
 
-const sortNodes = (nodes: FileNode[]): FileNode[] => {
+const sortFileNodes = (nodes: FileNode[]): FileNode[] => {
     return [...nodes].sort((a, b) => {
-        if (a.type === b.type) {
-            return a.name.localeCompare(b.name);
+        const partsA = (a.path || '').split('/').filter(p => p);
+        const partsB = (b.path || '').split('/').filter(p => p);
+        const len = Math.min(partsA.length, partsB.length);
+
+        for (let i = 0; i < len; i++) {
+            if (partsA[i] !== partsB[i]) {
+                // Segments differ.
+                // Determine if this segment represents a folder or file.
+                // If it's not the last segment, it's a folder.
+                // If it IS the last segment, we look at the node type.
+
+                const isFolderA = i < partsA.length - 1 || a.type === 'folder';
+                const isFolderB = i < partsB.length - 1 || b.type === 'folder';
+
+                if (isFolderA !== isFolderB) {
+                    return isFolderA ? -1 : 1; // Folders first
+                }
+                return partsA[i].localeCompare(partsB[i]);
+            }
         }
-        return a.type === 'folder' ? -1 : 1;
+
+        // If we get here, one path is a prefix of the other.
+        // Shorter path (parent) comes first.
+        return partsA.length - partsB.length;
     });
 };
 
-const insertNode = (nodes: FileNode[], newNode: FileNode, parentPath?: string): FileNode[] => {
-    if (!parentPath) {
-        return sortNodes([...nodes, newNode]);
-    }
-
-    let hasChanges = false;
-    const newNodes = nodes.map(node => {
-        if (node.path === parentPath && node.type === 'folder') {
-            hasChanges = true;
-            const children = node.children ? [...node.children, newNode] : [newNode];
-            return { ...node, children: sortNodes(children) };
-        }
-        if (node.children) {
-            const newChildren = insertNode(node.children, newNode, parentPath);
-            if (newChildren !== node.children) {
-                hasChanges = true;
-                return { ...node, children: newChildren };
-            }
-        }
-        return node;
-    });
-
-    return hasChanges ? newNodes : nodes;
+const insertNode = (nodes: FileNode[], newNode: FileNode, _parentPath?: string): FileNode[] => {
+    // Flat list insertion: just add and sort
+    // We ignore parentPath because the path is already in newNode.path
+    return sortFileNodes([...nodes, newNode]);
 };
 
 const removeNode = (nodes: FileNode[], path: string): FileNode[] => {
-    let hasChanges = false;
-    const filtered = nodes.filter(node => {
-        if (node.path === path) {
-            hasChanges = true;
-            return false;
-        }
-        return true;
-    });
-
-    if (filtered.length !== nodes.length) {
-        return filtered;
-    }
-
-    const newNodes = nodes.map(node => {
-        if (node.children) {
-            const newChildren = removeNode(node.children, path);
-            if (newChildren !== node.children) {
-                hasChanges = true;
-                return { ...node, children: newChildren };
-            }
-        }
-        return node;
-    });
-
-    return hasChanges ? newNodes : nodes;
+    return nodes.filter(node => node.path !== path && !node.path?.startsWith(path + '/'));
 };
 
 const updateNode = (nodes: FileNode[], path: string, updates: Partial<FileNode>): FileNode[] => {
-    let hasChanges = false;
-    const newNodes = nodes.map(node => {
+    return nodes.map(node => {
         if (node.path === path) {
-            hasChanges = true;
             return { ...node, ...updates };
-        }
-        if (node.children) {
-            const newChildren = updateNode(node.children, path, updates);
-            if (newChildren !== node.children) {
-                hasChanges = true;
-                return { ...node, children: newChildren };
-            }
         }
         return node;
     });
-
-    return hasChanges ? newNodes : nodes;
 };
+
 
 interface AppState {
     notes: Record<string, Note>;
@@ -289,7 +256,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
                 set({
                     vaultPath: savedVault,
-                    fileTree: files,
+                    fileTree: sortFileNodes(files),
                     notes: restoredNotes,
                     tabs: restoredTabs,
                     activeTabId: savedActiveTabId && restoredTabs.some(t => t.id === savedActiveTabId)
@@ -334,7 +301,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                 // console.log('[REFRESH] Incrementing fileTreeGeneration from', state.fileTreeGeneration, 'to', state.fileTreeGeneration + 1);
                 // Increment fileTreeGeneration to trigger graph and other file-dependent components to refresh
                 set({
-                    fileTree: files,
+                    fileTree: sortFileNodes(files),
                     fileTreeGeneration: state.fileTreeGeneration + 1
                 });
             } catch (e) {
@@ -528,7 +495,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                 set({
                     notes: newNotes,
                     tabs: newTabs,
-                    fileTree: sortNodes(newTree)
+                    fileTree: sortFileNodes(newTree)
                 });
 
             } catch (e) {
@@ -934,7 +901,7 @@ export const useAppStore = create<AppState>((set, get) => ({
                 const files = await readVault(path);
 
                 set({
-                    fileTree: files,
+                    fileTree: sortFileNodes(files),
                     isVaultLoading: false,
                 });
 

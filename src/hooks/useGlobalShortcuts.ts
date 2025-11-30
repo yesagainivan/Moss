@@ -25,6 +25,23 @@ export const useGlobalShortcuts = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [toggleSidebar]);
 
+    // Cmd+[ and Cmd+] for navigation (back/forward)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const state = useAppStore.getState();
+
+            if ((e.metaKey || e.ctrlKey) && e.key === '[') {
+                e.preventDefault();
+                state.navigateBack();
+            } else if ((e.metaKey || e.ctrlKey) && e.key === ']') {
+                e.preventDefault();
+                state.navigateForward();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     // Cmd+S variants (Cmd+Shift+S, Cmd+Alt+S)
     // Note: Plain Cmd+S is handled by the Editor component to ensure proper content sync
     useEffect(() => {
