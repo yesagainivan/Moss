@@ -118,12 +118,17 @@ interface AppState {
     renameNote: (id: string, title: string) => Promise<void>;
     moveNote: (oldPath: string, newPath: string) => Promise<void>;
     deleteNote: (id: string) => Promise<void>;
+    duplicateNote: (id: string) => Promise<string>;
     deleteFolder: (path: string) => Promise<void>;
     renameFolder: (oldPath: string, newName: string) => Promise<void>;
     refreshFileTree: () => Promise<void>;
+    collapseAllFolders: () => void;
+    expandAllFolders: () => void;
 
     openNote: (noteId: string, newTab?: boolean) => Promise<void>;
     closeTab: (tabId: string) => void;
+    closeAllTabs: () => void;
+    closeOtherTabs: (tabId: string) => void;
     setActiveTab: (tabId: string) => void;
     setTabDirty: (tabId: string, isDirty: boolean) => void;
     navigateBack: () => void;
@@ -641,6 +646,53 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
     },
 
+    duplicateNote: async (id: string): Promise<string> => {
+        const { vaultPath } = get();
+
+        if (!id.includes('/') || !vaultPath) {
+            return ''; // Only works for file-based notes
+        }
+
+        try {
+            // Load current note content
+            const content = await loadNoteContent(id);
+
+            // Get the directory and filename
+            const parentDir = id.substring(0, id.lastIndexOf('/'));
+            const filename = id.split('/').pop() || 'Untitled.md';
+            const nameWithoutExt = filename.replace(/\.md$/, '');
+
+            // Create new filename with timestamp
+            const timestamp = Date.now();
+            const newFilename = `${nameWithoutExt}-copy-${timestamp}.md`;
+            const newPath = `${parentDir}/${newFilename}`;
+
+            // Create the new file
+            await createFile(newPath, content);
+
+            // Add to file tree
+            const newNode: FileNode = {
+                id: newPath,
+                name: newFilename,
+                type: 'file',
+                noteId: newPath,
+                path: newPath
+            };
+
+            set(state => ({
+                fileTree: insertNode(state.fileTree, newNode, parentDir === vaultPath ? undefined : parentDir)
+            }));
+
+            // Open the duplicated note
+            await get().openNote(newPath);
+
+            return newPath;
+        } catch (e) {
+            console.error('Failed to duplicate note', e);
+            return '';
+        }
+    },
+
     openNote: async (noteId, newTab = false) => {
         const { tabs, setActiveTab, notes, activeTabId, dirtyNoteIds } = get();
 
@@ -827,6 +879,26 @@ export const useAppStore = create<AppState>((set, get) => ({
             return {
                 tabs: newTabs,
                 activeTabId: newActiveTabId
+            };
+        });
+    },
+
+    closeAllTabs: () => {
+        set({ tabs: [], activeTabId: null });
+        localStorage.removeItem('moss-tabs');
+        localStorage.removeItem('moss-active-tab');
+    },
+
+    closeOtherTabs: (tabId) => {
+        set((state) => {
+            const tabToKeep = state.tabs.find(t => t.id === tabId);
+            if (!tabToKeep) return state;
+
+            const newTabs = [tabToKeep];
+            persistTabsDebounced(newTabs, tabId);
+            return {
+                tabs: newTabs,
+                activeTabId: tabId
             };
         });
     },
@@ -1190,15 +1262,41 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     toggleFolder: (path: string) => {
         set((state) => {
-            const newSet = new Set(state.expandedPaths);
-            if (newSet.has(path)) {
-                newSet.delete(path);
+            const newExpandedPaths = new Set(state.expandedPaths);
+            if (newExpandedPaths.has(path)) {
+                newExpandedPaths.delete(path);
             } else {
-                newSet.add(path);
+                newExpandedPaths.add(path);
             }
-            persistExpandedPathsDebounced(newSet);
-            return { expandedPaths: newSet };
+            persistExpandedPathsDebounced(newExpandedPaths);
+            return { expandedPaths: newExpandedPaths };
         });
+    },
+
+    collapseAllFolders: () => {
+        set({ expandedPaths: new Set() });
+        localStorage.setItem('moss-expanded-paths', JSON.stringify([]));
+    },
+
+    expandAllFolders: () => {
+        const { fileTree } = get();
+        const allFolderPaths = new Set<string>();
+
+        // Recursively collect all folder paths
+        const collectFolders = (nodes: FileNode[]) => {
+            nodes.forEach(node => {
+                if (node.type === 'folder' && node.path) {
+                    allFolderPaths.add(node.path);
+                }
+                if (node.children) {
+                    collectFolders(node.children);
+                }
+            });
+        };
+
+        collectFolders(fileTree);
+        persistExpandedPathsDebounced(allFolderPaths);
+        set({ expandedPaths: allFolderPaths });
     },
 
     setCurrentView: (view: 'editor' | 'graph') => {
