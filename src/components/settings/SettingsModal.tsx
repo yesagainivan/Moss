@@ -434,6 +434,30 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                             </div>
                                         </div>
 
+                                        {/* Grain Texture */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Grain Texture
+                                            </label>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {(['subtle', 'dense', 'noise'] as const).map((texture) => (
+                                                    <button
+                                                        key={texture}
+                                                        onClick={() => {
+                                                            updateSettings({ grainTexture: texture });
+                                                            useThemeStore.getState().updateGrainTexture(texture);
+                                                        }}
+                                                        className={`px-3 py-2 text-sm font-medium rounded-md border transition-all ${settings.grainTexture === texture
+                                                            ? 'bg-accent text-background border-accent'
+                                                            : 'bg-background text-foreground border-input hover:bg-secondary/50'
+                                                            }`}
+                                                    >
+                                                        {texture.charAt(0).toUpperCase() + texture.slice(1)}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
                                         {/* Readable Line Length (Max Width) */}
                                         <div className="flex items-center justify-between">
                                             <div>

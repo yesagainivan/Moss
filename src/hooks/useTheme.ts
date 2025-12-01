@@ -4,7 +4,7 @@ import { useThemeStore } from '../store/useThemeStore';
 
 export const useTheme = () => {
     const { settings } = useSettingsStore();
-    const { loadThemes, applyTheme, activeThemeId, updateGrainLevel } = useThemeStore();
+    const { loadThemes, applyTheme, activeThemeId, updateGrainLevel, updateGrainTexture } = useThemeStore();
 
     // Load themes on mount
     useEffect(() => {
@@ -37,6 +37,7 @@ export const useTheme = () => {
 
             // Apply grain level
             updateGrainLevel(settings.grainLevel);
+            updateGrainTexture(settings.grainTexture || 'subtle');
         };
 
         updateTheme();
@@ -48,5 +49,5 @@ export const useTheme = () => {
             mediaQuery.addEventListener('change', handleChange);
             return () => mediaQuery.removeEventListener('change', handleChange);
         }
-    }, [settings.theme, settings.grainLevel, activeThemeId]); // Re-run when settings or active custom theme changes
+    }, [settings.theme, settings.grainLevel, settings.grainTexture, activeThemeId]); // Re-run when settings or active custom theme changes
 };

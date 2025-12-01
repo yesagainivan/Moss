@@ -13,6 +13,7 @@ interface ThemeState {
     setActiveTheme: (themeName: string | null) => void;
     applyTheme: (isDark: boolean) => void;
     updateGrainLevel: (level: number) => void;
+    updateGrainTexture: (texture: string) => void;
 }
 
 const THEMES_DIR = 'themes';
@@ -229,12 +230,20 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
         const maxOpacity = isDark ? 0.18 : 0.12;
         const opacity = level === 0 ? 0 : minOpacity + (level / 100) * (maxOpacity - minOpacity);
 
-        // Use PNG grain texture with CSS for better quality and performance
-        // The texture is tileable and looks much more authentic than SVG noise
         if (level === 0) {
             document.documentElement.style.setProperty('--grain-opacity', '0');
         } else {
             document.documentElement.style.setProperty('--grain-opacity', opacity.toFixed(3));
         }
+    },
+
+    updateGrainTexture: (texture: string) => {
+        let url = "url('/grain.png')";
+        if (texture === 'dense') {
+            url = "url('/grain_dense.png')";
+        } else if (texture === 'noise') {
+            url = "url('/svg_noise.svg')";
+        }
+        document.documentElement.style.setProperty('--grain-texture', url);
     }
 }));

@@ -18,7 +18,6 @@ Moss is a powerful desktop application that combines the elegance of markdown wi
 - **Tables**, **task lists**, and **images**
 - **Backlinks** automatically tracked
 - **Focus mode** for distraction-free writing
-- **Swipe navigation** for note history (macOS trackpad gestures)
 - **Command palette** (`Cmd+P`) for quick file switching
 
 ### 🤖 **AI-Powered Writing**

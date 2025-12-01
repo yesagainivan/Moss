@@ -13,6 +13,7 @@ export interface EditorSettings {
     enableMaxWidth: boolean; // Limit editor width for readability
     maxWidth: number;        // 600-1200px
     grainLevel: number;      // 0-100 (grain texture intensity)
+    grainTexture: 'subtle' | 'dense' | 'noise'; // Texture type
 }
 
 export interface GitHubSyncSettings {
@@ -44,6 +45,7 @@ const DEFAULT_SETTINGS: EditorSettings = {
     enableMaxWidth: true,
     maxWidth: 800,
     grainLevel: 50,
+    grainTexture: 'subtle',
 };
 
 const DEFAULT_GITHUB_SYNC: GitHubSyncSettings = {

@@ -22,7 +22,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { debounce } from 'lodash-es';
 import { ErrorDialog } from '../common/ErrorDialog';
 import { useMarkdownWorker } from '../../hooks/useMarkdownWorker';
-import { SwipeIndicator } from '../common/SwipeIndicator';
+
 import { slugify } from '../../lib/slugify';
 import { LRUCache } from '../../lib/LRUCache';
 
@@ -35,18 +35,14 @@ interface EditorProps {
 // LRU cache with capacity of 100 to prevent unbounded memory growth
 const markdownCache = new LRUCache<string, string>(100);
 
-// Global cooldown for navigation to prevent momentum scrolling from triggering multiple navigations
-let lastNavigationTime = 0;
+
 
 export const Editor = ({ noteId, initialContent }: EditorProps) => {
     const updateNote = useAppStore(state => state.updateNote);
     const setTabDirty = useAppStore(state => state.setTabDirty);
     const forceSaveNote = useAppStore(state => state.forceSaveNote);
     const setScrollPosition = useAppStore(state => state.setScrollPosition);
-    const navigateBack = useAppStore(state => state.navigateBack);
-    const navigateForward = useAppStore(state => state.navigateForward);
-    const canNavigateBack = useAppStore(state => state.canNavigateBack);
-    const canNavigateForward = useAppStore(state => state.canNavigateForward);
+
 
     const activeTab = useAppStore(state => state.tabs.find(t => t.id === state.activeTabId));
     const savedScrollPosition = useAppStore(state => state.scrollPositions[noteId]);
@@ -85,19 +81,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
     const [initialHtml, setInitialHtml] = useState<string | null>(null);
     const isReady = useRef(false);
 
-    // Swipe Navigation State
-    // Ref for direct DOM manipulation (performance)
-    const swipeIndicatorRef = useRef<{ update: (p: number, d: 'left' | 'right', isEnabled?: boolean) => void; reset: () => void }>(null);
 
-    const accumulatedDeltaX = useRef(0);
-    const isSwiping = useRef(false);
-    const hasScrolledContent = useRef(false);
-    const swipeTimeout = useRef<NodeJS.Timeout | null>(null);
-
-    // Velocity and commitment tracking for intentional swipe detection
-    const recentDeltas = useRef<Array<{ delta: number; timestamp: number }>>([]);
-    const swipeDirection = useRef<'left' | 'right' | null>(null);
-    const commitmentCount = useRef(0);
 
     // Helper to calculate prompt position
     const calculatePromptPosition = (view: any, selection: any) => {
@@ -173,212 +157,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
         }
     }, 100), [noteId, setScrollPosition]);
 
-    const hasTriggeredNavigation = useRef(false);
 
-    // Handle swipe navigation (horizontal scroll)
-    const isMounting = useRef(true);
-
-    useEffect(() => {
-        // Reset all gesture state when note changes
-        isMounting.current = true;
-        hasScrolledContent.current = false;
-        hasTriggeredNavigation.current = false;
-        accumulatedDeltaX.current = 0;
-        recentDeltas.current = [];
-        swipeDirection.current = null;
-        commitmentCount.current = 0;
-        const timer = setTimeout(() => {
-            isMounting.current = false;
-        }, 600); // 600ms to fully absorb momentum from navigation
-        return () => clearTimeout(timer);
-    }, [noteId]); // Re-run when noteId changes
-
-    const handleWheel = useCallback((e: React.WheelEvent) => {
-        // If we've already triggered navigation for this gesture, ignore ALL further updates
-        // This prevents the "swipe and throw" issue where momentum creates a second indicator
-        if (hasTriggeredNavigation.current) return;
-
-        // Ignore events during mount (prevents momentum from previous view triggering swipe)
-        if (isMounting.current) return;
-
-        // Production-ready horizontal filtering: require strong horizontal dominance
-        const MIN_HORIZONTAL_RATIO = 2.0; // Horizontal must be 2x vertical minimum
-        const horizontalRatio = Math.abs(e.deltaY) === 0 ? Infinity : Math.abs(e.deltaX) / Math.abs(e.deltaY);
-
-        if (horizontalRatio < MIN_HORIZONTAL_RATIO) return;
-
-        // If this gesture has already scrolled content, it CANNOT become a swipe
-        if (hasScrolledContent.current) return;
-
-        // Global cooldown check - this absorbs momentum after navigation
-        if (Date.now() - lastNavigationTime < 600) return;
-
-        const container = e.currentTarget as HTMLDivElement;
-
-        // Check if we can scroll horizontally
-        const canScrollLeft = container.scrollLeft > 0;
-        const canScrollRight = container.scrollLeft < (container.scrollWidth - container.clientWidth - 1); // -1 tolerance
-
-        // Detect if this container has ANY horizontal scrollable content at all
-        // This helps identify horizontal scroll gestures even when at the edges
-        const hasHorizontalScroll = container.scrollWidth > container.clientWidth;
-
-        // If we can scroll in the direction of the swipe, don't trigger navigation
-        // AND mark this gesture as a "scroll" gesture
-        if ((e.deltaX < 0 && canScrollLeft) || (e.deltaX > 0 && canScrollRight)) {
-            hasScrolledContent.current = true;
-            return;
-        }
-
-        // CRITICAL: If we've already identified this as a scroll gesture, never show swipe indicators
-        // This prevents indicators from flashing when momentum hits the scroll boundary
-        if (hasScrolledContent.current) return;
-
-        // Additional check: If container has horizontal scroll AND we're at an edge,
-        // treat this as a scroll gesture (user likely scrolled here and hit the edge)
-        if (hasHorizontalScroll && (canScrollLeft || canScrollRight)) {
-            // We're at one edge but there's scrollable content in the other direction
-            // This means the user is likely mid-scroll, so mark it as a scroll gesture
-            hasScrolledContent.current = true;
-            return;
-        }
-
-        // Determine swipe direction
-        const isSwipingLeft = e.deltaX > 0;  // Swipe left (positive deltaX) = forward
-        const isSwipingRight = e.deltaX < 0; // Swipe right (negative deltaX) = back
-
-        // Check if navigation is available in the intended direction
-        const canGoBack = canNavigateBack();
-        const canGoForward = canNavigateForward();
-
-        // If swiping in a disabled direction, show brief disabled feedback and abort
-        if ((isSwipingRight && !canGoBack) || (isSwipingLeft && !canGoForward)) {
-            // Show disabled indicator briefly
-            const direction = isSwipingRight ? 'left' : 'right';
-            swipeIndicatorRef.current?.update(0.3, direction, false);
-
-            // Clear indicator after brief feedback
-            if (swipeTimeout.current) clearTimeout(swipeTimeout.current);
-            swipeTimeout.current = setTimeout(() => {
-                swipeIndicatorRef.current?.reset();
-            }, 150);
-            return;
-        }
-
-        // Clear any existing timeout
-        if (swipeTimeout.current) clearTimeout(swipeTimeout.current);
-
-        // Track velocity for intentionality detection
-        const now = Date.now();
-        recentDeltas.current.push({ delta: e.deltaX, timestamp: now });
-
-        // Keep only last 5 samples (roughly 100ms of data at 60fps)
-        if (recentDeltas.current.length > 5) {
-            recentDeltas.current.shift();
-        }
-
-        // Calculate velocity (pixels per millisecond)
-        let velocity = 0;
-        if (recentDeltas.current.length >= 2) {
-            const oldest = recentDeltas.current[0];
-            const newest = recentDeltas.current[recentDeltas.current.length - 1];
-            const deltaSum = recentDeltas.current.reduce((sum, sample) => sum + Math.abs(sample.delta), 0);
-            const timeDiff = newest.timestamp - oldest.timestamp;
-            velocity = timeDiff > 0 ? deltaSum / timeDiff : 0;
-        }
-
-        // Production-ready thresholds
-        const VELOCITY_THRESHOLD = 0.5;          // Minimum velocity (pixels per ms) - filters slow drift
-        const SWIPE_START_THRESHOLD = 80;        // Increased from 50 - require more deliberate movement
-        const COMMITMENT_SAMPLES = 3;            // Require consistent direction
-        const threshold = 150;
-
-        // Accumulate delta
-        accumulatedDeltaX.current -= e.deltaX; // Invert delta: swipe left (positive delta) -> pull right (negative accum)
-        const absDeltaX = Math.abs(accumulatedDeltaX.current);
-
-        // Determine current direction
-        const currentDirection: 'left' | 'right' = accumulatedDeltaX.current > 0 ? 'left' : 'right';
-
-        // Track commitment: reset if direction changes
-        if (swipeDirection.current !== currentDirection) {
-            swipeDirection.current = currentDirection;
-            commitmentCount.current = 1;
-        } else {
-            commitmentCount.current++;
-        }
-
-        // Early exit checks: require velocity AND commitment before showing indicator
-        if (velocity < VELOCITY_THRESHOLD) {
-            // Too slow - likely accidental drift, not intentional swipe
-            return;
-        }
-
-        if (commitmentCount.current < COMMITMENT_SAMPLES) {
-            // Not enough consistent samples in same direction
-            return;
-        }
-
-        if (absDeltaX < SWIPE_START_THRESHOLD) {
-            // Haven't moved far enough yet
-            return;
-        }
-
-        const progress = Math.min(1, absDeltaX / threshold);
-
-        let direction: 'left' | 'right' | null = null;
-        let isEnabled = false;
-
-        if (accumulatedDeltaX.current > 0) {
-            direction = 'left'; // Pulling from left -> Back
-            isEnabled = canGoBack;
-        } else if (accumulatedDeltaX.current < 0) {
-            direction = 'right'; // Pulling from right -> Forward
-            isEnabled = canGoForward;
-        }
-
-        if (direction) {
-            isSwiping.current = true;
-
-            // Direct DOM update with enabled state
-            swipeIndicatorRef.current?.update(progress, direction, isEnabled);
-
-            // IMMEDIATE TRIGGER CHECK
-            if (progress >= 1 && !hasTriggeredNavigation.current && isEnabled) {
-                // Mark navigation triggered FIRST to block all subsequent events
-                hasTriggeredNavigation.current = true;
-
-                // Update global cooldown to absorb momentum
-                lastNavigationTime = Date.now();
-
-                // Trigger navigation
-                if (direction === 'left') {
-                    navigateBack();
-                } else if (direction === 'right') {
-                    navigateForward();
-                }
-
-                // FORCE HIDE INDICATORS IMMEDIATELY
-                swipeIndicatorRef.current?.reset();
-                accumulatedDeltaX.current = 0;
-                isSwiping.current = false;
-            }
-        }
-
-        // Set timeout to reset ONLY visual/accumulation state
-        // hasScrolledContent persists until note change to prevent scroll->swipe during momentum
-        swipeTimeout.current = setTimeout(() => {
-            if (!hasTriggeredNavigation.current) {
-                swipeIndicatorRef.current?.reset();
-                accumulatedDeltaX.current = 0;
-                isSwiping.current = false;
-                recentDeltas.current = [];
-                swipeDirection.current = null;
-                commitmentCount.current = 0;
-            }
-        }, 250);
-
-    }, [noteId, navigateBack, navigateForward, canNavigateBack, canNavigateForward]);
 
     const editor = useEditor({
         extensions: [
@@ -1107,7 +886,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
             <div
                 ref={containerRef}
                 onScroll={handleScroll}
-                onWheel={handleWheel}
+
                 className="h-full overflow-y-auto bg-background select-text"
                 style={{
                     fontSize: `${settings.fontSize}px`,
@@ -1177,7 +956,7 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
                     onDiscard={handleDiscard}
                 />
             )}
-            <SwipeIndicator ref={swipeIndicatorRef} />
+
         </>
     );
 };
