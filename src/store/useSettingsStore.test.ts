@@ -18,6 +18,7 @@ describe('useSettingsStore', () => {
                 enableMaxWidth: true,
                 maxWidth: 800,
                 grainLevel: 50,
+                grainTexture: 'subtle',
             },
             githubSync: {
                 repoUrl: null,

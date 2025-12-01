@@ -294,6 +294,15 @@ pub struct CommitInfo {
     pub author: String,
     pub timestamp: i64,
     pub is_ambre: bool,
+    pub stats: Option<CommitStats>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct CommitStats {
+    pub files_changed: usize,
+    pub insertions: usize,
+    pub deletions: usize,
+    pub file_paths: Vec<String>,
 }
 
 /// Get commit history, optionally filtered to Ambre commits only and/or specific file
@@ -302,6 +311,7 @@ pub fn get_commit_history(
     limit: usize,
     ambre_only: bool,
     file_path: Option<&Path>,
+    include_stats: bool,
 ) -> Result<Vec<CommitInfo>, GitError> {
     let mut revwalk = repo.revwalk()?;
 
@@ -352,12 +362,23 @@ pub fn get_commit_history(
             }
         }
 
+        // Optionally compute stats
+        let stats = if include_stats {
+            match compute_commit_stats(repo, &commit) {
+                Ok(s) => Some(s),
+                Err(_) => None,
+            }
+        } else {
+            None
+        };
+
         commits.push(CommitInfo {
             oid: oid.to_string(),
             message,
             author: commit.author().name().unwrap_or("Unknown").to_string(),
             timestamp: commit.time().seconds(),
             is_ambre,
+            stats,
         });
 
         count += 1;
@@ -395,6 +416,53 @@ pub fn get_file_content_at_commit(
 pub fn has_uncommitted_changes(repo: &Repository) -> Result<bool, GitError> {
     let statuses = repo.statuses(None)?;
     Ok(!statuses.is_empty())
+}
+
+/// Compute aggregated diff stats for a commit
+fn compute_commit_stats(repo: &Repository, commit: &git2::Commit) -> Result<CommitStats, GitError> {
+    let commit_tree = commit.tree()?;
+
+    // Get parent tree (or None if this is the first commit)
+    let parent_tree = match commit.parent(0) {
+        Ok(parent) => Some(parent.tree()?),
+        Err(_) => None,
+    };
+
+    // Create diff between parent and this commit
+    let diff = repo.diff_tree_to_tree(parent_tree.as_ref(), Some(&commit_tree), None)?;
+
+    let mut total_insertions = 0;
+    let mut total_deletions = 0;
+    let mut file_paths = Vec::new();
+    let files_changed = diff.deltas().len();
+
+    // Aggregate stats from all deltas
+    for (delta_idx, delta) in diff.deltas().enumerate() {
+        // Collect file path
+        let path = delta
+            .new_file()
+            .path()
+            .or_else(|| delta.old_file().path())
+            .and_then(|p| p.to_str())
+            .unwrap_or("unknown")
+            .to_string();
+
+        file_paths.push(path);
+
+        if let Ok(Some(patch)) = git2::Patch::from_diff(&diff, delta_idx) {
+            if let Ok((_context, adds, dels)) = patch.line_stats() {
+                total_insertions += adds;
+                total_deletions += dels;
+            }
+        }
+    }
+
+    Ok(CommitStats {
+        files_changed,
+        insertions: total_insertions,
+        deletions: total_deletions,
+        file_paths,
+    })
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Sparkles, Bot, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Settings as SettingsIcon, Sparkles, Bot, ArrowLeft, ArrowRight, BarChart3 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { SettingsModal } from '../settings/SettingsModal';
 import { AICommandMenu } from '../ai/AICommandMenu';
@@ -7,6 +7,7 @@ import { useAppStore } from '../../store/useStore';
 import { SaveIndicator } from '../editor/SaveIndicator';
 import { UndoAmbreButton } from '../git/UndoAmbreButton';
 import { NoteHistoryModal } from '../git/NoteHistoryModal';
+import { ActivityCalendar } from '../git/ActivityCalendar';
 import { Clock } from 'lucide-react';
 import { GitHubSyncIndicator } from '../toolbar/GitHubSyncIndicator';
 
@@ -14,6 +15,7 @@ export const Toolbar = () => {
     const [showSettings, setShowSettings] = useState(false);
     const [showAIMenu, setShowAIMenu] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
+    const [showActivity, setShowActivity] = useState(false);
     const aiButtonRef = useRef<HTMLButtonElement>(null);
     const { toggleOpen: toggleAgent, isOpen: isAgentOpen } = useAgentStore();
     const { navigateBack, navigateForward, tabs, activeTabId, gitEnabled } = useAppStore();
@@ -78,6 +80,16 @@ export const Toolbar = () => {
                         </button>
                     )}
 
+                    {gitEnabled && (
+                        <button
+                            onClick={() => setShowActivity(true)}
+                            className="p-1.5 hover:bg-accent/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                            title="Activity Calendar"
+                        >
+                            <BarChart3 className="w-4 h-4" />
+                        </button>
+                    )}
+
                     <button
                         ref={aiButtonRef}
                         onClick={() => setShowAIMenu(!showAIMenu)}
@@ -130,6 +142,11 @@ export const Toolbar = () => {
                     notePath={activeTab.noteId}
                 />
             )}
+
+            <ActivityCalendar
+                isOpen={showActivity}
+                onClose={() => setShowActivity(false)}
+            />
         </>
     );
 };

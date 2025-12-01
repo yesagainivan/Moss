@@ -336,6 +336,7 @@ async fn get_git_history(
     limit: Option<usize>,
     ambre_only: Option<bool>,
     file_path: Option<String>,
+    include_stats: Option<bool>,
 ) -> Result<Vec<git_manager::CommitInfo>, String> {
     let path = std::path::Path::new(&vault_path);
 
@@ -360,6 +361,7 @@ async fn get_git_history(
             limit.unwrap_or(50),
             ambre_only.unwrap_or(false),
             relative_file_path.as_deref(),
+            include_stats.unwrap_or(false),
         )
         .map_err(|e| format!("Failed to get commit history: {}", e))
     } else {

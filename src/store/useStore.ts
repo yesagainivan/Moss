@@ -165,12 +165,20 @@ interface AppState {
     snapshotVault: () => Promise<void>;
 }
 
+export interface CommitStats {
+    files_changed: number;
+    insertions: number;
+    deletions: number;
+    file_paths: string[];
+}
+
 export interface CommitInfo {
     oid: string;
     message: string;
     author: string;
     timestamp: number;
     is_ambre: boolean;
+    stats?: CommitStats;
 }
 
 
