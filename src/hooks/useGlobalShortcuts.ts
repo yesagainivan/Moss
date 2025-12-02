@@ -70,8 +70,49 @@ export const useGlobalShortcuts = () => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'w') {
                 e.preventDefault();
                 const state = useAppStore.getState();
-                if (state.activeTabId) {
-                    state.closeTab(state.activeTabId);
+
+                // If we have multiple panes, close the active pane
+                // Otherwise close the tab
+                if (state.paneRoot.type === 'split') {
+                    if (state.activePaneId) {
+                        state.closePane(state.activePaneId);
+                    }
+                } else {
+                    if (state.activeTabId) {
+                        state.closeTab(state.activeTabId);
+                    }
+                }
+            }
+
+            // Split View Shortcuts
+            // Cmd+\ : Split Vertical
+            if ((e.metaKey || e.ctrlKey) && e.key === '\\' && !e.shiftKey) {
+                e.preventDefault();
+                const state = useAppStore.getState();
+                if (state.activePaneId) {
+                    state.splitPane(state.activePaneId, 'vertical');
+                }
+            }
+
+            // Cmd+Shift+\ : Split Horizontal
+            if ((e.metaKey || e.ctrlKey) && e.key === '|' || ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === '\\')) {
+                e.preventDefault();
+                const state = useAppStore.getState();
+                if (state.activePaneId) {
+                    state.splitPane(state.activePaneId, 'horizontal');
+                }
+            }
+
+            // Pane Focus Switching (Cmd+1, Cmd+2)
+            if ((e.metaKey || e.ctrlKey) && (e.key === '1' || e.key === '2')) {
+                e.preventDefault();
+                const state = useAppStore.getState();
+                const leafPanes = state.getAllLeafPanes();
+
+                if (e.key === '1' && leafPanes.length > 0) {
+                    state.setActivePane(leafPanes[0].id);
+                } else if (e.key === '2' && leafPanes.length > 1) {
+                    state.setActivePane(leafPanes[1].id);
                 }
             }
 

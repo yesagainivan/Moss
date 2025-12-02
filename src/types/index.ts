@@ -29,3 +29,18 @@ export interface SaveState {
     lastSaved: number | null;
     error: string | null;
 }
+
+// Pane system for split view
+export interface PaneNode {
+    id: string;
+    type: 'leaf' | 'split';
+
+    // For split nodes (contain two child panes)
+    direction?: 'horizontal' | 'vertical';
+    children?: [PaneNode, PaneNode];
+    splitRatio?: number; // 0.0 to 1.0, how much space first child gets
+
+    // For leaf nodes (actual editor panes that display content)
+    tabs?: Tab[]; // Each leaf pane has its own tabs
+    activeTabId?: string | null; // Which tab is displayed in this pane
+}

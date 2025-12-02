@@ -1,9 +1,14 @@
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { useSaveState, useActiveNote, useVaultStatus } from '../../store/useStore';
 
-export const SaveIndicator = () => {
+interface SaveIndicatorProps {
+    noteId?: string;
+}
+
+export const SaveIndicator = ({ noteId }: SaveIndicatorProps) => {
     const activeNote = useActiveNote();
-    const saveState = useSaveState(activeNote?.id || '');
+    const targetNoteId = noteId || activeNote?.id;
+    const saveState = useSaveState(targetNoteId || '');
     const vaultStatus = useVaultStatus();
 
     // Priority 1: Vault Status (Global operations)
@@ -34,7 +39,7 @@ export const SaveIndicator = () => {
     }
 
     // Priority 2: Active Note Save State
-    if (!activeNote || !activeNote.id || !activeNote.id.includes('/')) {
+    if (!targetNoteId || !targetNoteId.includes('/')) {
         return null; // Only show for file system notes
     }
 

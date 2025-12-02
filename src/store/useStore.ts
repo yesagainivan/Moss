@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Note, Tab, FileNode, SaveState } from '../types';
+import { Note, Tab, FileNode, SaveState, PaneNode } from '../types';
 import { useSettingsStore } from './useSettingsStore';
 import { v4 as uuidv4 } from 'uuid';
 import { openVault, readVault, loadNoteContent, saveNoteContent, createFile, renameFile, renameNote, createFolder as createFolderFS, deleteFile, deleteFolder as deleteFolderFS } from '../lib/fs';
@@ -108,6 +108,10 @@ interface AppState {
     vaultStatus: 'idle' | 'snapshotting' | 'success' | 'error';
     vaultStatusMessage: string | null;
 
+    // Pane system for split view
+    paneRoot: PaneNode; // Root of the pane tree
+    activePaneId: string | null; // Which leaf pane currently has focus
+
     // Actions
     initialize: () => Promise<void>;
     setCommandPaletteOpen: (isOpen: boolean) => void;
@@ -153,6 +157,22 @@ interface AppState {
     setCurrentView: (view: 'editor' | 'graph') => void;
     toggleSidebar: () => void;
     setScrollPosition: (noteId: string, position: number) => void;
+
+    // Pane Management
+    splitPane: (paneId: string, direction: 'horizontal' | 'vertical') => void;
+    closePane: (paneId: string) => void;
+    setActivePane: (paneId: string) => void;
+    setPaneTab: (paneId: string, tabId: string | null) => void;
+    findPaneById: (id: string, node?: PaneNode) => PaneNode | null;
+    getAllLeafPanes: (node?: PaneNode) => PaneNode[];
+
+    // Pane-aware tab helpers
+    getActivePane: () => PaneNode | null;
+    getActivePaneTabs: () => Tab[];
+    addTabToPane: (paneId: string, tab: Tab) => void;
+    removeTabFromPane: (paneId: string, tabId: string) => void;
+    updateTabInPane: (paneId: string, tabId: string, updates: Partial<Tab>) => void;
+    findPaneByTabId: (tabId: string) => PaneNode | null;
 
     // Git Version Control
     checkGitStatus: () => Promise<void>;
@@ -206,6 +226,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     vaultStatus: 'idle',
     vaultStatusMessage: null,
 
+    // Pane system - start with single pane
+    paneRoot: {
+        id: 'root',
+        type: 'leaf',
+        tabs: [],
+        activeTabId: null
+    },
+    activePaneId: 'root',
+
     initialize: async () => {
         set({ isVaultLoading: true });
         const savedVault = localStorage.getItem('moss-vault-path');
@@ -258,25 +287,56 @@ export const useAppStore = create<AppState>((set, get) => ({
 
                 // Restore expanded paths
                 const savedExpandedPathsJson = localStorage.getItem('moss-expanded-paths');
-                let restoredExpandedPaths = new Set<string>();
-                if (savedExpandedPathsJson) {
+                const expandedPaths = savedExpandedPathsJson
+                    ? new Set(JSON.parse(savedExpandedPathsJson) as string[])
+                    : new Set<string>();
+
+                // Restore pane state
+                const savedPaneRootJson = localStorage.getItem('moss-pane-root');
+                const savedActivePaneId = localStorage.getItem('moss-active-pane-id');
+
+                let paneRoot = get().paneRoot;
+                let activePaneId = get().activePaneId;
+
+                if (savedPaneRootJson) {
                     try {
-                        const paths = JSON.parse(savedExpandedPathsJson) as string[];
-                        restoredExpandedPaths = new Set(paths);
+                        paneRoot = JSON.parse(savedPaneRootJson);
+                        if (savedActivePaneId) {
+                            activePaneId = savedActivePaneId;
+                        }
+
+                        // Migration: If pane root is a leaf and doesn't have tabs but we have globals tabs, migrate them
+                        if (paneRoot.type === 'leaf' && (!paneRoot.tabs || paneRoot.tabs.length === 0) && restoredTabs.length > 0) {
+                            paneRoot = {
+                                ...paneRoot,
+                                tabs: restoredTabs,
+                                activeTabId: savedActiveTabId || (restoredTabs.length > 0 ? restoredTabs[0].id : null)
+                            };
+                        }
                     } catch (e) {
-                        console.error('Failed to parse saved expanded paths:', e);
+                        console.error('Failed to parse saved pane state:', e);
                     }
+                } else {
+                    // No saved pane state - fresh start or migration from old version
+                    // Put all restored tabs into the root pane
+                    paneRoot = {
+                        id: 'root',
+                        type: 'leaf',
+                        tabs: restoredTabs,
+                        activeTabId: savedActiveTabId || (restoredTabs.length > 0 ? restoredTabs[0].id : null)
+                    };
                 }
 
                 set({
-                    vaultPath: savedVault,
-                    fileTree: sortFileNodes(files),
                     notes: restoredNotes,
                     tabs: restoredTabs,
-                    activeTabId: savedActiveTabId && restoredTabs.some(t => t.id === savedActiveTabId)
-                        ? savedActiveTabId
-                        : restoredTabs.length > 0 ? restoredTabs[0].id : null,
-                    expandedPaths: restoredExpandedPaths
+                    activeTabId: savedActiveTabId,
+                    fileTree: files,
+                    vaultPath: savedVault,
+                    isVaultLoading: false,
+                    expandedPaths,
+                    paneRoot,
+                    activePaneId
                 });
 
                 // Check Git status for the restored vault
@@ -702,16 +762,14 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     openNote: async (noteId, newTab = false) => {
-        const { tabs, setActiveTab, notes, activeTabId, dirtyNoteIds } = get();
+        const { notes, dirtyNoteIds, getAllLeafPanes, getActivePane, addTabToPane, updateTabInPane, setActivePane } = get();
 
-        // Check if note is already loaded in store
-        // Also check if it has a title (fix for "Untitled" issue if it was partially loaded)
+        // 1. Load note content if not already loaded
         if (!notes[noteId] || !notes[noteId].title) {
             if (noteId.includes('/')) {
                 try {
                     const content = await loadNoteContent(noteId);
                     const filename = noteId.split('/').pop() || 'Untitled';
-                    // Strip .md extension for cleaner titles
                     const name = filename.replace(/\.md$/, '');
                     const newNote: Note = {
                         id: noteId,
@@ -730,16 +788,45 @@ export const useAppStore = create<AppState>((set, get) => ({
             }
         }
 
-        // If explicitly requested new tab
-        if (newTab) {
+        // 2. Find target pane
+        let targetPane = getActivePane();
+
+        // If no active pane or not a leaf, find first suitable pane
+        if (!targetPane) {
+            const leafPanes = getAllLeafPanes();
+            if (leafPanes.length === 0) {
+                console.error('No leaf panes available!');
+                return;
+            }
+
+            // Try to find an empty pane (no tabs or no activeTabId)
+            targetPane = leafPanes.find(p => !p.tabs || p.tabs.length === 0 || !p.activeTabId) || leafPanes[0];
+
+            // Set this as the active pane
+            setActivePane(targetPane.id);
+        }
+
+        const paneTabs = targetPane.tabs || [];
+        const currentTabId = targetPane.activeTabId;
+        const currentTab = paneTabs.find(t => t.id === currentTabId);
+
+        // 3. Determine if we need a new tab
+        const shouldCreateNewTab = newTab || !currentTab;
+
+        if (shouldCreateNewTab) {
+            // Create new tab in this pane
             const newTabObj: Tab = {
                 id: uuidv4(),
                 noteId,
                 isDirty: dirtyNoteIds.has(noteId),
-                isPreview: false, // Explicit new tabs are permanent
+                isPreview: false,
                 history: [noteId],
                 historyIndex: 0
             };
+
+            addTabToPane(targetPane.id, newTabObj);
+
+            // Update global state for backward compatibility
             set((state) => {
                 const newTabs = [...state.tabs, newTabObj];
                 persistTabsDebounced(newTabs, newTabObj.id);
@@ -748,68 +835,37 @@ export const useAppStore = create<AppState>((set, get) => ({
                     activeTabId: newTabObj.id
                 };
             });
+
             get().revealNoteInSidebar(noteId);
             return;
         }
 
-        // Check if the note is already open in ANY tab
-        const existingTab = tabs.find(t => t.noteId === noteId);
-        if (existingTab) {
-            setActiveTab(existingTab.id);
-            get().revealNoteInSidebar(noteId);
-            return;
-        }
+        // 4. Navigate within existing tab
+        if (currentTab && currentTab.noteId !== noteId) {
+            // Truncate forward history and add new note
+            const newHistory = currentTab.history ? currentTab.history.slice(0, (currentTab.historyIndex || 0) + 1) : [currentTab.noteId];
+            newHistory.push(noteId);
 
-        // Navigation within active tab
-        const activeTab = tabs.find(t => t.id === activeTabId);
-        if (activeTab) {
-            set((state) => {
-                const newTabs = state.tabs.map(t => {
-                    if (t.id === activeTabId) {
-                        // Truncate forward history
-                        const newHistory = t.history ? t.history.slice(0, (t.historyIndex || 0) + 1) : [t.noteId];
-                        // Add new note
-                        newHistory.push(noteId);
-
-                        return {
-                            ...t,
-                            noteId,
-                            // If we navigate, it becomes permanent unless it was a fresh preview
-                            // Actually, let's keep preview logic simple: if you navigate, it's a browsing session.
-                            // But if you edit, it becomes permanent.
-                            // Let's say navigation keeps it as is, but updates dirty state.
-                            isDirty: dirtyNoteIds.has(noteId),
-                            history: newHistory,
-                            historyIndex: newHistory.length - 1
-                        };
-                    }
-                    return t;
-                });
-                persistTabsDebounced(newTabs, activeTabId);
-                return { tabs: newTabs };
-            });
-        } else {
-            // No active tab, create one
-            const newTabObj: Tab = {
-                id: uuidv4(),
+            const tabUpdates: Partial<Tab> = {
                 noteId,
                 isDirty: dirtyNoteIds.has(noteId),
-                isPreview: true,
-                history: [noteId],
-                historyIndex: 0
+                history: newHistory,
+                historyIndex: newHistory.length - 1
             };
-            set((state) => {
-                const newTabs = [...state.tabs, newTabObj];
-                persistTabsDebounced(newTabs, newTabObj.id);
-                return {
-                    tabs: newTabs,
-                    activeTabId: newTabObj.id
-                };
-            });
-        }
 
-        // Reveal the note in sidebar by expanding parent folders
-        get().revealNoteInSidebar(noteId);
+            updateTabInPane(targetPane.id, currentTab.id, tabUpdates);
+
+            // Also update global tabs for backward compatibility
+            set((state) => {
+                const newTabs = state.tabs.map(t =>
+                    t.id === currentTab.id ? { ...t, ...tabUpdates } : t
+                );
+                persistTabsDebounced(newTabs, currentTab.id);
+                return { tabs: newTabs, activeTabId: currentTab.id };
+            });
+
+            get().revealNoteInSidebar(noteId);
+        }
     },
 
     navigateBack: () => {
@@ -875,13 +931,20 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     closeTab: (tabId) => {
+        const { findPaneByTabId, removeTabFromPane } = get();
+
+        // Find which pane contains this tab
+        const pane = findPaneByTabId(tabId);
+        if (pane) {
+            removeTabFromPane(pane.id, tabId);
+        }
+
+        // Also update global tabs for backward compatibility
         set((state) => {
             const newTabs = state.tabs.filter(t => t.id !== tabId);
-            let newActiveTabId = state.activeTabId;
-
-            if (state.activeTabId === tabId) {
-                newActiveTabId = newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null;
-            }
+            const newActiveTabId = state.activeTabId === tabId
+                ? (newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null)
+                : state.activeTabId;
 
             persistTabsDebounced(newTabs, newActiveTabId);
             return {
@@ -912,6 +975,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     setActiveTab: (tabId) => {
+        const { findPaneByTabId, setPaneTab } = get();
+
+        // Find which pane contains this tab
+        const pane = findPaneByTabId(tabId);
+        if (pane) {
+            setPaneTab(pane.id, tabId);
+        }
+
+        // Also update global state for backward compatibility
         set((state) => {
             persistTabsDebounced(state.tabs, tabId);
             return { activeTabId: tabId };
@@ -946,6 +1018,17 @@ export const useAppStore = create<AppState>((set, get) => ({
             persistTabsDebounced(newTabs, state.activeTabId);
             return { tabs: newTabs, dirtyNoteIds: newDirtyIds };
         });
+
+        // CRITICAL: Also update the tab in the specific pane
+        // This ensures that the UI for that specific pane reflects the dirty state
+        const state = get();
+        const pane = state.findPaneByTabId(tabId);
+        if (pane) {
+            state.updateTabInPane(pane.id, tabId, {
+                isDirty,
+                isPreview: isDirty ? false : undefined
+            });
+        }
     },
 
     openVault: async () => {
@@ -1089,8 +1172,17 @@ export const useAppStore = create<AppState>((set, get) => ({
                         };
                     });
 
+                    // CRITICAL: Also update pane-specific tabs to clear dirty flag
+                    const state = get();
+                    const leafPanes = state.getAllLeafPanes();
+                    for (const pane of leafPanes) {
+                        const tab = pane.tabs?.find(t => t.noteId === noteId);
+                        if (tab) {
+                            state.updateTabInPane(pane.id, tab.id, { isDirty: false });
+                        }
+                    }
+
                     // Auto-reset to idle after 2 seconds
-                    // Only if no new save has started in the meantime
                     setTimeout(() => {
                         const currentState = get().saveStates[noteId];
                         if (currentState?.status === 'saved' && !saveQueue.has(noteId)) {
@@ -1318,6 +1410,320 @@ export const useAppStore = create<AppState>((set, get) => ({
                 [noteId]: position
             }
         }));
+    },
+
+    // ============================================================================
+    // Pane Management
+    // ============================================================================
+
+    findPaneById: (id: string, node?: PaneNode): PaneNode | null => {
+        const searchNode = node || get().paneRoot;
+
+        if (searchNode.id === id) {
+            return searchNode;
+        }
+
+        if (searchNode.type === 'split' && searchNode.children) {
+            const leftResult = get().findPaneById(id, searchNode.children[0]);
+            if (leftResult) return leftResult;
+
+            const rightResult = get().findPaneById(id, searchNode.children[1]);
+            if (rightResult) return rightResult;
+        }
+
+        return null;
+    },
+
+    getAllLeafPanes: (node?: PaneNode): PaneNode[] => {
+        const searchNode = node || get().paneRoot;
+
+        if (searchNode.type === 'leaf') {
+            return [searchNode];
+        }
+
+        if (searchNode.type === 'split' && searchNode.children) {
+            const leftLeaves = get().getAllLeafPanes(searchNode.children[0]);
+            const rightLeaves = get().getAllLeafPanes(searchNode.children[1]);
+            return [...leftLeaves, ...rightLeaves];
+        }
+
+        return [];
+    },
+
+    splitPane: (paneId: string, direction: 'horizontal' | 'vertical') => {
+        const paneRoot = get().paneRoot;
+
+        // Helper function to recursively update the tree
+        const updateTree = (node: PaneNode): PaneNode => {
+            if (node.id === paneId && node.type === 'leaf') {
+                // Found the pane to split - convert to split node
+                const newPane1: PaneNode = {
+                    id: `pane-${uuidv4()}`,
+                    type: 'leaf',
+                    tabs: node.tabs || [], // Keep existing tabs in first pane
+                    activeTabId: node.activeTabId // Keep current tab in first pane
+                };
+                const newPane2: PaneNode = {
+                    id: `pane-${uuidv4()}`,
+                    type: 'leaf',
+                    tabs: [], // Start empty
+                    activeTabId: null // Empty second pane
+                };
+
+                return {
+                    id: node.id,
+                    type: 'split',
+                    direction,
+                    splitRatio: 0.5,
+                    children: [newPane1, newPane2]
+                };
+            }
+
+            if (node.type === 'split' && node.children) {
+                return {
+                    ...node,
+                    children: [
+                        updateTree(node.children[0]),
+                        updateTree(node.children[1])
+                    ] as [PaneNode, PaneNode]
+                };
+            }
+
+            return node;
+        };
+
+        const newRoot = updateTree(paneRoot);
+        set({ paneRoot: newRoot });
+
+        // Persist to localStorage
+        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+    },
+
+    closePane: (paneId: string) => {
+        const paneRoot = get().paneRoot;
+
+        // Can't close if it's the only pane
+        if (paneRoot.type === 'leaf') {
+            return;
+        }
+
+        // Helper to find parent of pane and collapse the split
+        const updateTree = (node: PaneNode): { newNode: PaneNode | null, shouldRemove: boolean } => {
+            if (node.type === 'split' && node.children) {
+                const [left, right] = node.children;
+
+                // Check if one of the direct children is the pane to close
+                if (left.id === paneId) {
+                    // Remove left child, promote right child
+                    return { newNode: right, shouldRemove: false };
+                }
+                if (right.id === paneId) {
+                    // Remove right child, promote left child
+                    return { newNode: left, shouldRemove: false };
+                }
+
+                // Recursively check children
+                const leftResult = updateTree(left);
+                const rightResult = updateTree(right);
+
+                if (leftResult.shouldRemove || rightResult.shouldRemove) {
+                    return { newNode: null, shouldRemove: true };
+                }
+
+                return {
+                    newNode: {
+                        ...node,
+                        children: [
+                            leftResult.newNode || left,
+                            rightResult.newNode || right
+                        ] as [PaneNode, PaneNode]
+                    },
+                    shouldRemove: false
+                };
+            }
+
+            return { newNode: node, shouldRemove: false };
+        };
+
+        const { newNode } = updateTree(paneRoot);
+        if (newNode) {
+            set({ paneRoot: newNode });
+
+            // Update active pane if we closed it
+            if (get().activePaneId === paneId) {
+                const leafPanes = get().getAllLeafPanes(newNode);
+                if (leafPanes.length > 0) {
+                    set({ activePaneId: leafPanes[0].id });
+                }
+            }
+
+            // Persist to localStorage
+            localStorage.setItem('moss-pane-root', JSON.stringify(newNode));
+        }
+    },
+
+    setActivePane: (paneId: string) => {
+        const state = get();
+        const pane = state.findPaneById(paneId);
+
+        // Update active pane ID
+        set({ activePaneId: paneId });
+        localStorage.setItem('moss-active-pane-id', paneId);
+
+        // Sync global activeTabId with the pane's active tab
+        // This ensures global components (like SaveIndicator) reflect the active pane's state
+        if (pane && pane.type === 'leaf' && pane.activeTabId) {
+            set({ activeTabId: pane.activeTabId });
+        }
+    },
+
+    setPaneTab: (paneId: string, tabId: string | null) => {
+        const paneRoot = get().paneRoot;
+
+        const updateTree = (node: PaneNode): PaneNode => {
+            if (node.id === paneId && node.type === 'leaf') {
+                return { ...node, activeTabId: tabId };
+            }
+
+            if (node.type === 'split' && node.children) {
+                return {
+                    ...node,
+                    children: [
+                        updateTree(node.children[0]),
+                        updateTree(node.children[1])
+                    ] as [PaneNode, PaneNode]
+                };
+            }
+
+            return node;
+        };
+
+        const newRoot = updateTree(paneRoot);
+        set({ paneRoot: newRoot });
+
+        // Persist to localStorage
+        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+    },
+
+    // Pane-aware tab helpers
+    getActivePane: () => {
+        const { activePaneId, findPaneById } = get();
+        if (!activePaneId) return null;
+        const pane = findPaneById(activePaneId);
+        return pane && pane.type === 'leaf' ? pane : null;
+    },
+
+    getActivePaneTabs: () => {
+        const activePane = get().getActivePane();
+        return activePane?.tabs || [];
+    },
+
+    addTabToPane: (paneId: string, tab: Tab) => {
+        const paneRoot = get().paneRoot;
+
+        const updateTree = (node: PaneNode): PaneNode => {
+            if (node.id === paneId && node.type === 'leaf') {
+                const tabs = node.tabs || [];
+                return {
+                    ...node,
+                    tabs: [...tabs, tab],
+                    activeTabId: tab.id
+                };
+            }
+
+            if (node.type === 'split' && node.children) {
+                return {
+                    ...node,
+                    children: [
+                        updateTree(node.children[0]),
+                        updateTree(node.children[1])
+                    ] as [PaneNode, PaneNode]
+                };
+            }
+
+            return node;
+        };
+
+        const newRoot = updateTree(paneRoot);
+        set({ paneRoot: newRoot });
+        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+    },
+
+    removeTabFromPane: (paneId: string, tabId: string) => {
+        const paneRoot = get().paneRoot;
+
+        const updateTree = (node: PaneNode): PaneNode => {
+            if (node.id === paneId && node.type === 'leaf') {
+                const tabs = node.tabs || [];
+                const newTabs = tabs.filter(t => t.id !== tabId);
+                const newActiveTabId = node.activeTabId === tabId
+                    ? (newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null)
+                    : node.activeTabId;
+
+                return {
+                    ...node,
+                    tabs: newTabs,
+                    activeTabId: newActiveTabId
+                };
+            }
+
+            if (node.type === 'split' && node.children) {
+                return {
+                    ...node,
+                    children: [
+                        updateTree(node.children[0]),
+                        updateTree(node.children[1])
+                    ] as [PaneNode, PaneNode]
+                };
+            }
+
+            return node;
+        };
+
+        const newRoot = updateTree(paneRoot);
+        set({ paneRoot: newRoot });
+        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+    },
+
+    updateTabInPane: (paneId: string, tabId: string, updates: Partial<Tab>) => {
+        const paneRoot = get().paneRoot;
+
+        const updateTree = (node: PaneNode): PaneNode => {
+            if (node.id === paneId && node.type === 'leaf') {
+                const tabs = node.tabs || [];
+                const newTabs = tabs.map(t =>
+                    t.id === tabId ? { ...t, ...updates } : t
+                );
+
+                return { ...node, tabs: newTabs };
+            }
+
+            if (node.type === 'split' && node.children) {
+                return {
+                    ...node,
+                    children: [
+                        updateTree(node.children[0]),
+                        updateTree(node.children[1])
+                    ] as [PaneNode, PaneNode]
+                };
+            }
+
+            return node;
+        };
+
+        const newRoot = updateTree(paneRoot);
+        set({ paneRoot: newRoot });
+        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+    },
+
+    findPaneByTabId: (tabId: string) => {
+        const leafPanes = get().getAllLeafPanes();
+        for (const pane of leafPanes) {
+            if (pane.tabs?.some(t => t.id === tabId)) {
+                return pane;
+            }
+        }
+        return null;
     },
 
     // Git Version Control Actions

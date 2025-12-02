@@ -195,6 +195,10 @@ export interface AIState {
     addModel: (provider: string, model: string) => void;
     removeModel: (provider: string, model: string) => void;
     resetModels: (provider: string) => void;
+
+    // Pane Awareness
+    activeRequestPaneId: string | null;
+    setActiveRequestPaneId: (paneId: string | null) => void;
 }
 
 const DEFAULT_MODELS = {
@@ -249,6 +253,7 @@ export const useAIStore = create<AIState>()(
                 set({
                     isStreaming: false,
                     streamedText: '',
+                    activeRequestPaneId: null,
                 }),
 
             addCustomPrompt: (name, instruction) =>
@@ -303,6 +308,11 @@ export const useAIStore = create<AIState>()(
                     },
                     selectedModel: DEFAULT_MODELS[provider as keyof typeof DEFAULT_MODELS][0],
                 })),
+
+            // Pane Awareness
+            activeRequestPaneId: null,
+            setActiveRequestPaneId: (paneId) => set({ activeRequestPaneId: paneId }),
+
         }),
         {
             name: 'ai-store',

@@ -29,6 +29,7 @@ import { LRUCache } from '../../lib/LRUCache';
 interface EditorProps {
     noteId: string;
     initialContent: string;
+    paneId?: string; // NEW: Add paneId to identify which pane this editor belongs to
 }
 
 // Cache for parsed markdown to speed up note switching
@@ -37,14 +38,19 @@ const markdownCache = new LRUCache<string, string>(100);
 
 
 
-export const Editor = ({ noteId, initialContent }: EditorProps) => {
+export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
     const updateNote = useAppStore(state => state.updateNote);
     const setTabDirty = useAppStore(state => state.setTabDirty);
     const forceSaveNote = useAppStore(state => state.forceSaveNote);
     const setScrollPosition = useAppStore(state => state.setScrollPosition);
+    const activePaneId = useAppStore(state => state.activePaneId);
 
-
-    const activeTab = useAppStore(state => state.tabs.find(t => t.id === state.activeTabId));
+    const editorTab = useAppStore(state => {
+        if (!paneId) return undefined;
+        const pane = state.findPaneById(paneId);
+        if (!pane || pane.type !== 'leaf') return undefined;
+        return pane.tabs?.find(t => t.noteId === noteId);
+    });
     const savedScrollPosition = useAppStore(state => state.scrollPositions[noteId]);
 
     const settings = useSettingsStore(state => state.settings);
@@ -358,8 +364,8 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
             }
 
             // Mark tab as dirty immediately for UI feedback
-            if (activeTab) {
-                setTabDirty(activeTab.id, true);
+            if (editorTab) {
+                setTabDirty(editorTab.id, true);
             }
 
             // Debounce the heavy serialization and store update
@@ -397,10 +403,15 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
     }, [noteId, initialHtml, editor, savedScrollPosition]);
 
     // Listen for external updates (e.g. from Agent)
+    // CRITICAL: Only respond if this editor is in the active pane
     useEffect(() => {
         const handleExternalUpdate = async (e: Event) => {
             const customEvent = e as CustomEvent;
             const { noteId: updatedNoteId, content } = customEvent.detail;
+
+            // Only update if:
+            // 1. This is the right note
+            // We REMOVED the check for active pane to ensure all split views stay in sync
 
             if (updatedNoteId === noteId && editor) {
 
@@ -429,15 +440,68 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
         return () => {
             window.removeEventListener('note-updated-externally', handleExternalUpdate);
         };
-    }, [noteId, editor, parseMarkdown, debouncedUpdate, updateNote]);
+    }, [noteId, editor, parseMarkdown, debouncedUpdate, updateNote, paneId, activePaneId]);
 
     // Handle AI Commands
+    useEffect(() => {
+        const handleStreamChunk = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            const text = customEvent.detail;
+
+            // CRITICAL: Only process stream if this editor initiated the request
+            const activeRequestPaneId = useAIStore.getState().activeRequestPaneId;
+
+            // If we have a paneId, we MUST match the active request pane
+            if (paneId && activeRequestPaneId && paneId !== activeRequestPaneId) {
+                return;
+            }
+
+            // If we don't have a paneId (legacy/fallback), only process if no specific pane is active
+            if (!paneId && activeRequestPaneId) {
+                return;
+            }
+
+            if (editor && !editor.isDestroyed) {
+                if (isLiveModeActive) {
+                    appendStreamedText(text);
+                    // Insert directly into the editor at the tracked position
+                    editor.chain()
+                        .insertContentAt(liveStreamInsertPos.current!, text)
+                        .run();
+                    liveStreamInsertPos.current! += text.length;
+                } else {
+                    // Diff mode: just append to streamedText state
+                    appendStreamedText(text);
+                }
+            }
+        };
+
+        window.addEventListener('ai-stream-chunk', handleStreamChunk);
+        return () => {
+            window.removeEventListener('ai-stream-chunk', handleStreamChunk);
+        };
+    }, [editor, isLiveModeActive, appendStreamedText, paneId]);
+
     useEffect(() => {
         const handleCommand = async (e: Event) => {
             const customEvent = e as CustomEvent;
             const { instruction } = customEvent.detail;
 
             if (!editor) return;
+
+            // CRITICAL: Only respond if this editor is in the active pane
+            const currentActivePaneId = useAppStore.getState().activePaneId;
+            console.log('[AI Command] Editor checking pane:', { paneId, currentActivePaneId, noteId });
+
+            // Strict check: paneId must exist and match activePaneId
+            if (!paneId || paneId !== currentActivePaneId) {
+                console.log('[AI Command] Skipping inactive or undefined pane:', paneId);
+                return;
+            }
+            console.log('[AI Command] Processing in active pane:', paneId);
+
+            // Set this pane as the active requestor for AI
+            useAIStore.getState().setActiveRequestPaneId(paneId);
 
             const selection = editor.state.selection;
             // Allow empty selection for generation
@@ -825,8 +889,8 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
 
         // Update store and save
         updateNote(noteId, newContent);
-        if (activeTab) {
-            setTabDirty(activeTab.id, true);
+        if (editorTab) {
+            setTabDirty(editorTab.id, true);
         }
         debouncedSaveNote(noteId, newContent);
     };
@@ -859,8 +923,8 @@ export const Editor = ({ noteId, initialContent }: EditorProps) => {
             setSourceContent(newValue);
             // Update store and save
             updateNote(noteId, newValue);
-            if (activeTab) {
-                setTabDirty(activeTab.id, true);
+            if (editorTab) {
+                setTabDirty(editorTab.id, true);
             }
             debouncedSaveNote(noteId, newValue);
             // Move cursor after inserted spaces

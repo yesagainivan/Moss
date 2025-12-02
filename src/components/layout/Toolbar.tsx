@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Sparkles, Bot, ArrowLeft, ArrowRight, BarChart3 } from 'lucide-react';
+import { Settings as SettingsIcon, Sparkles, Bot, ArrowLeft, ArrowRight, BarChart3, SplitSquareHorizontal, SplitSquareVertical, XCircle } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { SettingsModal } from '../settings/SettingsModal';
 import { AICommandMenu } from '../ai/AICommandMenu';
@@ -18,11 +18,14 @@ export const Toolbar = () => {
     const [showActivity, setShowActivity] = useState(false);
     const aiButtonRef = useRef<HTMLButtonElement>(null);
     const { toggleOpen: toggleAgent, isOpen: isAgentOpen } = useAgentStore();
-    const { navigateBack, navigateForward, tabs, activeTabId, gitEnabled } = useAppStore();
+    const { navigateBack, navigateForward, tabs, activeTabId, gitEnabled, splitPane, closePane, activePaneId, paneRoot } = useAppStore();
 
     const activeTab = tabs.find(t => t.id === activeTabId);
     const canGoBack = activeTab?.history && (activeTab.historyIndex || 0) > 0;
     const canGoForward = activeTab?.history && (activeTab.historyIndex || 0) < (activeTab.history.length - 1);
+
+    // Check if we can close the current pane (must have more than one pane)
+    const canClosePane = paneRoot.type === 'split';
 
     // Listen for global shortcut
     useEffect(() => {
@@ -65,6 +68,31 @@ export const Toolbar = () => {
                             title="Go Forward"
                         >
                             <ArrowRight className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <div className="flex items-center gap-1 mr-2 border-r border-border pr-2">
+                        <button
+                            onClick={() => activePaneId && splitPane(activePaneId, 'vertical')}
+                            className="p-1.5 hover:bg-accent/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                            title="Split Vertical (Cmd+\)"
+                        >
+                            <SplitSquareHorizontal className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => activePaneId && splitPane(activePaneId, 'horizontal')}
+                            className="p-1.5 hover:bg-accent/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                            title="Split Horizontal (Cmd+Shift+\)"
+                        >
+                            <SplitSquareVertical className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => activePaneId && closePane(activePaneId)}
+                            disabled={!canClosePane}
+                            className={`p-1.5 rounded-md transition-colors ${canClosePane ? 'hover:bg-accent/10 text-muted-foreground hover:text-foreground' : 'text-muted-foreground/30 cursor-not-allowed'}`}
+                            title="Close Pane (Cmd+W)"
+                        >
+                            <XCircle className="w-4 h-4" />
                         </button>
                     </div>
 

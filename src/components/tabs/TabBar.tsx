@@ -1,10 +1,17 @@
 import { useCallback } from 'react';
-import { useAppStore, useTabs, useActiveTabId } from '../../store/useStore';
+import { useAppStore } from '../../store/useStore';
 import { TabItem } from './TabItem';
 
 export const TabBar = () => {
-    const tabs = useTabs();
-    const activeTabId = useActiveTabId();
+    // Subscribe to paneRoot to react to changes
+    const paneRoot = useAppStore(state => state.paneRoot);
+    const activePaneId = useAppStore(state => state.activePaneId);
+    const findPaneById = useAppStore(state => state.findPaneById);
+
+    const activePane = activePaneId ? findPaneById(activePaneId, paneRoot) : null;
+    const tabs = (activePane?.type === 'leaf' ? activePane.tabs : null) || [];
+    const activeTabId = activePane?.type === 'leaf' ? activePane.activeTabId : null;
+
     const setActiveTab = useAppStore(state => state.setActiveTab);
     const closeTab = useAppStore(state => state.closeTab);
 
