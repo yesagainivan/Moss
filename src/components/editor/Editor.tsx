@@ -442,45 +442,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         };
     }, [noteId, editor, parseMarkdown, debouncedUpdate, updateNote, paneId, activePaneId]);
 
-    // Handle AI Commands
-    useEffect(() => {
-        const handleStreamChunk = (e: Event) => {
-            const customEvent = e as CustomEvent;
-            const text = customEvent.detail;
 
-            // CRITICAL: Only process stream if this editor initiated the request
-            const activeRequestPaneId = useAIStore.getState().activeRequestPaneId;
-
-            // If we have a paneId, we MUST match the active request pane
-            if (paneId && activeRequestPaneId && paneId !== activeRequestPaneId) {
-                return;
-            }
-
-            // If we don't have a paneId (legacy/fallback), only process if no specific pane is active
-            if (!paneId && activeRequestPaneId) {
-                return;
-            }
-
-            if (editor && !editor.isDestroyed) {
-                if (isLiveModeActive) {
-                    appendStreamedText(text);
-                    // Insert directly into the editor at the tracked position
-                    editor.chain()
-                        .insertContentAt(liveStreamInsertPos.current!, text)
-                        .run();
-                    liveStreamInsertPos.current! += text.length;
-                } else {
-                    // Diff mode: just append to streamedText state
-                    appendStreamedText(text);
-                }
-            }
-        };
-
-        window.addEventListener('ai-stream-chunk', handleStreamChunk);
-        return () => {
-            window.removeEventListener('ai-stream-chunk', handleStreamChunk);
-        };
-    }, [editor, isLiveModeActive, appendStreamedText, paneId]);
 
     useEffect(() => {
         const handleCommand = async (e: Event) => {
@@ -751,6 +713,19 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     if (!isMounted) return;
                     const chunk = event.payload;
 
+                    // CRITICAL: Only process stream if this editor initiated the request
+                    const activeRequestPaneId = useAIStore.getState().activeRequestPaneId;
+
+                    // If we have a paneId, we MUST match the active request pane
+                    if (paneId && activeRequestPaneId && paneId !== activeRequestPaneId) {
+                        return;
+                    }
+
+                    // If we don't have a paneId (legacy/fallback), only process if no specific pane is active
+                    if (!paneId && activeRequestPaneId) {
+                        return;
+                    }
+
                     // Check if we're in live mode by checking if liveStreamInsertPos is set
                     // This avoids closure issues with settings
                     const isInLiveMode = liveStreamInsertPos.current !== null;
@@ -769,6 +744,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     appendStreamedText(chunk);
                 });
 
+
                 const unlistenDone = await listen('ai-stream-done', async () => {
                     if (!isMounted) return;
                     setStreaming(false);
@@ -786,6 +762,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 if (isMounted) {
                     unlistenFunctions = [unlistenChunk, unlistenDone, unlistenError];
                 } else {
+
                     unlistenChunk();
                     unlistenDone();
                     unlistenError();
