@@ -1,8 +1,8 @@
+import React, { useCallback } from 'react';
 import { useAppStore } from '../../store/useStore';
 import { PaneNode } from '../../types';
 import { PaneView } from './PaneView';
 import { ResizableSplit } from './ResizableSplit';
-import React from 'react';
 
 /**
  * PaneContainer recursively renders the pane tree
@@ -12,7 +12,8 @@ export const PaneContainer = () => {
     const paneRoot = useAppStore(state => state.paneRoot);
     const activePaneId = useAppStore(state => state.activePaneId);
 
-    const renderPane = (node: PaneNode): React.ReactElement => {
+    // Memoize renderPane to prevent unnecessary re-renders
+    const renderPane = useCallback((node: PaneNode): React.ReactElement => {
         if (node.type === 'leaf') {
             // Render a single pane with editor
             return <PaneView paneId={node.id} isActive={node.id === activePaneId} />;
@@ -38,7 +39,7 @@ export const PaneContainer = () => {
         }
 
         return <div>Invalid pane configuration</div>;
-    };
+    }, [activePaneId]); // Only recreate when activePaneId changes
 
     return (
         <div className="flex-1 h-full overflow-hidden">

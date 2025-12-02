@@ -13,7 +13,7 @@ interface ResizableSplitProps {
     persistenceKey?: string; // Key for localStorage persistence
 }
 
-export const ResizableSplit: React.FC<ResizableSplitProps> = ({
+export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
     mainContent,
     sideContent,
     side,
@@ -155,4 +155,4 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = ({
             )}
         </div>
     );
-};
+});

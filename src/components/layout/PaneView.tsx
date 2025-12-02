@@ -1,3 +1,4 @@
+import React, { useCallback } from 'react';
 import { useAppStore } from '../../store/useStore';
 import { EditorLoader } from '../editor/EditorLoader';
 
@@ -8,14 +9,25 @@ interface PaneViewProps {
 
 /**
  * PaneView renders a single leaf pane with its editor
+ * Optimized with React.memo to prevent unnecessary re-renders
  */
-export const PaneView = ({ paneId, isActive }: PaneViewProps) => {
-    const paneRoot = useAppStore(state => state.paneRoot);
-    const findPaneById = useAppStore(state => state.findPaneById);
-    const pane = findPaneById(paneId, paneRoot);
-
+export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
+    // Optimized selector - only fetches this specific pane, not entire tree
+    const pane = useAppStore(
+        useCallback(
+            state => state.findPaneById(paneId),
+            [paneId]
+        )
+    );
     const setActivePane = useAppStore(state => state.setActivePane);
     const notes = useAppStore(state => state.notes);
+
+    // Stable callback reference prevents child re-renders
+    const handleClick = useCallback(() => {
+        if (!isActive) {
+            setActivePane(paneId);
+        }
+    }, [isActive, paneId, setActivePane]);
 
     if (!pane || pane.type !== 'leaf') {
         return null;
@@ -27,20 +39,11 @@ export const PaneView = ({ paneId, isActive }: PaneViewProps) => {
     const noteId = activeTab?.noteId;
     const note = noteId ? notes[noteId] : null;
 
-    const handleClick = () => {
-        if (!isActive) {
-            setActivePane(paneId);
-        }
-    };
-
     return (
         <div
             className={`flex-1 flex flex-col h-full overflow-hidden relative ${isActive ? 'border border-accent' : ''
                 }`}
             onClick={handleClick}
-        // className={`flex-1 flex flex-col h-full overflow-hidden relative ${isActive ? 'ring-2 ring-accent/50 ring-inset' : ''
-        //     }`}
-        // onClick={handleClick}
         >
             {noteId && note ? (
                 <EditorLoader noteId={noteId} paneId={paneId} />
@@ -54,4 +57,4 @@ export const PaneView = ({ paneId, isActive }: PaneViewProps) => {
             )}
         </div>
     );
-};
+});

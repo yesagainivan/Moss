@@ -22,6 +22,11 @@ const persistExpandedPathsDebounced = debounce((paths: Set<string>) => {
     localStorage.setItem('moss-expanded-paths', JSON.stringify(Array.from(paths)));
 }, 300);
 
+// Debounced helper to persist pane root to prevent blocking UI
+const persistPaneRootDebounced = debounce((paneRoot: PaneNode) => {
+    localStorage.setItem('moss-pane-root', JSON.stringify(paneRoot));
+}, 300);
+
 // Save queue to prevent concurrent saves to the same note
 const saveQueue = new Map<string, Promise<void>>();
 // Pending content for queued saves
@@ -30,6 +35,30 @@ const pendingSaves = new Map<string, string>();
 // Debounced save functions per note (2 second debounce)
 // Debounced save functions per note (2 second debounce)
 const debouncedSaveByNote = new Map<string, { debouncer: ReturnType<typeof debounce>, delay: number }>();
+
+// ============================================================================
+// Pane Index Helper (Phase 3)
+// ============================================================================
+
+/**
+ * Rebuilds the pane index from the tree for O(1) lookups.
+ * Call this whenever the pane tree structure changes.
+ */
+const updatePaneIndex = (root: PaneNode): Map<string, PaneNode> => {
+    const index = new Map<string, PaneNode>();
+
+    const traverse = (node: PaneNode) => {
+        index.set(node.id, node);
+
+        if (node.type === 'split' && node.children) {
+            traverse(node.children[0]);
+            traverse(node.children[1]);
+        }
+    };
+
+    traverse(root);
+    return index;
+};
 
 // ============================================================================
 // File Tree Helpers (Incremental Updates)
@@ -111,6 +140,7 @@ interface AppState {
     // Pane system for split view
     paneRoot: PaneNode; // Root of the pane tree
     activePaneId: string | null; // Which leaf pane currently has focus
+    paneIndex: Map<string, PaneNode>; // O(1) lookup index for panes
 
     // Actions
     initialize: () => Promise<void>;
@@ -234,6 +264,12 @@ export const useAppStore = create<AppState>((set, get) => ({
         activeTabId: null
     },
     activePaneId: 'root',
+    paneIndex: new Map([['root', {
+        id: 'root',
+        type: 'leaf',
+        tabs: [],
+        activeTabId: null
+    }]]), // Initialize index with root pane
 
     initialize: async () => {
         set({ isVaultLoading: true });
@@ -327,6 +363,9 @@ export const useAppStore = create<AppState>((set, get) => ({
                     };
                 }
 
+                // Build pane index from restored tree
+                const paneIndex = updatePaneIndex(paneRoot);
+
                 set({
                     notes: restoredNotes,
                     tabs: restoredTabs,
@@ -336,7 +375,8 @@ export const useAppStore = create<AppState>((set, get) => ({
                     isVaultLoading: false,
                     expandedPaths,
                     paneRoot,
-                    activePaneId
+                    activePaneId,
+                    paneIndex // Initialize index
                 });
 
                 // Check Git status for the restored vault
@@ -1413,45 +1453,45 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     // ============================================================================
-    // Pane Management
+    // Pane Management - Optimized with O(1) Index (Phase 3)
     // ============================================================================
 
-    findPaneById: (id: string, node?: PaneNode): PaneNode | null => {
-        const searchNode = node || get().paneRoot;
-
-        if (searchNode.id === id) {
-            return searchNode;
-        }
-
-        if (searchNode.type === 'split' && searchNode.children) {
-            const leftResult = get().findPaneById(id, searchNode.children[0]);
-            if (leftResult) return leftResult;
-
-            const rightResult = get().findPaneById(id, searchNode.children[1]);
-            if (rightResult) return rightResult;
-        }
-
-        return null;
+    /**
+     * Find pane by ID using O(1) index lookup.
+     * Previously: O(n) recursive tree traversal
+     * Now: O(1) direct map lookup
+     */
+    findPaneById: (id: string): PaneNode | null => {
+        return get().paneIndex.get(id) || null;
     },
 
-    getAllLeafPanes: (node?: PaneNode): PaneNode[] => {
-        const searchNode = node || get().paneRoot;
-
-        if (searchNode.type === 'leaf') {
-            return [searchNode];
-        }
-
-        if (searchNode.type === 'split' && searchNode.children) {
-            const leftLeaves = get().getAllLeafPanes(searchNode.children[0]);
-            const rightLeaves = get().getAllLeafPanes(searchNode.children[1]);
-            return [...leftLeaves, ...rightLeaves];
-        }
-
-        return [];
+    /**
+     * Get all leaf panes using index.
+     * Previously: O(n) recursive traversal
+     * Now: O(n) but simpler - iterate index values
+     */
+    getAllLeafPanes: (): PaneNode[] => {
+        const panes = Array.from(get().paneIndex.values());
+        return panes.filter(pane => pane.type === 'leaf');
     },
 
-    splitPane: (paneId: string, direction: 'horizontal' | 'vertical') => {
-        const paneRoot = get().paneRoot;
+    splitPane: (paneId: string, direction: 'horizontal' | 'vertical'): boolean => {
+        const state = get();
+        const pane = state.findPaneById(paneId);
+
+        // Validate pane exists
+        if (!pane) {
+            console.error(`[splitPane] Cannot split: pane ${paneId} not found`);
+            return false;
+        }
+
+        // Validate pane is a leaf node
+        if (pane.type !== 'leaf') {
+            console.error(`[splitPane] Cannot split: pane ${paneId} is already a split node`);
+            return false;
+        }
+
+        const paneRoot = state.paneRoot;
 
         // Helper function to recursively update the tree
         const updateTree = (node: PaneNode): PaneNode => {
@@ -1493,18 +1533,32 @@ export const useAppStore = create<AppState>((set, get) => ({
         };
 
         const newRoot = updateTree(paneRoot);
-        set({ paneRoot: newRoot });
+        const newIndex = updatePaneIndex(newRoot);
 
-        // Persist to localStorage
-        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+        set({
+            paneRoot: newRoot,
+            paneIndex: newIndex
+        });
+
+        // Persist to localStorage (debounced)
+        persistPaneRootDebounced(newRoot);
+        return true;
     },
 
-    closePane: (paneId: string) => {
+    closePane: (paneId: string): boolean => {
         const paneRoot = get().paneRoot;
 
         // Can't close if it's the only pane
         if (paneRoot.type === 'leaf') {
-            return;
+            console.warn('[closePane] Cannot close the last pane');
+            return false;
+        }
+
+        // Validate pane exists
+        const pane = get().findPaneById(paneId);
+        if (!pane) {
+            console.error(`[closePane] Cannot close: pane ${paneId} not found`);
+            return false;
         }
 
         // Helper to find parent of pane and collapse the split
@@ -1547,7 +1601,12 @@ export const useAppStore = create<AppState>((set, get) => ({
 
         const { newNode } = updateTree(paneRoot);
         if (newNode) {
-            set({ paneRoot: newNode });
+            const newIndex = updatePaneIndex(newNode);
+
+            set({
+                paneRoot: newNode,
+                paneIndex: newIndex
+            });
 
             // Update active pane if we closed it
             if (get().activePaneId === paneId) {
@@ -1557,9 +1616,13 @@ export const useAppStore = create<AppState>((set, get) => ({
                 }
             }
 
-            // Persist to localStorage
-            localStorage.setItem('moss-pane-root', JSON.stringify(newNode));
+            // Persist to localStorage (debounced)
+            persistPaneRootDebounced(newNode);
+            return true;
         }
+
+        console.error(`[closePane] Failed to close pane ${paneId}`);
+        return false;
     },
 
     setActivePane: (paneId: string) => {
@@ -1599,10 +1662,15 @@ export const useAppStore = create<AppState>((set, get) => ({
         };
 
         const newRoot = updateTree(paneRoot);
-        set({ paneRoot: newRoot });
+        const newIndex = updatePaneIndex(newRoot);
 
-        // Persist to localStorage
-        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+        set({
+            paneRoot: newRoot,
+            paneIndex: newIndex
+        });
+
+        // Persist to localStorage (debounced)
+        persistPaneRootDebounced(newRoot);
     },
 
     // Pane-aware tab helpers
@@ -1645,8 +1713,13 @@ export const useAppStore = create<AppState>((set, get) => ({
         };
 
         const newRoot = updateTree(paneRoot);
-        set({ paneRoot: newRoot });
-        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+        const newIndex = updatePaneIndex(newRoot);
+
+        set({
+            paneRoot: newRoot,
+            paneIndex: newIndex
+        });
+        persistPaneRootDebounced(newRoot);
     },
 
     removeTabFromPane: (paneId: string, tabId: string) => {
@@ -1681,8 +1754,13 @@ export const useAppStore = create<AppState>((set, get) => ({
         };
 
         const newRoot = updateTree(paneRoot);
-        set({ paneRoot: newRoot });
-        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+        const newIndex = updatePaneIndex(newRoot);
+
+        set({
+            paneRoot: newRoot,
+            paneIndex: newIndex
+        });
+        persistPaneRootDebounced(newRoot);
     },
 
     updateTabInPane: (paneId: string, tabId: string, updates: Partial<Tab>) => {
@@ -1712,12 +1790,21 @@ export const useAppStore = create<AppState>((set, get) => ({
         };
 
         const newRoot = updateTree(paneRoot);
-        set({ paneRoot: newRoot });
-        localStorage.setItem('moss-pane-root', JSON.stringify(newRoot));
+        const newIndex = updatePaneIndex(newRoot);
+
+        set({
+            paneRoot: newRoot,
+            paneIndex: newIndex
+        });
+        persistPaneRootDebounced(newRoot);
     },
 
+    /**
+     * Find pane containing a specific tab.
+     * Uses index to iterate only leaf panes instead of full tree traversal.
+     */
     findPaneByTabId: (tabId: string) => {
-        const leafPanes = get().getAllLeafPanes();
+        const leafPanes = get().getAllLeafPanes(); // Now O(n) via index, not recursive
         for (const pane of leafPanes) {
             if (pane.tabs?.some(t => t.id === tabId)) {
                 return pane;
