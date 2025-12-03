@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Toolbar } from './Toolbar';
 import { TabBar } from '../tabs/TabBar';
 import { ResizableSplit } from './ResizableSplit';
@@ -15,6 +16,57 @@ export const MainContent = () => {
     const isAgentOpen = useAgentStore(state => state.isOpen);
     const settings = useSettingsStore(state => state.settings);
 
+    // Memoize PaneContainer to prevent remounting when unrelated state changes
+    const paneContainer = useMemo(() => <PaneContainer />, []);
+
+    // Memoize the main content area to maintain stable references
+    const mainContent = useMemo(() => {
+        if (currentView === 'graph' && settings.graphPosition === 'center') {
+            return (
+                <ResizableSplit
+                    side="right"
+                    initialSize={400}
+                    minSize={300}
+                    maxSize={800}
+                    persistenceKey="moss-graph-width"
+                    sideContent={<GraphView />}
+                    mainContent={paneContainer}
+                />
+            );
+        }
+        return paneContainer;
+    }, [currentView, settings.graphPosition, paneContainer]);
+
+    // Memoize the side content area
+    const sideContent = useMemo(() => {
+        const showGraph = currentView === 'graph' && settings.graphPosition === 'sidebar';
+        const showAgent = isAgentOpen;
+
+        if (showGraph && showAgent) {
+            return (
+                <ResizableSplit
+                    side="top"
+                    initialSize={300}
+                    minSize={150}
+                    maxSize={600}
+                    persistenceKey="moss-graph-height"
+                    sideContent={<GraphView />}
+                    mainContent={<AgentChat />}
+                />
+            );
+        }
+
+        if (showGraph) {
+            return <GraphView />;
+        }
+
+        if (showAgent) {
+            return <AgentChat />;
+        }
+
+        return null;
+    }, [currentView, settings.graphPosition, isAgentOpen]);
+
     return (
         <div className="flex-1 flex flex-col min-w-0 bg-background h-full overflow-hidden">
             <Toolbar />
@@ -28,51 +80,8 @@ export const MainContent = () => {
                     maxSize={600}
                     isOpen={isAgentOpen || (currentView === 'graph' && settings.graphPosition === 'sidebar')}
                     persistenceKey="moss-agent-width"
-                    sideContent={
-                        (() => {
-                            const showGraph = currentView === 'graph' && settings.graphPosition === 'sidebar';
-                            const showAgent = isAgentOpen;
-
-                            if (showGraph && showAgent) {
-                                return (
-                                    <ResizableSplit
-                                        side="top"
-                                        initialSize={300}
-                                        minSize={150}
-                                        maxSize={600}
-                                        persistenceKey="moss-graph-height"
-                                        sideContent={<GraphView />}
-                                        mainContent={<AgentChat />}
-                                    />
-                                );
-                            }
-
-                            if (showGraph) {
-                                return <GraphView />;
-                            }
-
-                            if (showAgent) {
-                                return <AgentChat />;
-                            }
-
-                            return null;
-                        })()
-                    }
-                    mainContent={
-                        currentView === 'graph' && settings.graphPosition === 'center' ? (
-                            <ResizableSplit
-                                side="right"
-                                initialSize={400}
-                                minSize={300}
-                                maxSize={800}
-                                persistenceKey="moss-graph-width"
-                                sideContent={<GraphView />}
-                                mainContent={<PaneContainer />}
-                            />
-                        ) : (
-                            <PaneContainer />
-                        )
-                    }
+                    sideContent={sideContent}
+                    mainContent={mainContent}
                 />
             </div>
         </div>

@@ -41,10 +41,13 @@ export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
 
     return (
         <div
-            className={`flex-1 flex flex-col h-full overflow-hidden relative ${isActive ? 'border-b border-accent' : ''
-                }`}
+            className="flex-1 flex flex-col h-full overflow-hidden relative"
             onClick={handleClick}
         >
+            {/* Active pane indicator dot */}
+            {isActive && (
+                <div className="absolute top-2 right-2 z-10 w-2 h-2 rounded-full bg-accent animate-pulse" />
+            )}
             {noteId && note ? (
                 <EditorLoader noteId={noteId} paneId={paneId} />
             ) : (

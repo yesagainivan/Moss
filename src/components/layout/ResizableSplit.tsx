@@ -88,39 +88,36 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
         }
     }, [isResizing, size, persistenceKey]);
 
-    if (!isOpen) {
-        return (
-            <div ref={containerRef} className={cn("flex h-full w-full overflow-hidden", isVertical ? "flex-col" : "flex-row", className)}>
-                <div className="flex-1 min-w-0 min-h-0 h-full w-full overflow-hidden">
-                    {mainContent}
-                </div>
-            </div>
-        );
-    }
-
+    // Always render the same structure, use CSS to hide/show instead of conditional rendering
+    // This prevents mainContent from remounting when isOpen changes
     return (
         <div ref={containerRef} className={cn("flex h-full w-full overflow-hidden", isVertical ? "flex-col" : "flex-row", className)}>
             {(side === 'left' || side === 'top') && (
                 <>
                     <div
                         ref={sidebarRef}
-                        style={{ [isVertical ? 'height' : 'width']: size }}
+                        style={{
+                            [isVertical ? 'height' : 'width']: isOpen ? size : 0,
+                            display: isOpen ? 'block' : 'none'
+                        }}
                         className="shrink-0 overflow-hidden"
                     >
                         {sideContent}
                     </div>
-                    <div
-                        className={cn(
-                            "z-10 flex items-center justify-center group transition-colors hover:bg-accent/50 active:bg-accent",
-                            isVertical ? "h-1 w-full cursor-row-resize" : "w-1 h-full cursor-col-resize"
-                        )}
-                        onMouseDown={startResizing}
-                    >
-                        <div className={cn(
-                            "bg-border group-hover:bg-accent/50",
-                            isVertical ? "h-[1px] w-full" : "w-[1px] h-full"
-                        )} />
-                    </div>
+                    {isOpen && (
+                        <div
+                            className={cn(
+                                "z-10 flex items-center justify-center group transition-colors hover:bg-accent/50 active:bg-accent",
+                                isVertical ? "h-1 w-full cursor-row-resize" : "w-1 h-full cursor-col-resize"
+                            )}
+                            onMouseDown={startResizing}
+                        >
+                            <div className={cn(
+                                "bg-border group-hover:bg-accent/50",
+                                isVertical ? "h-[1px] w-full" : "w-[1px] h-full"
+                            )} />
+                        </div>
+                    )}
                 </>
             )}
 
@@ -133,20 +130,25 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
 
             {(side === 'right' || side === 'bottom') && (
                 <>
+                    {isOpen && (
+                        <div
+                            className={cn(
+                                "z-10 flex items-center justify-center group transition-colors hover:bg-accent/50 active:bg-accent",
+                                isVertical ? "h-1 w-full cursor-row-resize" : "w-1 h-full cursor-col-resize"
+                            )}
+                            onMouseDown={startResizing}
+                        >
+                            <div className={cn(
+                                "bg-border group-hover:bg-accent/50",
+                                isVertical ? "h-[1px] w-full" : "w-[1px] h-full"
+                            )} />
+                        </div>
+                    )}
                     <div
-                        className={cn(
-                            "z-10 flex items-center justify-center group transition-colors hover:bg-accent/50 active:bg-accent",
-                            isVertical ? "h-1 w-full cursor-row-resize" : "w-1 h-full cursor-col-resize"
-                        )}
-                        onMouseDown={startResizing}
-                    >
-                        <div className={cn(
-                            "bg-border group-hover:bg-accent/50",
-                            isVertical ? "h-[1px] w-full" : "w-[1px] h-full"
-                        )} />
-                    </div>
-                    <div
-                        style={{ [isVertical ? 'height' : 'width']: size }}
+                        style={{
+                            [isVertical ? 'height' : 'width']: isOpen ? size : 0,
+                            display: isOpen ? 'block' : 'none'
+                        }}
                         className="shrink-0 overflow-hidden"
                     >
                         {sideContent}

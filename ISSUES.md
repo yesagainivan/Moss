@@ -181,31 +181,46 @@ This is technically correct for a pane-based system, but users might expect to s
 
 ---
 
-### 6. No Visual Indicator for Active Pane
+### 6. ✅ No Visual Indicator for Active Pane
 
 **Severity:** Medium  
 **Impact:** Hard to tell which pane is active when typing  
-**Status:** Partially addressed
+**Status:** ✅ RESOLVED (December 3, 2025)
 
-#### Current Implementation
+#### Original Problem
 ```typescript:src/components/layout/PaneView.tsx
-// Lines 43-46: Border on active pane
+// Old implementation - border approach
 <div
     className={`flex-1 flex flex-col h-full overflow-hidden relative ${isActive ? 'border border-accent' : ''}`}
     onClick={handleClick}
 >
 ```
 
-A border is shown, but it might not be prominent enough.
+A border was shown, but it wasn't prominent enough.
 
-#### Recommendation
-Consider more prominent visual indicators:
-- Subtle background tint
-- Animated glow effect
-- Title bar color change
+#### Resolution
+Replaced the border approach with a **dot indicator** in the top right corner:
 
-**Estimated Effort:** 1 hour  
-**Risk:** Very low (pure styling)
+```typescript:src/components/layout/PaneView.tsx
+// New implementation - dot indicator
+<div
+    className="flex-1 flex flex-col h-full overflow-hidden relative"
+    onClick={handleClick}
+>
+    {/* Active pane indicator dot */}
+    {isActive && (
+        <div className="absolute top-2 right-2 z-10 w-2 h-2 rounded-full bg-accent animate-pulse" />
+    )}
+```
+
+**Features:**
+- Small 8x8 pixel dot in top right corner
+- Uses accent color for theme consistency
+- Subtle pulse animation for visibility
+- Positioned absolutely to not affect layout
+
+**Time to Complete:** 10 minutes  
+**Impact:** Clear, unobtrusive visual feedback
 
 ---
 
