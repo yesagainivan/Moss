@@ -264,9 +264,11 @@ export const useAppStore = create<AppState>((set, get) => ({
         type: 'leaf',
         tabs: [],
         activeTabId: null
-    }]]), // Initialize index with root pane
-
+    }]]),
     initialize: async () => {
+        const { vaultPath } = get();
+        if (vaultPath) return; // Already initialized
+
         set({ isVaultLoading: true });
         const savedVault = localStorage.getItem('moss-vault-path');
         if (savedVault) {
@@ -276,86 +278,51 @@ export const useAppStore = create<AppState>((set, get) => ({
 
                 const files = await readVault(savedVault);
 
-                // Restore saved tabs
-                const savedTabsJson = localStorage.getItem('moss-tabs');
-                const savedActiveTabId = localStorage.getItem('moss-active-tab');
-                let restoredTabs: Tab[] = [];
-                let restoredNotes: Record<string, Note> = {};
-
-                if (savedTabsJson) {
-                    try {
-                        const savedTabs = JSON.parse(savedTabsJson) as Tab[];
-                        // Only restore non-preview tabs
-                        const permanentTabs = savedTabs.filter(t => !t.isPreview);
-
-                        // Load note content for each tab
-                        for (const tab of permanentTabs) {
-                            try {
-                                const content = await loadNoteContent(tab.noteId);
-                                const name = tab.noteId.split('/').pop() || 'Untitled';
-                                restoredNotes[tab.noteId] = {
-                                    id: tab.noteId,
-                                    title: name,
-                                    content,
-                                    createdAt: Date.now(),
-                                    updatedAt: Date.now(),
-                                };
-                                // Ensure history exists (migration)
-                                restoredTabs.push({
-                                    ...tab,
-                                    history: tab.history || [tab.noteId],
-                                    historyIndex: tab.historyIndex !== undefined ? tab.historyIndex : 0
-                                });
-                            } catch (e) {
-                                console.warn(`Failed to restore tab for note ${tab.noteId}:`, e);
-                                // Skip this tab if the file no longer exists
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Failed to parse saved tabs:', e);
-                    }
-                }
-
                 // Restore expanded paths
                 const savedExpandedPathsJson = localStorage.getItem('moss-expanded-paths');
                 const expandedPaths = savedExpandedPathsJson
                     ? new Set(JSON.parse(savedExpandedPathsJson) as string[])
                     : new Set<string>();
 
-                // Restore pane state
-                const savedPaneRootJson = localStorage.getItem('moss-pane-root');
-                const savedActivePaneId = localStorage.getItem('moss-active-pane-id');
+                // Restore pane state from vault
+                const paneLayout = await loadPaneLayout(savedVault);
 
                 let paneRoot = get().paneRoot;
                 let activePaneId = get().activePaneId;
+                let restoredNotes: Record<string, Note> = {};
 
-                if (savedPaneRootJson) {
-                    try {
-                        paneRoot = JSON.parse(savedPaneRootJson);
-                        if (savedActivePaneId) {
-                            activePaneId = savedActivePaneId;
-                        }
+                if (paneLayout) {
+                    paneRoot = paneLayout.paneRoot;
+                    activePaneId = paneLayout.activePaneId;
+                }
 
-                        // Migration: If pane root is a leaf and doesn't have tabs but we have globals tabs, migrate them
-                        if (paneRoot.type === 'leaf' && (!paneRoot.tabs || paneRoot.tabs.length === 0) && restoredTabs.length > 0) {
-                            paneRoot = {
-                                ...paneRoot,
-                                tabs: restoredTabs,
-                                activeTabId: savedActiveTabId || (restoredTabs.length > 0 ? restoredTabs[0].id : null)
-                            };
-                        }
-                    } catch (e) {
-                        console.error('Failed to parse saved pane state:', e);
+                // Collect all tabs to load their content
+                const allTabs: Tab[] = [];
+                const traverse = (node: PaneNode) => {
+                    if (node.type === 'leaf' && node.tabs) {
+                        allTabs.push(...node.tabs);
                     }
-                } else {
-                    // No saved pane state - fresh start or migration from old version
-                    // Put all restored tabs into the root pane
-                    paneRoot = {
-                        id: 'root',
-                        type: 'leaf',
-                        tabs: restoredTabs,
-                        activeTabId: savedActiveTabId || (restoredTabs.length > 0 ? restoredTabs[0].id : null)
-                    };
+                    if (node.children) {
+                        node.children.forEach(traverse);
+                    }
+                };
+                traverse(paneRoot);
+
+                // Load note content for each tab
+                for (const tab of allTabs) {
+                    try {
+                        const content = await loadNoteContent(tab.noteId);
+                        const name = tab.noteId.split('/').pop() || 'Untitled';
+                        restoredNotes[tab.noteId] = {
+                            id: tab.noteId,
+                            title: name,
+                            content,
+                            createdAt: Date.now(),
+                            updatedAt: Date.now(),
+                        };
+                    } catch (e) {
+                        console.warn(`Failed to restore tab for note ${tab.noteId}:`, e);
+                    }
                 }
 
                 // Build pane index from restored tree
@@ -363,8 +330,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
                 set({
                     notes: restoredNotes,
-                    tabs: restoredTabs,
-                    activeTabId: savedActiveTabId,
+                    // ❌ REMOVED: tabs: restoredTabs,
+                    // ❌ REMOVED: activeTabId: savedActiveTabId,
                     fileTree: files,
                     vaultPath: savedVault,
                     isVaultLoading: false,
@@ -523,11 +490,6 @@ export const useAppStore = create<AppState>((set, get) => ({
             const newDirtyIds = new Set(state.dirtyNoteIds);
             newDirtyIds.add(id);
 
-            // Also update active tab dirty state if it matches
-            const newTabs = state.tabs.map(t =>
-                t.noteId === id ? { ...t, isDirty: true, isPreview: false } : t
-            );
-
             // Check if note exists
             const existingNote = state.notes[id];
             let newNoteEntry: Note;
@@ -552,14 +514,23 @@ export const useAppStore = create<AppState>((set, get) => ({
                     ...state.notes,
                     [id]: newNoteEntry
                 },
-                dirtyNoteIds: newDirtyIds,
-                tabs: newTabs
+                dirtyNoteIds: newDirtyIds
             };
         });
+
+        // Update pane tabs to reflect dirty state
+        const state = get();
+        const leafPanes = state.getAllLeafPanes();
+        for (const pane of leafPanes) {
+            const tab = pane.tabs?.find(t => t.noteId === id);
+            if (tab && (!tab.isDirty || tab.isPreview)) {
+                state.updateTabInPane(pane.id, tab.id, { isDirty: true, isPreview: false });
+            }
+        }
     },
 
     renameNote: async (id, title) => {
-        const { vaultPath, notes, tabs } = get();
+        const { vaultPath, notes } = get();
 
         // If it's a file path
         if (id.includes('/') && vaultPath) {
@@ -583,12 +554,36 @@ export const useAppStore = create<AppState>((set, get) => ({
                     newNotes[newPath] = { ...note, id: newPath, title: newFilename };
                 }
 
-                // 2. Tabs - Update current noteId AND history
-                const newTabs = tabs.map(t => ({
-                    ...t,
-                    noteId: t.noteId === oldPath ? newPath : t.noteId,
-                    history: t.history ? t.history.map(h => h === oldPath ? newPath : h) : [t.noteId === oldPath ? newPath : t.noteId]
-                }));
+                // 2. Tabs - Update current noteId AND history in ALL panes
+                const { paneRoot, activePaneId } = get();
+                const newRoot = JSON.parse(JSON.stringify(paneRoot));
+                let changed = false;
+
+                const traverse = (node: PaneNode) => {
+                    if (node.type === 'leaf' && node.tabs) {
+                        const newTabs = node.tabs.map(t => ({
+                            ...t,
+                            noteId: t.noteId === oldPath ? newPath : t.noteId,
+                            history: t.history ? t.history.map(h => h === oldPath ? newPath : h) : [t.noteId === oldPath ? newPath : t.noteId]
+                        }));
+                        if (JSON.stringify(newTabs) !== JSON.stringify(node.tabs)) {
+                            node.tabs = newTabs;
+                            changed = true;
+                        }
+                    }
+                    if (node.children) {
+                        node.children.forEach(traverse);
+                    }
+                };
+                traverse(newRoot);
+
+                if (changed) {
+                    const newIndex = updatePaneIndex(newRoot);
+                    set({ paneRoot: newRoot, paneIndex: newIndex });
+                    if (vaultPath) {
+                        persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId });
+                    }
+                }
 
                 // 3. FileTree - Incremental update
                 const newName = newPath.split('/').pop() || title;
@@ -603,7 +598,6 @@ export const useAppStore = create<AppState>((set, get) => ({
 
                 set({
                     notes: newNotes,
-                    tabs: newTabs,
                     fileTree: sortFileNodes(newTree)
                 });
 
@@ -625,7 +619,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     moveNote: async (oldPath: string, newPath: string) => {
-        const { vaultPath, notes, tabs } = get();
+        const { vaultPath, notes } = get();
 
         if (vaultPath) {
             try {
@@ -642,19 +636,40 @@ export const useAppStore = create<AppState>((set, get) => ({
                     newNotes[newPath] = { ...note, id: newPath, title: newFilename };
                 }
 
-                // 2. Tabs - Update current noteId AND history
-                const newTabs = tabs.map(t => ({
-                    ...t,
-                    noteId: t.noteId === oldPath ? newPath : t.noteId,
-                    history: t.history ? t.history.map(h => h === oldPath ? newPath : h) : [t.noteId === oldPath ? newPath : t.noteId]
-                }));
+                // 2. Tabs - Update current noteId AND history in ALL panes
+                const { paneRoot, activePaneId } = get();
+                const newRoot = JSON.parse(JSON.stringify(paneRoot));
+                let changed = false;
+
+                const traverse = (node: PaneNode) => {
+                    if (node.type === 'leaf' && node.tabs) {
+                        const newTabs = node.tabs.map(t => ({
+                            ...t,
+                            noteId: t.noteId === oldPath ? newPath : t.noteId,
+                            history: t.history ? t.history.map(h => h === oldPath ? newPath : h) : [t.noteId === oldPath ? newPath : t.noteId]
+                        }));
+                        if (JSON.stringify(newTabs) !== JSON.stringify(node.tabs)) {
+                            node.tabs = newTabs;
+                            changed = true;
+                        }
+                    }
+                    if (node.children) {
+                        node.children.forEach(traverse);
+                    }
+                };
+                traverse(newRoot);
+
+                if (changed) {
+                    const newIndex = updatePaneIndex(newRoot);
+                    set({ paneRoot: newRoot, paneIndex: newIndex });
+                    persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId });
+                }
 
                 // 3. FileTree
                 const files = await readVault(vaultPath);
 
                 set({
                     notes: newNotes,
-                    tabs: newTabs,
                     fileTree: files
                 });
             } catch (e) {
@@ -674,9 +689,15 @@ export const useAppStore = create<AppState>((set, get) => ({
                 await deleteFile(id);
 
                 // Close any tabs with this note
-                const tabsToClose = tabs.filter(t => t.noteId === id);
-                for (const tab of tabsToClose) {
-                    get().closeTab(tab.id);
+                const { getAllLeafPanes } = get();
+                const leafPanes = getAllLeafPanes();
+                for (const pane of leafPanes) {
+                    const tabsToClose = pane.tabs?.filter(t => t.noteId === id);
+                    if (tabsToClose) {
+                        for (const tab of tabsToClose) {
+                            get().closeTab(tab.id);
+                        }
+                    }
                 }
 
                 // Remove from notes
@@ -693,9 +714,15 @@ export const useAppStore = create<AppState>((set, get) => ({
             }
         } else {
             // Memory note - just remove from state
-            const tabsToClose = tabs.filter(t => t.noteId === id);
-            for (const tab of tabsToClose) {
-                get().closeTab(tab.id);
+            const { getAllLeafPanes } = get();
+            const leafPanes = getAllLeafPanes();
+            for (const pane of leafPanes) {
+                const tabsToClose = pane.tabs?.filter(t => t.noteId === id);
+                if (tabsToClose) {
+                    for (const tab of tabsToClose) {
+                        get().closeTab(tab.id);
+                    }
+                }
             }
 
             const newNotes = { ...notes };
@@ -709,15 +736,34 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     deleteFolder: async (path: string) => {
-        const { vaultPath, tabs } = get();
+        const { vaultPath } = get();
         if (vaultPath) {
             try {
                 await deleteFolderFS(path);
 
-                // Close tabs for notes in this folder
-                const tabsToClose = tabs.filter(t => t.noteId.startsWith(path + '/'));
-                for (const tab of tabsToClose) {
-                    get().closeTab(tab.id);
+                // Update tabs in all panes
+                const { paneRoot, activePaneId } = get();
+                const newRoot = JSON.parse(JSON.stringify(paneRoot));
+                let changed = false;
+
+                const traverse = (node: PaneNode) => {
+                    if (node.type === 'leaf' && node.tabs) {
+                        const newTabs = node.tabs.filter(t => !t.noteId.startsWith(path + '/'));
+                        if (JSON.stringify(newTabs) !== JSON.stringify(node.tabs)) {
+                            node.tabs = newTabs;
+                            changed = true;
+                        }
+                    }
+                    if (node.children) node.children.forEach(traverse);
+                };
+                traverse(newRoot);
+
+                if (changed) {
+                    const newIndex = updatePaneIndex(newRoot);
+                    set({ paneRoot: newRoot, paneIndex: newIndex });
+                    if (vaultPath) {
+                        persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId });
+                    }
                 }
 
                 // Refresh tree
@@ -860,17 +906,6 @@ export const useAppStore = create<AppState>((set, get) => ({
             };
 
             addTabToPane(targetPane.id, newTabObj);
-
-            // Update global state for backward compatibility
-            set((state) => {
-                const newTabs = [...state.tabs, newTabObj];
-                persistTabsDebounced(newTabs, newTabObj.id);
-                return {
-                    tabs: newTabs,
-                    activeTabId: newTabObj.id
-                };
-            });
-
             get().revealNoteInSidebar(noteId);
             return;
         }
@@ -889,177 +924,160 @@ export const useAppStore = create<AppState>((set, get) => ({
             };
 
             updateTabInPane(targetPane.id, currentTab.id, tabUpdates);
-
-            // Also update global tabs for backward compatibility
-            set((state) => {
-                const newTabs = state.tabs.map(t =>
-                    t.id === currentTab.id ? { ...t, ...tabUpdates } : t
-                );
-                persistTabsDebounced(newTabs, currentTab.id);
-                return { tabs: newTabs, activeTabId: currentTab.id };
-            });
-
             get().revealNoteInSidebar(noteId);
         }
     },
 
     navigateBack: () => {
-        const { tabs, activeTabId } = get();
-        const activeTab = tabs.find(t => t.id === activeTabId);
+        const { getActivePane, updateTabInPane, dirtyNoteIds } = get();
+        const activePane = getActivePane();
+        if (!activePane) return;
+
+        const activeTab = activePane.tabs?.find(t => t.id === activePane.activeTabId);
 
         if (activeTab && activeTab.history && activeTab.historyIndex > 0) {
-            set((state) => {
-                const newTabs = state.tabs.map(t => {
-                    if (t.id === activeTabId) {
-                        const newIndex = t.historyIndex - 1;
-                        const newNoteId = t.history[newIndex];
-                        return {
-                            ...t,
-                            noteId: newNoteId,
-                            historyIndex: newIndex,
-                            isDirty: state.dirtyNoteIds.has(newNoteId)
-                        };
-                    }
-                    return t;
-                });
-                persistTabsDebounced(newTabs, activeTabId);
-                return { tabs: newTabs };
+            const newIndex = activeTab.historyIndex - 1;
+            const newNoteId = activeTab.history[newIndex];
+
+            updateTabInPane(activePane.id, activeTab.id, {
+                noteId: newNoteId,
+                historyIndex: newIndex,
+                isDirty: dirtyNoteIds.has(newNoteId)
             });
         }
     },
 
     navigateForward: () => {
-        const { tabs, activeTabId } = get();
-        const activeTab = tabs.find(t => t.id === activeTabId);
+        const { getActivePane, updateTabInPane, dirtyNoteIds } = get();
+        const activePane = getActivePane();
+        if (!activePane) return;
+
+        const activeTab = activePane.tabs?.find(t => t.id === activePane.activeTabId);
 
         if (activeTab && activeTab.history && activeTab.historyIndex < activeTab.history.length - 1) {
-            set((state) => {
-                const newTabs = state.tabs.map(t => {
-                    if (t.id === activeTabId) {
-                        const newIndex = t.historyIndex + 1;
-                        const newNoteId = t.history[newIndex];
-                        return {
-                            ...t,
-                            noteId: newNoteId,
-                            historyIndex: newIndex,
-                            isDirty: state.dirtyNoteIds.has(newNoteId)
-                        };
-                    }
-                    return t;
-                });
-                persistTabsDebounced(newTabs, activeTabId);
-                return { tabs: newTabs };
+            const newIndex = activeTab.historyIndex + 1;
+            const newNoteId = activeTab.history[newIndex];
+
+            updateTabInPane(activePane.id, activeTab.id, {
+                noteId: newNoteId,
+                historyIndex: newIndex,
+                isDirty: dirtyNoteIds.has(newNoteId)
             });
         }
     },
 
     canNavigateBack: () => {
-        const { tabs, activeTabId } = get();
-        const activeTab = tabs.find(t => t.id === activeTabId);
+        const { getActivePane } = get();
+        const activePane = getActivePane();
+        const activeTab = activePane?.tabs?.find(t => t.id === activePane.activeTabId);
         return !!(activeTab && activeTab.history && activeTab.historyIndex > 0);
     },
 
     canNavigateForward: () => {
-        const { tabs, activeTabId } = get();
-        const activeTab = tabs.find(t => t.id === activeTabId);
+        const { getActivePane } = get();
+        const activePane = getActivePane();
+        const activeTab = activePane?.tabs?.find(t => t.id === activePane.activeTabId);
         return !!(activeTab && activeTab.history && activeTab.historyIndex < activeTab.history.length - 1);
     },
 
     closeTab: (tabId) => {
         const { findPaneByTabId, removeTabFromPane } = get();
-
-        // Find which pane contains this tab
         const pane = findPaneByTabId(tabId);
         if (pane) {
             removeTabFromPane(pane.id, tabId);
         }
-
-        // Also update global tabs for backward compatibility
-        set((state) => {
-            const newTabs = state.tabs.filter(t => t.id !== tabId);
-            const newActiveTabId = state.activeTabId === tabId
-                ? (newTabs.length > 0 ? newTabs[newTabs.length - 1].id : null)
-                : state.activeTabId;
-
-            persistTabsDebounced(newTabs, newActiveTabId);
-            return {
-                tabs: newTabs,
-                activeTabId: newActiveTabId
-            };
-        });
     },
 
     closeAllTabs: () => {
-        set({ tabs: [], activeTabId: null });
-        localStorage.removeItem('moss-tabs');
-        localStorage.removeItem('moss-active-tab');
+        const { paneRoot, vaultPath, activePaneId } = get();
+
+        // Create deep copy to modify
+        const newRoot = JSON.parse(JSON.stringify(paneRoot));
+
+        const traverse = (node: PaneNode) => {
+            if (node.type === 'leaf') {
+                node.tabs = [];
+                node.activeTabId = null;
+            }
+            if (node.children) {
+                node.children.forEach(traverse);
+            }
+        };
+        traverse(newRoot);
+
+        const newIndex = updatePaneIndex(newRoot);
+
+        set({ paneRoot: newRoot, paneIndex: newIndex });
+
+        if (vaultPath) {
+            persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId });
+        }
     },
 
     closeOtherTabs: (tabId) => {
-        set((state) => {
-            const tabToKeep = state.tabs.find(t => t.id === tabId);
-            if (!tabToKeep) return state;
+        const { findPaneByTabId, updateTabInPane } = get();
+        const pane = findPaneByTabId(tabId);
 
-            const newTabs = [tabToKeep];
-            persistTabsDebounced(newTabs, tabId);
-            return {
-                tabs: newTabs,
-                activeTabId: tabId
-            };
-        });
+        if (pane && pane.tabs) {
+            const tabToKeep = pane.tabs.find(t => t.id === tabId);
+            if (tabToKeep) {
+                // We can't use updateTabInPane to remove other tabs easily without a new action
+                // So we'll manually update the pane tree here
+                const { paneRoot, vaultPath, activePaneId } = get();
+                const newRoot = JSON.parse(JSON.stringify(paneRoot));
+
+                // Helper to find and update the specific pane in the new tree
+                const updatePaneInTree = (node: PaneNode) => {
+                    if (node.id === pane.id) {
+                        node.tabs = [tabToKeep];
+                        node.activeTabId = tabId;
+                    } else if (node.children) {
+                        node.children.forEach(updatePaneInTree);
+                    }
+                };
+                updatePaneInTree(newRoot);
+
+                const newIndex = updatePaneIndex(newRoot);
+                set({ paneRoot: newRoot, paneIndex: newIndex });
+
+                if (vaultPath) {
+                    persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId });
+                }
+            }
+        }
     },
 
     setActiveTab: (tabId) => {
-        const { findPaneByTabId, setPaneTab } = get();
-
-        // Find which pane contains this tab
+        const { findPaneByTabId, setPaneTab, getActivePane } = get();
         const pane = findPaneByTabId(tabId);
         if (pane) {
             setPaneTab(pane.id, tabId);
-        }
 
-        // Also update global state for backward compatibility
-        set((state) => {
-            persistTabsDebounced(state.tabs, tabId);
-            return { activeTabId: tabId };
-        });
-
-        // Reveal the note in sidebar when switching tabs
-        const tab = get().tabs.find(t => t.id === tabId);
-        if (tab) {
-            get().revealNoteInSidebar(tab.noteId);
+            // Reveal note in sidebar
+            const tab = pane.tabs?.find(t => t.id === tabId);
+            if (tab) {
+                get().revealNoteInSidebar(tab.noteId);
+            }
         }
     },
 
     setTabDirty: (tabId, isDirty) => {
-        set((state) => {
-            const newTabs = state.tabs.map(t =>
-                t.id === tabId
-                    ? { ...t, isDirty, isPreview: isDirty ? false : t.isPreview } // Convert to permanent when dirty
-                    : t
-            );
+        const { findPaneByTabId, updateTabInPane, dirtyNoteIds } = get();
+        const pane = findPaneByTabId(tabId);
 
-            // Sync dirtyNoteIds immediately for UI responsiveness
-            const tab = state.tabs.find(t => t.id === tabId);
-            let newDirtyIds = state.dirtyNoteIds;
-
-            if (tab && isDirty) {
-                newDirtyIds = new Set(state.dirtyNoteIds);
-                newDirtyIds.add(tab.noteId);
-            }
-            // Note: We don't remove from dirtyNoteIds here when isDirty is false,
-            // because that usually happens after a successful save in saveNote.
-
-            persistTabsDebounced(newTabs, state.activeTabId);
-            return { tabs: newTabs, dirtyNoteIds: newDirtyIds };
-        });
-
-        // CRITICAL: Also update the tab in the specific pane
-        // This ensures that the UI for that specific pane reflects the dirty state
-        const state = get();
-        const pane = state.findPaneByTabId(tabId);
         if (pane) {
-            state.updateTabInPane(pane.id, tabId, {
+            // Update dirtyNoteIds globally
+            const tab = pane.tabs?.find(t => t.id === tabId);
+            if (tab) {
+                const newDirtyIds = new Set(dirtyNoteIds);
+                if (isDirty) {
+                    newDirtyIds.add(tab.noteId);
+                }
+                // Don't remove if false, handled by saveNote
+                set({ dirtyNoteIds: newDirtyIds });
+            }
+
+            updateTabInPane(pane.id, tabId, {
                 isDirty,
                 isPreview: isDirty ? false : undefined
             });
@@ -1081,8 +1099,11 @@ export const useAppStore = create<AppState>((set, get) => ({
                     vaultPath: path,
                     fileTree: [],
                     notes: {},
-                    tabs: [],
-                    activeTabId: null,
+                    // ❌ REMOVED: tabs: [],
+                    // ❌ REMOVED: activeTabId: null,
+                    paneRoot: { id: 'root', type: 'leaf', tabs: [], activeTabId: null },
+                    activePaneId: 'root',
+                    paneIndex: new Map([['root', { id: 'root', type: 'leaf', tabs: [], activeTabId: null }]]),
                     saveStates: {}, // Clear save states
                     selectedFolderPath: null, // Clear selected folder
                     vaultGeneration: prevGeneration + 1, // Increment generation to invalidate in-flight operations
@@ -1092,8 +1113,8 @@ export const useAppStore = create<AppState>((set, get) => ({
                 });
 
                 // Clear localStorage to prevent stale tabs from being restored
-                localStorage.removeItem('moss-tabs');
-                localStorage.removeItem('moss-active-tab');
+                // ❌ REMOVED: localStorage.removeItem('moss-tabs');
+                // ❌ REMOVED: localStorage.removeItem('moss-active-tab');
                 localStorage.removeItem('moss-expanded-paths');
                 localStorage.setItem('moss-vault-path', path);
 
@@ -1196,14 +1217,8 @@ export const useAppStore = create<AppState>((set, get) => ({
                         const newDirtyIds = new Set(state.dirtyNoteIds);
                         newDirtyIds.delete(noteId);
 
-                        // Update tabs
-                        const newTabs = state.tabs.map(t =>
-                            t.noteId === noteId ? { ...t, isDirty: false } : t
-                        );
-
                         return {
-                            dirtyNoteIds: newDirtyIds,
-                            tabs: newTabs
+                            dirtyNoteIds: newDirtyIds
                         };
                     });
 
@@ -1259,10 +1274,13 @@ export const useAppStore = create<AppState>((set, get) => ({
             // Clear dirty flag after successful save
             // Must get fresh state to check if save was successful
             const freshState = get();
-            const activeTab = freshState.tabs.find(t => t.noteId === noteId);
+            const leafPanes = freshState.getAllLeafPanes();
 
-            if (activeTab && freshState.saveStates[noteId]?.status === 'saved') {
-                freshState.setTabDirty(activeTab.id, false);
+            for (const pane of leafPanes) {
+                const tab = pane.tabs?.find(t => t.noteId === noteId);
+                if (tab && freshState.saveStates[noteId]?.status === 'saved') {
+                    freshState.setTabDirty(tab.id, false);
+                }
             }
 
             // Check if save failed and throw error for caller to handle
@@ -1306,7 +1324,12 @@ export const useAppStore = create<AppState>((set, get) => ({
             set({ fileTree, vaultGeneration: get().vaultGeneration + 1 });
 
             // Close all tabs and reload
-            set({ tabs: [], activeTabId: null, notes: {} });
+            set({
+                paneRoot: { id: 'root', type: 'leaf', tabs: [], activeTabId: null },
+                activePaneId: 'root',
+                paneIndex: new Map([['root', { id: 'root', type: 'leaf', tabs: [], activeTabId: null }]]),
+                notes: {}
+            });
 
             // Refresh Git status
             await get().checkGitStatus();
@@ -1320,15 +1343,21 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     // Save all dirty notes
     saveAllDirtyNotes: async () => {
-        const { tabs, notes, forceSaveNote } = get();
-        const dirtyNotes = tabs
-            .filter(t => t.isDirty)
-            .map(t => notes[t.noteId])
-            .filter(note => note && note.id.includes('/'));
+        const { getAllLeafPanes, forceSaveNote } = get();
+        const leafPanes = getAllLeafPanes();
+        const dirtyNoteIds = new Set<string>();
+
+        leafPanes.forEach(pane => {
+            pane.tabs?.forEach(t => {
+                if (t.isDirty) {
+                    dirtyNoteIds.add(t.noteId);
+                }
+            });
+        });
 
         // Save all in parallel
         await Promise.all(
-            dirtyNotes.map(note => forceSaveNote(note.id))
+            Array.from(dirtyNoteIds).map(noteId => forceSaveNote(noteId))
         );
     },
 
@@ -1536,7 +1565,10 @@ export const useAppStore = create<AppState>((set, get) => ({
         });
 
         // Persist to localStorage (debounced)
-        persistPaneRootDebounced(newRoot);
+        const vaultPath = get().vaultPath;
+        if (vaultPath) {
+            persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId: get().activePaneId });
+        }
         return true;
     },
 
@@ -1612,7 +1644,10 @@ export const useAppStore = create<AppState>((set, get) => ({
             }
 
             // Persist to localStorage (debounced)
-            persistPaneRootDebounced(newNode);
+            const vaultPath = get().vaultPath;
+            if (vaultPath) {
+                persistPaneLayoutDebounced(vaultPath, { paneRoot: newNode, activePaneId: get().activePaneId });
+            }
             return true;
         }
 
@@ -1621,17 +1656,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     setActivePane: (paneId: string) => {
-        const state = get();
-        const pane = state.findPaneById(paneId);
-
         // Update active pane ID
         set({ activePaneId: paneId });
-        localStorage.setItem('moss-active-pane-id', paneId);
 
-        // Sync global activeTabId with the pane's active tab
-        // This ensures global components (like SaveIndicator) reflect the active pane's state
-        if (pane && pane.type === 'leaf' && pane.activeTabId) {
-            set({ activeTabId: pane.activeTabId });
+        const vaultPath = get().vaultPath;
+        if (vaultPath) {
+            persistPaneLayoutDebounced(vaultPath, { paneRoot: get().paneRoot, activePaneId: paneId });
         }
     },
 
@@ -1665,7 +1695,10 @@ export const useAppStore = create<AppState>((set, get) => ({
         });
 
         // Persist to localStorage (debounced)
-        persistPaneRootDebounced(newRoot);
+        const vaultPath = get().vaultPath;
+        if (vaultPath) {
+            persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId: get().activePaneId });
+        }
     },
 
     // Pane-aware tab helpers
@@ -1714,7 +1747,10 @@ export const useAppStore = create<AppState>((set, get) => ({
             paneRoot: newRoot,
             paneIndex: newIndex
         });
-        persistPaneRootDebounced(newRoot);
+        const vaultPath = get().vaultPath;
+        if (vaultPath) {
+            persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId: get().activePaneId });
+        }
     },
 
     removeTabFromPane: (paneId: string, tabId: string) => {
@@ -1755,7 +1791,10 @@ export const useAppStore = create<AppState>((set, get) => ({
             paneRoot: newRoot,
             paneIndex: newIndex
         });
-        persistPaneRootDebounced(newRoot);
+        const vaultPath = get().vaultPath;
+        if (vaultPath) {
+            persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId: get().activePaneId });
+        }
     },
 
     updateTabInPane: (paneId: string, tabId: string, updates: Partial<Tab>) => {
@@ -1791,7 +1830,10 @@ export const useAppStore = create<AppState>((set, get) => ({
             paneRoot: newRoot,
             paneIndex: newIndex
         });
-        persistPaneRootDebounced(newRoot);
+        const vaultPath = get().vaultPath;
+        if (vaultPath) {
+            persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId: get().activePaneId });
+        }
     },
 
     /**
@@ -1994,14 +2036,24 @@ export const useAppStore = create<AppState>((set, get) => ({
 
 export const useActiveNote = () => useAppStore(
     state => {
-        const activeTab = state.tabs.find(t => t.id === state.activeTabId);
+        const activePaneId = state.activePaneId;
+        const activePane = state.paneIndex.get(activePaneId || '');
+        const activeTab = activePane?.tabs?.find(t => t.id === activePane.activeTabId);
         return activeTab ? state.notes[activeTab.noteId] : null;
     }
 );
 
-export const useActiveTabId = () => useAppStore(state => state.activeTabId);
+export const useActiveTabId = () => useAppStore(state => {
+    const activePaneId = state.activePaneId;
+    const activePane = state.paneIndex.get(activePaneId || '');
+    return activePane?.activeTabId || null;
+});
 
-export const useTabs = () => useAppStore(state => state.tabs);
+export const useTabs = () => useAppStore(state => {
+    const activePaneId = state.activePaneId;
+    const activePane = state.paneIndex.get(activePaneId || '');
+    return activePane?.tabs || [];
+});
 
 export const useFileTree = () => useAppStore(state => state.fileTree);
 
@@ -2062,9 +2114,13 @@ export const debouncedSaveNote = (noteId: string, content: string) => {
             // Clear dirty flag after successful save
             // Need to get fresh store state again after save completes
             const freshStore = useAppStore.getState();
-            const activeTab = freshStore.tabs.find(t => t.noteId === id);
-            if (activeTab && freshStore.saveStates[id]?.status === 'saved') {
-                freshStore.setTabDirty(activeTab.id, false);
+            const leafPanes = freshStore.getAllLeafPanes();
+
+            for (const pane of leafPanes) {
+                const tab = pane.tabs?.find(t => t.noteId === id);
+                if (tab && freshStore.saveStates[id]?.status === 'saved') {
+                    freshStore.setTabDirty(tab.id, false);
+                }
             }
         }, delay);
 
@@ -2083,7 +2139,8 @@ export const debouncedSaveNote = (noteId: string, content: string) => {
 if (typeof window !== 'undefined') {
     window.addEventListener('beforeunload', (e) => {
         const state = useAppStore.getState();
-        const hasDirtyNotes = state.tabs.some(t => t.isDirty);
+        const leafPanes = state.getAllLeafPanes();
+        const hasDirtyNotes = leafPanes.some(pane => pane.tabs?.some(t => t.isDirty));
 
         if (hasDirtyNotes) {
             // Attempt to save all dirty notes synchronously

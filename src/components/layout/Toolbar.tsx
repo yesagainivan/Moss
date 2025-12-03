@@ -18,8 +18,11 @@ export const Toolbar = () => {
     const [showActivity, setShowActivity] = useState(false);
     const aiButtonRef = useRef<HTMLButtonElement>(null);
     const { toggleOpen: toggleAgent, isOpen: isAgentOpen } = useAgentStore();
-    const { navigateBack, navigateForward, tabs, activeTabId, gitEnabled, splitPane, closePane, activePaneId, paneRoot } = useAppStore();
+    const { navigateBack, navigateForward, gitEnabled, splitPane, closePane, activePaneId, paneRoot, getActivePane } = useAppStore();
 
+    const activePane = getActivePane();
+    const tabs = activePane?.tabs || [];
+    const activeTabId = activePane?.activeTabId;
     const activeTab = tabs.find(t => t.id === activeTabId);
     const canGoBack = activeTab?.history && (activeTab.historyIndex || 0) > 0;
     const canGoForward = activeTab?.history && (activeTab.historyIndex || 0) < (activeTab.history.length - 1);

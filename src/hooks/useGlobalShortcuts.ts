@@ -58,7 +58,8 @@ export const useGlobalShortcuts = () => {
                 } else if (e.shiftKey) {
                     // Cmd+Shift+S: Snapshot Active Note
                     e.preventDefault();
-                    const activeTab = state.tabs.find(t => t.id === state.activeTabId);
+                    const activePane = state.getActivePane();
+                    const activeTab = activePane?.tabs?.find(t => t.id === activePane.activeTabId);
                     if (activeTab && activeTab.noteId) {
                         state.snapshotNote(activeTab.noteId);
                     }
@@ -78,8 +79,9 @@ export const useGlobalShortcuts = () => {
                         state.closePane(state.activePaneId);
                     }
                 } else {
-                    if (state.activeTabId) {
-                        state.closeTab(state.activeTabId);
+                    const activePane = state.getActivePane();
+                    if (activePane && activePane.activeTabId) {
+                        state.closeTab(activePane.activeTabId);
                     }
                 }
             }

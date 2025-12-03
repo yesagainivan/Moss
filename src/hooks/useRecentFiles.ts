@@ -7,8 +7,11 @@ const STORAGE_KEY = 'moss-recent-files';
 
 export const useRecentFiles = () => {
     const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
-    const activeTabId = useAppStore(state => state.activeTabId);
-    const tabs = useAppStore(state => state.tabs);
+    const activePaneId = useAppStore(state => state.activePaneId);
+    const paneIndex = useAppStore(state => state.paneIndex);
+    const activePane = paneIndex.get(activePaneId || '');
+    const activeTabId = activePane?.activeTabId;
+    const tabs = activePane?.tabs || [];
     const fileTree = useAppStore(state => state.fileTree);
 
     // Load recent files from localStorage on mount

@@ -41,7 +41,7 @@ export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
 
     return (
         <div
-            className={`flex-1 flex flex-col h-full overflow-hidden relative ${isActive ? 'border border-accent' : ''
+            className={`flex-1 flex flex-col h-full overflow-hidden relative ${isActive ? 'border-b border-accent' : ''
                 }`}
             onClick={handleClick}
         >

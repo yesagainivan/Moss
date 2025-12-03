@@ -31,10 +31,38 @@
         }
       ]
     },
-    "fs:allow-read-dir",
-    "fs:allow-rename",
-    "fs:allow-create",
-    "fs:allow-remove",
+    {
+      "identifier": "fs:allow-read-dir",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-rename",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-create",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-remove",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
     {
       "identifier": "fs:allow-mkdir",
       "allow": [
@@ -43,7 +71,14 @@
         }
       ]
     },
-    "fs:allow-exists",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
     "dialog:default",
     "window-state:default",
     {

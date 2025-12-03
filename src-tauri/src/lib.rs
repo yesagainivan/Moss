@@ -695,6 +695,36 @@ async fn git_get_commit_changes(
     }
 }
 
+#[tauri::command]
+async fn save_pane_layout(vault_path: String, layout: String) -> Result<(), String> {
+    let path = std::path::Path::new(&vault_path);
+    if !path.exists() {
+        return Err("Vault path does not exist".to_string());
+    }
+
+    let moss_dir = path.join(".moss");
+    if !moss_dir.exists() {
+        std::fs::create_dir(&moss_dir).map_err(|e| e.to_string())?;
+    }
+
+    let layout_path = moss_dir.join("pane-layout.json");
+    std::fs::write(layout_path, layout).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn load_pane_layout(vault_path: String) -> Result<Option<String>, String> {
+    let path = std::path::Path::new(&vault_path).join(".moss/pane-layout.json");
+    if !path.exists() {
+        return Ok(None);
+    }
+
+    match std::fs::read_to_string(path) {
+        Ok(content) => Ok(Some(content)),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -759,6 +789,8 @@ pub fn run() {
             git_abort_merge,
             git_get_sync_status,
             git_get_commit_changes,
+            save_pane_layout,
+            load_pane_layout,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

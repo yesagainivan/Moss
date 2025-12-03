@@ -100,7 +100,9 @@ const FileTreeRow = ({
     // Selective subscriptions
     const isActiveNote = useAppStore(state => {
         if (!node.noteId) return false;
-        const activeTab = state.tabs.find(t => t.id === state.activeTabId);
+        const activePaneId = state.activePaneId;
+        const activePane = state.paneIndex.get(activePaneId || '');
+        const activeTab = activePane?.tabs?.find(t => t.id === activePane.activeTabId);
         return activeTab?.noteId === node.noteId;
     });
     const isSelected = useAppStore(state => state.selectedFolderPath === node.path);
@@ -360,8 +362,11 @@ export const Sidebar = () => {
     const expandedPaths = useAppStore(state => state.expandedPaths);
     const toggleFolder = useAppStore(state => state.toggleFolder);
     const revealTrigger = useAppStore(state => state.revealTrigger); // Subscribe to trigger
-    const activeTabId = useAppStore(state => state.activeTabId);
-    const tabs = useAppStore(state => state.tabs);
+    const activePaneId = useAppStore(state => state.activePaneId);
+    const paneIndex = useAppStore(state => state.paneIndex);
+    const activePane = paneIndex.get(activePaneId || '');
+    const activeTabId = activePane?.activeTabId;
+    const tabs = activePane?.tabs || [];
 
     const virtuosoRef = React.useRef<VirtuosoHandle>(null);
 
