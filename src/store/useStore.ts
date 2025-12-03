@@ -1,31 +1,24 @@
 import { create } from 'zustand';
-import { Note, Tab, FileNode, SaveState, PaneNode } from '../types';
+import { Note, Tab, FileNode, SaveState, PaneNode } from '../types'
+    ;
 import { useSettingsStore } from './useSettingsStore';
 import { v4 as uuidv4 } from 'uuid';
-import { openVault, readVault, loadNoteContent, saveNoteContent, createFile, renameFile, renameNote, createFolder as createFolderFS, deleteFile, deleteFolder as deleteFolderFS } from '../lib/fs';
+import { openVault, readVault, loadNoteContent, saveNoteContent, createFile, renameFile, renameNote, createFolder as createFolderFS, deleteFile, deleteFolder as deleteFolderFS, savePaneLayout, loadPaneLayout } from '../lib/fs';
 import { debounce } from 'lodash-es';
 import { logger } from '../lib/logger';
-
-// Debounced helper to persist tabs to localStorage (only non-preview tabs)
-const persistTabsDebounced = debounce((tabs: Tab[], activeTabId: string | null) => {
-    const permanentTabs = tabs.filter(t => !t.isPreview);
-    localStorage.setItem('moss-tabs', JSON.stringify(permanentTabs));
-    if (activeTabId) {
-        localStorage.setItem('moss-active-tab', activeTabId);
-    } else {
-        localStorage.removeItem('moss-active-tab');
-    }
-}, 300); // 300ms debounce for localStorage writes
 
 // Debounced helper to persist expanded paths
 const persistExpandedPathsDebounced = debounce((paths: Set<string>) => {
     localStorage.setItem('moss-expanded-paths', JSON.stringify(Array.from(paths)));
 }, 300);
 
-// Debounced helper to persist pane root to prevent blocking UI
-const persistPaneRootDebounced = debounce((paneRoot: PaneNode) => {
-    localStorage.setItem('moss-pane-root', JSON.stringify(paneRoot));
+// Debounced helper to persist pane layout to vault's .moss directory
+// This replaces both persistTabsDebounced and persistPaneRootDebounced
+const persistPaneLayoutDebounced = debounce(async (vaultPath: string, layout: { paneRoot: PaneNode; activePaneId: string | null }) => {
+    if (!vaultPath) return;
+    await savePaneLayout(vaultPath, layout);
 }, 300);
+
 
 // Save queue to prevent concurrent saves to the same note
 const saveQueue = new Map<string, Promise<void>>();
@@ -115,8 +108,7 @@ const updateNode = (nodes: FileNode[], path: string, updates: Partial<FileNode>)
 
 interface AppState {
     notes: Record<string, Note>;
-    tabs: Tab[];
-    activeTabId: string | null;
+    // ❌ REMOVED: tabs: Tab[] and activeTabId (now stored per-pane)
     fileTree: FileNode[];
     vaultPath: string | null;
     selectedFolderPath: string | null;
@@ -137,7 +129,7 @@ interface AppState {
     vaultStatus: 'idle' | 'snapshotting' | 'success' | 'error';
     vaultStatusMessage: string | null;
 
-    // Pane system for split view
+    // Pane system for split view (SINGLE SOURCE OF TRUTH for tabs)
     paneRoot: PaneNode; // Root of the pane tree
     activePaneId: string | null; // Which leaf pane currently has focus
     paneIndex: Map<string, PaneNode>; // O(1) lookup index for panes
@@ -154,7 +146,9 @@ interface AppState {
     deleteNote: (id: string) => Promise<void>;
     duplicateNote: (id: string) => Promise<string>;
     deleteFolder: (path: string) => Promise<void>;
-    renameFolder: (oldPath: string, newName: string) => Promise<void>;
+    renameFolder: (oldPath: string, newName: string) =>
+
+        Promise<void>;
     refreshFileTree: () => Promise<void>;
     collapseAllFolders: () => void;
     expandAllFolders: () => void;
@@ -169,6 +163,7 @@ interface AppState {
     navigateForward: () => void;
     canNavigateBack: () => boolean;
     canNavigateForward: () => boolean;
+
 
     // Confirmation
     requestConfirmation: (message: string) => Promise<boolean>;

@@ -927,16 +927,11 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             <div
                 ref={containerRef}
                 onScroll={handleScroll}
-
                 className="h-full overflow-y-auto bg-background select-text"
                 style={{
                     fontSize: `${settings.fontSize}px`,
                     lineHeight: settings.lineHeight,
                     cursor: 'text',
-                    ...(settings.enableMaxWidth && {
-                        maxWidth: `${settings.maxWidth}px`,
-                        margin: '0 auto',
-                    }),
                 }}
             >
                 {isSourceMode ? (
@@ -946,12 +941,25 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                         onChange={handleSourceChange}
                         onKeyDown={handleSourceKeyDown}
                         className="w-full h-full p-8 pb-32 bg-transparent resize-none focus:outline-none font-mono"
+                        style={{
+                            ...(settings.enableMaxWidth && {
+                                maxWidth: `${settings.maxWidth}px`,
+                                margin: '0 auto',
+                                display: 'block',
+                            }),
+                        }}
                         spellCheck={settings.spellCheck}
                     />
                 ) : (
                     <EditorContent
                         editor={editor}
                         className="h-full"
+                        style={{
+                            ...(settings.enableMaxWidth && {
+                                maxWidth: `${settings.maxWidth}px`,
+                                margin: '0 auto',
+                            }),
+                        }}
                         spellCheck={settings.spellCheck}
                         onKeyDown={(e) => {
                             // Cmd+T: Toggle Source Mode

@@ -84,3 +84,46 @@ export const getGraphData = async (vaultPath: string): Promise<GraphData> => {
         return { nodes: [], links: [] };
     }
 };
+
+/**
+ * Save pane layout to vault's .moss directory
+ */
+export const savePaneLayout = async (vaultPath: string, layout: any): Promise<void> => {
+    const mossDir = `${vaultPath}/.moss`;
+    const layoutPath = `${mossDir}/pane-layout.json`;
+
+    try {
+        // Ensure .moss directory exists
+        const mossExists = await exists(mossDir);
+        if (!mossExists) {
+            await mkdir(mossDir, { recursive: true });
+        }
+
+        // Write layout file
+        await writeTextFile(layoutPath, JSON.stringify(layout, null, 2));
+    } catch (e) {
+        console.error('Failed to save pane layout:', e);
+    }
+};
+
+/**
+ * Load pane layout from vault's .moss directory
+ * Returns null if file doesn't exist
+ */
+export const loadPaneLayout = async (vaultPath: string): Promise<any | null> => {
+    const layoutPath = `${vaultPath}/.moss/pane-layout.json`;
+
+    try {
+        const fileExists = await exists(layoutPath);
+        if (!fileExists) {
+            return null;
+        }
+
+        const content = await readTextFile(layoutPath);
+        return JSON.parse(content);
+    } catch (e) {
+        console.warn('Failed to load pane layout:', e);
+        return null;
+    }
+};
+
