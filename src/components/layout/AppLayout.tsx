@@ -5,6 +5,7 @@ import { ResizableSplit } from './ResizableSplit';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { TitleBar } from './TitleBar';
 import { CommandPalette } from '../common/CommandPalette';
+import { SearchModal } from '../common/SearchModal';
 import { useAppInitialization } from '../../hooks/useAppInitialization';
 import { useGlobalShortcuts } from '../../hooks/useGlobalShortcuts';
 
@@ -43,7 +44,7 @@ export const AppLayout = () => {
                 onCancel={() => resolveConfirmation(false)}
             />
             <CommandPalette />
+            <SearchModal />
         </div>
     );
 };
-

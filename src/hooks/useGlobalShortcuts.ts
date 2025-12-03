@@ -13,6 +13,19 @@ export const useGlobalShortcuts = () => {
     // BUT, since we are using event listeners, we can use useAppStore.getState() inside the handler!
     // This avoids subscriptions entirely for the shortcuts.
 
+    // Cmd+Opt+B (Backlinks)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === 'KeyB') {
+                e.preventDefault();
+                const state = useAppStore.getState();
+                state.setBacklinksPanelOpen(!state.isBacklinksPanelOpen);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     // Cmd+B to toggle sidebar
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -122,6 +135,13 @@ export const useGlobalShortcuts = () => {
             if ((e.metaKey || e.ctrlKey) && e.code === 'KeyH') {
                 e.preventDefault();
                 window.dispatchEvent(new CustomEvent('open-history-modal'));
+            }
+
+            // Cmd+Shift+F (Search)
+            if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === 'KeyF') {
+                e.preventDefault();
+                const state = useAppStore.getState();
+                state.setSearchModalOpen(true);
             }
 
             // Cmd+, (Settings)

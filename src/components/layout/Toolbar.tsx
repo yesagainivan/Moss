@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Sparkles, Bot, ArrowLeft, ArrowRight, BarChart3, SplitSquareHorizontal, SplitSquareVertical, XCircle } from 'lucide-react';
+import { Settings as SettingsIcon, Sparkles, Bot, ArrowLeft, ArrowRight, BarChart3, SplitSquareHorizontal, SplitSquareVertical, XCircle, Link2 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { SettingsModal } from '../settings/SettingsModal';
 import { AICommandMenu } from '../ai/AICommandMenu';
@@ -18,7 +18,7 @@ export const Toolbar = () => {
     const [showActivity, setShowActivity] = useState(false);
     const aiButtonRef = useRef<HTMLButtonElement>(null);
     const { toggleOpen: toggleAgent, isOpen: isAgentOpen } = useAgentStore();
-    const { navigateBack, navigateForward, gitEnabled, splitPane, closePane, activePaneId, paneRoot, getActivePane } = useAppStore();
+    const { navigateBack, navigateForward, gitEnabled, splitPane, closePane, activePaneId, paneRoot, getActivePane, isBacklinksPanelOpen, setBacklinksPanelOpen } = useAppStore();
 
     const activePane = getActivePane();
     const tabs = activePane?.tabs || [];
@@ -137,6 +137,13 @@ export const Toolbar = () => {
 
                 {/* Right side - Settings & Agent */}
                 <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setBacklinksPanelOpen(!isBacklinksPanelOpen)}
+                        className={`p-1.5 rounded-md transition-colors ${isBacklinksPanelOpen ? 'bg-accent/10 text-accent' : 'hover:bg-accent/10 text-muted-foreground'}`}
+                        title="Toggle Backlinks (Cmd+Opt+B)"
+                    >
+                        <Link2 className="w-4 h-4" />
+                    </button>
                     <GitHubSyncIndicator />
                     <button
                         onClick={toggleAgent}

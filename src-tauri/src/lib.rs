@@ -238,6 +238,39 @@ async fn get_graph_data(vault_path: String) -> Result<graph::GraphData, String> 
     graph::get_graph_data_with_cache(path)
 }
 
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct Backlink {
+    source_path: String,
+    source_title: String,
+}
+
+#[tauri::command]
+async fn get_backlinks(vault_path: String, note_path: String) -> Result<Vec<Backlink>, String> {
+    let path = std::path::Path::new(&vault_path);
+    if !path.exists() || !path.is_dir() {
+        return Err(format!("Vault path '{}' does not exist", vault_path));
+    }
+
+    // Get graph data
+    let graph_data = graph::get_graph_data_with_cache(path)?;
+
+    // Find all links where target matches the note_path
+    let mut backlinks = Vec::new();
+    for link in &graph_data.links {
+        if link.target == note_path {
+            // Find source node to get title
+            if let Some(source_node) = graph_data.nodes.iter().find(|n| n.id == link.source) {
+                backlinks.push(Backlink {
+                    source_path: source_node.id.clone(),
+                    source_title: source_node.name.clone(),
+                });
+            }
+        }
+    }
+
+    Ok(backlinks)
+}
+
 // ============================================================================
 // Vector Search / Semantic Search
 // ============================================================================
@@ -742,6 +775,7 @@ pub fn run() {
             ai_rewrite_text,
             get_file_tree,
             get_graph_data,
+            get_backlinks,
             tools::agent_get_note,
             tools::agent_batch_read,
             tools::agent_search_notes,

@@ -121,6 +121,7 @@ interface AppState {
     expandedPaths: Set<string>; // Persisted expanded folder paths
     isSidebarOpen: boolean; // Sidebar visibility state
     isCommandPaletteOpen: boolean; // Command Palette visibility state
+    isSearchModalOpen: boolean; // Search Modal visibility state
     dirtyNoteIds: Set<string>; // Track dirty state globally per note
     gitEnabled: boolean; // Whether the vault has Git initialized
     hasUncommittedChanges: boolean; // Whether there are uncommitted changes
@@ -137,6 +138,11 @@ interface AppState {
     // Actions
     initialize: () => Promise<void>;
     setCommandPaletteOpen: (isOpen: boolean) => void;
+    setSearchModalOpen: (isOpen: boolean) => void;
+
+    // Backlinks Panel
+    isBacklinksPanelOpen: boolean;
+    setBacklinksPanelOpen: (isOpen: boolean) => void;
     createNote: (title?: string, parentPath?: string, useExactName?: boolean) => Promise<string>;
     createFolder: (name: string, parentPath?: string) => Promise<void>;
     setSelectedFolder: (path: string | null) => void;
@@ -243,6 +249,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     expandedPaths: new Set<string>(), // Initialize expanded folders
     isSidebarOpen: true, // Sidebar open by default
     isCommandPaletteOpen: false,
+    isSearchModalOpen: false, // Search modal closed by default
+    isBacklinksPanelOpen: false, // Backlinks panel closed by default
     dirtyNoteIds: new Set(),
     gitEnabled: false, // Will be checked on vault load
     hasUncommittedChanges: false,
@@ -485,6 +493,14 @@ export const useAppStore = create<AppState>((set, get) => ({
         set({ isCommandPaletteOpen: isOpen });
     },
 
+    setSearchModalOpen: (isOpen: boolean) => {
+        set({ isSearchModalOpen: isOpen });
+    },
+
+    setBacklinksPanelOpen: (isOpen: boolean) => {
+        set({ isBacklinksPanelOpen: isOpen });
+    },
+
     updateNote: (id, content) => {
         set((state) => {
             const newDirtyIds = new Set(state.dirtyNoteIds);
@@ -680,7 +696,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     deleteNote: async (id) => {
-        const { vaultPath, notes, tabs } = get();
+        const { vaultPath, notes } = get();
 
         // If it's a file path (filesystem note)
         if (id.includes('/') && vaultPath) {
@@ -1015,7 +1031,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     closeOtherTabs: (tabId) => {
-        const { findPaneByTabId, updateTabInPane } = get();
+        const { findPaneByTabId } = get();
         const pane = findPaneByTabId(tabId);
 
         if (pane && pane.tabs) {
@@ -1048,7 +1064,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     setActiveTab: (tabId) => {
-        const { findPaneByTabId, setPaneTab, getActivePane } = get();
+        const { findPaneByTabId, setPaneTab } = get();
         const pane = findPaneByTabId(tabId);
         if (pane) {
             setPaneTab(pane.id, tabId);
