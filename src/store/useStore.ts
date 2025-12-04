@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { invoke } from '@tauri-apps/api/core';
 import { Note, Tab, FileNode, SaveState, PaneNode } from '../types'
     ;
 import { useSettingsStore } from './useSettingsStore';
@@ -147,6 +148,14 @@ interface AppState {
     // Outline Panel
     isOutlinePanelOpen: boolean;
     setOutlinePanelOpen: (isOpen: boolean) => void;
+
+    // Tags
+    tagsData: import('../types/tags').TagsData | null;
+    selectedTags: string[];
+    loadTags: () => Promise<void>;
+    toggleTag: (tag: string) => void;
+    setSelectedTags: (tags: string[]) => void;
+
     createNote: (title?: string, parentPath?: string, useExactName?: boolean) => Promise<string>;
     createFolder: (name: string, parentPath?: string) => Promise<void>;
     setSelectedFolder: (path: string | null) => void;
@@ -256,6 +265,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     isSearchModalOpen: false, // Search modal closed by default
     isBacklinksPanelOpen: false, // Backlinks panel closed by default
     isOutlinePanelOpen: false, // Outline panel closed by default
+    tagsData: null, // Tags data loaded on vault init
+    selectedTags: [], // No tags selected by default
     dirtyNoteIds: new Set(),
     gitEnabled: false, // Will be checked on vault load
     hasUncommittedChanges: false,
@@ -351,8 +362,12 @@ export const useAppStore = create<AppState>((set, get) => ({
                     expandedPaths,
                     paneRoot,
                     activePaneId,
-                    paneIndex // Initialize index
+                    paneIndex, // Initialize index
+                    vaultGeneration: get().vaultGeneration + 1,
                 });
+
+                // Load tags after vault is initialized
+                await get().loadTags();
 
                 // Check Git status for the restored vault
                 await get().checkGitStatus();
@@ -516,6 +531,32 @@ export const useAppStore = create<AppState>((set, get) => ({
             // Close backlinks when opening outline
             isBacklinksPanelOpen: isOpen ? false : state.isBacklinksPanelOpen,
         }));
+    },
+
+    loadTags: async () => {
+        const { vaultPath } = get();
+        if (!vaultPath) return;
+
+        try {
+            const tagsData = await invoke<import('../types/tags').TagsData>('get_all_tags', {
+                vaultPath,
+            });
+            set({ tagsData });
+        } catch (error) {
+            console.error('Failed to load tags:', error);
+        }
+    },
+
+    toggleTag: (tag: string) => {
+        const { selectedTags } = get();
+        const newTags = selectedTags.includes(tag)
+            ? selectedTags.filter(t => t !== tag)
+            : [...selectedTags, tag];
+        set({ selectedTags: newTags });
+    },
+
+    setSelectedTags: (tags: string[]) => {
+        set({ selectedTags: tags });
     },
 
     updateNote: (id, content) => {
@@ -1142,7 +1183,9 @@ export const useAppStore = create<AppState>((set, get) => ({
                     vaultGeneration: prevGeneration + 1, // Increment generation to invalidate in-flight operations
                     expandedPaths: new Set(), // Clear expanded paths for new vault
                     vaultStatus: 'idle',
-                    vaultStatusMessage: null
+                    vaultStatusMessage: null,
+                    tagsData: null, // Clear tags data
+                    selectedTags: [] // Clear selected tags
                 });
 
                 // Clear localStorage to prevent stale tabs from being restored
@@ -1157,6 +1200,9 @@ export const useAppStore = create<AppState>((set, get) => ({
                     fileTree: sortFileNodes(files),
                     isVaultLoading: false,
                 });
+
+                // Load tags for the new vault
+                await get().loadTags();
 
                 // Check Git status for the newly opened vault
                 await get().checkGitStatus();
@@ -1254,6 +1300,12 @@ export const useAppStore = create<AppState>((set, get) => ({
                             dirtyNoteIds: newDirtyIds
                         };
                     });
+
+                    // Refresh tags after successful save
+                    // We use a small timeout to ensure the file system has settled
+                    setTimeout(() => {
+                        get().loadTags();
+                    }, 100);
 
                     // CRITICAL: Also update pane-specific tabs to clear dirty flag
                     const state = get();

@@ -7,6 +7,7 @@ import { FileNode } from '../../types';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { DndContext, DragEndEvent, DragOverlay, PointerSensor, KeyboardSensor, useSensor, useSensors, DragStartEvent, pointerWithin, useDraggable, useDroppable } from '@dnd-kit/core';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
+import { TagsPanel } from '../tags/TagsPanel';
 
 // ... (existing code)
 
@@ -367,6 +368,8 @@ export const Sidebar = () => {
     const activePane = paneIndex.get(activePaneId || '');
     const activeTabId = activePane?.activeTabId;
     const tabs = activePane?.tabs || [];
+    const selectedTags = useAppStore(state => state.selectedTags);
+    const tagsData = useAppStore(state => state.tagsData);
 
     const virtuosoRef = React.useRef<VirtuosoHandle>(null);
 
@@ -375,6 +378,7 @@ export const Sidebar = () => {
     const [activeId, setActiveId] = useState<string | null>(null);
     const [sidebarContextMenu, setSidebarContextMenu] = useState<{ x: number; y: number } | null>(null);
     const [rowContextMenu, setRowContextMenu] = useState<{ x: number; y: number; node: FileNode } | null>(null);
+    const [isTagsPanelCollapsed, setIsTagsPanelCollapsed] = useState(false);
 
     // Drag & Drop sensors
     const sensors = useSensors(
@@ -393,6 +397,44 @@ export const Sidebar = () => {
     // Flatten tree logic
     const flatData = useMemo(() => {
         if (!fileTree || fileTree.length === 0) return [];
+
+        // Filter files by selected tags (AND logic)
+        let filteredTree = fileTree;
+        if (selectedTags.length > 0 && tagsData) {
+            // Build a set of file paths that have ALL selected tags
+            const filesWithAllTags = new Set<string>();
+
+            // For each selected tag, get the files that have it
+            const tagFileSets = selectedTags.map(tag => {
+                const tagInfo = tagsData.tags.find(t => t.tag === tag);
+                return new Set(tagInfo?.files || []);
+            });
+
+            // Find files that are in ALL tag sets (intersection)
+            if (tagFileSets.length > 0) {
+                // Start with the first tag's files
+                const firstSet = tagFileSets[0];
+                firstSet.forEach(filePath => {
+                    // Check if this file is in all other tag sets
+                    const inAllSets = tagFileSets.every(set => set.has(filePath));
+                    if (inAllSets) {
+                        filesWithAllTags.add(filePath);
+                    }
+                });
+            }
+
+            // Filter the file tree to only include matching files
+            filteredTree = fileTree.filter(node => {
+                if (node.type === 'file') {
+                    // For files, check if they're in the filtered set
+                    const relativePath = node.path?.replace(vaultPath + '/', '') || '';
+                    return filesWithAllTags.has(relativePath);
+                } else {
+                    // Keep folders (we'll handle folder visibility in the flatten logic)
+                    return true;
+                }
+            });
+        }
 
         const result: FlatNode[] = [];
         const vaultPathStr = vaultPath || '';
@@ -441,7 +483,7 @@ export const Sidebar = () => {
         // Let's stick to the flat list from backend and just filter for visibility.
         // If sorting is an issue, we can address it.
 
-        for (const node of fileTree) {
+        for (const node of filteredTree) {
             if (!node.path) continue;
 
             // Calculate depth
@@ -493,7 +535,7 @@ export const Sidebar = () => {
         }
 
         return result;
-    }, [fileTree, expandedPaths, creatingState, vaultPath]);
+    }, [fileTree, expandedPaths, creatingState, vaultPath, selectedTags, tagsData]);
 
 
 
@@ -770,7 +812,11 @@ export const Sidebar = () => {
                     />
                 )}
 
-
+                {/* Tags Panel */}
+                <TagsPanel
+                    isCollapsed={isTagsPanelCollapsed}
+                    onToggleCollapse={() => setIsTagsPanelCollapsed(!isTagsPanelCollapsed)}
+                />
 
                 <div className="p-2 border-t border-border space-y-1 shrink-0">
                     <button

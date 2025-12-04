@@ -6,6 +6,7 @@ mod git_manager;
 mod github;
 mod graph;
 mod indexer;
+mod tags;
 mod tools;
 mod vector_store;
 mod watcher;
@@ -269,6 +270,36 @@ async fn get_backlinks(vault_path: String, note_path: String) -> Result<Vec<Back
     }
 
     Ok(backlinks)
+}
+
+// ============================================================================
+// Tags
+// ============================================================================
+
+#[tauri::command]
+async fn get_all_tags(vault_path: String) -> Result<tags::TagsData, String> {
+    let path = std::path::Path::new(&vault_path);
+    if !path.exists() || !path.is_dir() {
+        return Err(format!("Vault path '{}' does not exist", vault_path));
+    }
+
+    tags::get_tags_data_with_cache(path)
+}
+
+#[tauri::command]
+async fn get_notes_by_tag(vault_path: String, tag: String) -> Result<Vec<String>, String> {
+    let path = std::path::Path::new(&vault_path);
+    if !path.exists() || !path.is_dir() {
+        return Err(format!("Vault path '{}' does not exist", vault_path));
+    }
+
+    let tags_data = tags::get_tags_data_with_cache(path)?;
+
+    // Find the tag (case-insensitive)
+    let tag_lower = tag.to_lowercase();
+    let tag_info = tags_data.tags.into_iter().find(|t| t.tag == tag_lower);
+
+    Ok(tag_info.map(|t| t.files).unwrap_or_default())
 }
 
 // ============================================================================
@@ -776,6 +807,8 @@ pub fn run() {
             get_file_tree,
             get_graph_data,
             get_backlinks,
+            get_all_tags,
+            get_notes_by_tag,
             tools::agent_get_note,
             tools::agent_batch_read,
             tools::agent_search_notes,

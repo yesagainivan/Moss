@@ -11,6 +11,7 @@ import TableHeader from '@tiptap/extension-table-header';
 import { TaskList } from '@tiptap/extension-list/task-list';
 import { TaskItem } from '@tiptap/extension-list/task-item';
 import { ImageWithMarkdown } from './extensions/ImageWithMarkdown';
+import { TagHighlight } from './extensions/TagHighlight';
 import { useAppStore, debouncedSaveNote } from '../../store/useStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useAIStore } from '../../store/useAIStore';
@@ -240,6 +241,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     }
                 },
             }),
+            TagHighlight,
             Callout,
             ImageWithMarkdown.configure({
                 inline: false, // Block mode for note-taking (like Obsidian/Notion)

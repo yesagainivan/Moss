@@ -1011,3 +1011,28 @@ li[data-type="taskItem"]>div>p {
   font-weight: 600;
   color: var(--foreground);
 }
+
+/* hr */
+/* horizontal rule hr {
+  border: 1px solid var();
+} */
+
+.prose :where(hr):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  border-color: var(--border);
+  border-top-width: 1px;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+/* Tag Highlighting */
+.tag-highlight {
+  color: var(--primary);
+  background-color: color-mix(in srgb, var(--primary), transparent 95%);
+  border-radius: 4px;
+  padding: 0 2px;
+  font-weight: 500;
+}
+
+.dark .tag-highlight {
+  background-color: color-mix(in srgb, var(--primary), transparent 90%);
+}
