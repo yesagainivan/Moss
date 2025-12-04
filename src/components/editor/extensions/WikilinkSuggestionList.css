@@ -1,0 +1,101 @@
+/* Wikilink Suggestion Dropdown */
+.wikilink-suggestion-list {
+    background: var(--popover);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 0.25rem;
+    min-width: 300px;
+    max-width: 500px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 50;
+}
+
+.wikilink-suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    text-align: left;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    color: var(--foreground);
+}
+
+.wikilink-suggestion-item:hover,
+.wikilink-suggestion-item.is-selected {
+    background-color: color-mix(in srgb, var(--accent), transparent 90%);
+}
+
+.wikilink-suggestion-badge {
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    flex-shrink: 0;
+}
+
+.wikilink-suggestion-badge.recent {
+    background-color: color-mix(in srgb, var(--accent), transparent 85%);
+    color: var(--accent);
+}
+
+.wikilink-suggestion-badge.same-folder {
+    background-color: color-mix(in srgb, var(--info), transparent 85%);
+    color: var(--info);
+}
+
+.wikilink-suggestion-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    flex: 1;
+    min-width: 0;
+    /* Allow text truncation */
+}
+
+.wikilink-suggestion-name {
+    color: var(--foreground);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wikilink-suggestion-path {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wikilink-suggestion-empty {
+    padding: 0.75rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+/* Tippy.js theme */
+.tippy-box[data-theme~='wikilink-suggestion'] {
+    background-color: transparent;
+    padding: 0;
+}
+
+.tippy-box[data-theme~='wikilink-suggestion'] .tippy-content {
+    padding: 0;
+}
+
+.dark .wikilink-suggestion-item:hover,
+.dark .wikilink-suggestion-item.is-selected {
+    background-color: color-mix(in srgb, var(--accent), transparent 85%);
+}

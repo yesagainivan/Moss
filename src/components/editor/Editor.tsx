@@ -13,6 +13,7 @@ import { TaskItem } from '@tiptap/extension-list/task-item';
 import { ImageWithMarkdown } from './extensions/ImageWithMarkdown';
 import { TagHighlight } from './extensions/TagHighlight';
 import { TagSuggestion } from './extensions/TagSuggestion';
+import { WikilinkSuggestion } from './extensions/WikilinkSuggestion';
 import { useAppStore, debouncedSaveNote } from '../../store/useStore';
 import 'tippy.js/dist/tippy.css';
 import { useSettingsStore } from '../../store/useSettingsStore';
@@ -245,6 +246,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             }),
             TagHighlight,
             TagSuggestion,
+            WikilinkSuggestion,
             Callout,
             ImageWithMarkdown.configure({
                 inline: false, // Block mode for note-taking (like Obsidian/Notion)

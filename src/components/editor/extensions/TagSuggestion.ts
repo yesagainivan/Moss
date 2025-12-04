@@ -4,6 +4,7 @@ import { ReactRenderer } from '@tiptap/react';
 import tippy, { Instance as TippyInstance } from 'tippy.js';
 import { TagSuggestionList } from './TagSuggestionList.tsx';
 import { useAppStore } from '../../../store/useStore';
+import { PluginKey } from '@tiptap/pm/state';
 
 export interface TagSuggestionOptions {
     suggestion: {
@@ -34,6 +35,7 @@ export const TagSuggestion = Extension.create<TagSuggestionOptions>({
     addProseMirrorPlugins() {
         return [
             Suggestion({
+                pluginKey: new PluginKey('tagSuggestion'),
                 editor: this.editor,
                 char: this.options.suggestion.char,
                 command: this.options.suggestion.command,
