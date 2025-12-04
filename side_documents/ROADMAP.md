@@ -61,24 +61,25 @@ Transform Amber Brown from a functional note-taking app into a **production-read
 
 ### Sprint 2: Organization (Week 2)
 
-#### 4. Tags System (~2-3 days) 🏷️
+#### 4. Tags System (~2-3 days) 🏷️ ✅ COMPLETE
 **Priority:** 🔴 CRITICAL - Table stakes for PKM
 
-**Backend Work:**
-- [ ] Tag extraction from markdown (`#tag` syntax)
-- [ ] Tag index/cache system (similar to `graph.rs`)
-- [ ] Tauri command: `get_all_tags` (returns tag list with counts)
-- [ ] Tauri command: `get_notes_by_tag` (filter notes)
+**Completed Features:**
+- ✅ Tag extraction from markdown (`#tag` syntax)
+- ✅ Tag index/cache system (similar to `graph.rs`)
+- ✅ Tauri commands: `get_all_tags`, `get_notes_by_tag`
+- ✅ Tag panel in sidebar (collapsible section)
+- ✅ Tag list with note counts
+- ✅ Click tag → filter file tree (AND logic)
+- ✅ **BONUS:** Tag autocomplete in editor (Tiptap extension)
+- ✅ **BONUS:** Wikilink autocomplete with smart suggestions
+  - Recent notes (from tab history)
+  - Same folder context
+  - Fuzzy search
 
-**Frontend Work:**
-- [ ] Tag panel in sidebar (collapsible section)
-- [ ] Tag list with note counts
-- [ ] Click tag → filter file tree
-- [ ] Tag autocomplete in editor (Tiptap extension)
-- [ ] Multi-tag filtering
-
-**Estimated Effort:** 2-3 days  
-**Impact:** Unlocks serious organization workflows
+**Completed:** December 4, 2025  
+**Actual Effort:** ~4 hours (faster than estimated!)  
+**Impact:** Major organization capability unlocked + improved editor UX
 
 ---
 
@@ -272,11 +273,11 @@ Transform Amber Brown from a functional note-taking app into a **production-read
 ## 📊 Progress Summary
 
 **Total Features Planned:** 14  
-**Completed:** 3 (Sprint 1)  
+**Completed:** 4 (Sprint 1 + Tags System)  
 **In Progress:** 0  
-**Remaining:** 11
+**Remaining:** 10
 
-**Estimated Time to Beta:** ~3-4 weeks
+**Estimated Time to Beta:** ~2.5-3 weeks
 
 ---
 
@@ -286,7 +287,7 @@ Transform Amber Brown from a functional note-taking app into a **production-read
 - [x] Global search UI
 - [x] Backlinks panel
 - [x] Note outline/TOC
-- [ ] Tags system
+- [x] Tags system
 - [ ] Frontmatter support
 - [ ] Templates system
 - [ ] Daily notes

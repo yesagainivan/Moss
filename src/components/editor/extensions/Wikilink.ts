@@ -85,7 +85,13 @@ export const Wikilink = Node.create<WikilinkOptions>({
                     const target = match[1].trim();
                     const label = match[2] ? match[2].trim() : null;
 
-                    tr.replaceWith(start, end, this.type.create({ target, label }));
+                    // Insert the wikilink node
+                    const wikilinkNode = this.type.create({ target, label });
+                    tr.replaceWith(start, end, wikilinkNode);
+
+                    // Position cursor after the wikilink node
+                    // The node is at position 'start' and has nodeSize of 1 (atom)
+                    tr.setSelection(state.selection.constructor.near(tr.doc.resolve(start + 1)));
                 },
             }),
         ];

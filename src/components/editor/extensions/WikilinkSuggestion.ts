@@ -69,20 +69,29 @@ export const WikilinkSuggestion = Extension.create<WikilinkSuggestionOptions>({
                         return;
                     }
 
-                    // Create and insert the wikilink node directly
-                    editor
-                        .chain()
-                        .focus()
-                        .deleteRange(range)
-                        .insertContent({
-                            type: 'wikilink',
-                            attrs: {
-                                target: props.name,
-                                label: null,
-                                fragment: null,
-                            },
-                        })
-                        .run();
+                    // Use a command to have full control over the transaction
+                    editor.commands.command(({ tr, state }) => {
+                        // Delete the trigger range ([[)
+                        tr.delete(range.from, range.to);
+
+                        // Create the wikilink node
+                        const wikilinkNode = wikilinkType.create({
+                            target: props.name,
+                            label: null,
+                            fragment: null,
+                        });
+
+                        // Insert the node at the current position
+                        const insertPos = range.from;
+                        tr.insert(insertPos, wikilinkNode);
+
+                        // Position cursor after the wikilink node
+                        // The wikilink node has nodeSize of 1 (atom)
+                        const cursorPos = insertPos + 1;
+                        tr.setSelection(state.selection.constructor.near(tr.doc.resolve(cursorPos)));
+
+                        return true;
+                    });
                 },
             },
         };
@@ -94,6 +103,7 @@ export const WikilinkSuggestion = Extension.create<WikilinkSuggestionOptions>({
                 pluginKey: new PluginKey('wikilinkSuggestion'),
                 editor: this.editor,
                 char: this.options.suggestion.char,
+                allowedPrefixes: null, // Allow triggering after any character
                 command: this.options.suggestion.command,
 
                 items: ({ query }) => {
@@ -243,30 +253,30 @@ export const WikilinkSuggestion = Extension.create<WikilinkSuggestionOptions>({
                         },
 
                         onUpdate(props) {
-                            component.updateProps(props);
+                            component?.updateProps(props);
 
                             if (!props.clientRect) {
                                 return;
                             }
 
-                            popup[0].setProps({
+                            popup?.[0]?.setProps({
                                 getReferenceClientRect: props.clientRect as any,
                             });
                         },
 
                         onKeyDown(props) {
                             if (props.event.key === 'Escape') {
-                                popup[0].hide();
+                                popup?.[0]?.hide();
                                 return true;
                             }
 
-                            const ref = component.ref as any;
+                            const ref = component?.ref as any;
                             return ref?.onKeyDown?.(props) ?? false;
                         },
 
                         onExit() {
-                            popup[0].destroy();
-                            component.destroy();
+                            popup?.[0]?.destroy();
+                            component?.destroy();
                         },
                     };
                 },

@@ -2,7 +2,7 @@ import { Extension } from '@tiptap/core';
 import Suggestion from '@tiptap/suggestion';
 import { ReactRenderer } from '@tiptap/react';
 import tippy, { Instance as TippyInstance } from 'tippy.js';
-import { TagSuggestionList } from './TagSuggestionList.tsx';
+import { TagSuggestionList } from './TagSuggestionList';
 import { useAppStore } from '../../../store/useStore';
 import { PluginKey } from '@tiptap/pm/state';
 
@@ -38,6 +38,7 @@ export const TagSuggestion = Extension.create<TagSuggestionOptions>({
                 pluginKey: new PluginKey('tagSuggestion'),
                 editor: this.editor,
                 char: this.options.suggestion.char,
+                allowedPrefixes: null, // Allow triggering after any character
                 command: this.options.suggestion.command,
 
                 items: ({ query }) => {
@@ -87,31 +88,31 @@ export const TagSuggestion = Extension.create<TagSuggestionOptions>({
                         },
 
                         onUpdate(props) {
-                            component.updateProps(props);
+                            component?.updateProps(props);
 
                             if (!props.clientRect) {
                                 return;
                             }
 
-                            popup[0].setProps({
+                            popup?.[0]?.setProps({
                                 getReferenceClientRect: props.clientRect as any,
                             });
                         },
 
                         onKeyDown(props) {
                             if (props.event.key === 'Escape') {
-                                popup[0].hide();
+                                popup?.[0]?.hide();
                                 return true;
                             }
 
                             // Access the component's ref properly
-                            const ref = component.ref as any;
+                            const ref = component?.ref as any;
                             return ref?.onKeyDown?.(props) ?? false;
                         },
 
                         onExit() {
-                            popup[0].destroy();
-                            component.destroy();
+                            popup?.[0]?.destroy();
+                            component?.destroy();
                         },
                     };
                 },
