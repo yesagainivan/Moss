@@ -1,0 +1,142 @@
+.container {
+    width: 300px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border);
+    background: var(--background);
+    transition: width 0.3s ease;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--muted/30);
+}
+
+.title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.count {
+    font-size: 12px;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.closeButton {
+    background: transparent;
+    border: none;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.closeButton:hover {
+    background: var(--muted);
+    color: var(--foreground);
+}
+
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.headingItem {
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--foreground);
+}
+
+.headingItem:hover {
+    background: var(--accent);
+}
+
+/* Indentation based on heading level */
+.level1 {
+    padding-left: 12px;
+    font-weight: 600;
+}
+
+.level2 {
+    padding-left: 28px;
+    font-weight: 500;
+}
+
+.level3 {
+    padding-left: 44px;
+}
+
+.level4 {
+    padding-left: 60px;
+}
+
+.level5 {
+    padding-left: 76px;
+}
+
+.level6 {
+    padding-left: 92px;
+}
+
+.headingIcon {
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+.headingText {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--muted-foreground);
+    gap: 8px;
+    text-align: center;
+    padding: 20px;
+}
+
+.emptyIcon {
+    opacity: 0.5;
+}
+
+.emptyText {
+    font-size: 13px;
+}

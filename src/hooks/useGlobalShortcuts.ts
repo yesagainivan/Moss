@@ -26,6 +26,19 @@ export const useGlobalShortcuts = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
+    // Cmd+Opt+O (Outline)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.altKey && e.code === 'KeyO') {
+                e.preventDefault();
+                const state = useAppStore.getState();
+                state.setOutlinePanelOpen(!state.isOutlinePanelOpen);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     // Cmd+B to toggle sidebar
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {

@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useAppStore } from '../../store/useStore';
 import { EditorLoader } from '../editor/EditorLoader';
 import { BacklinksPanel } from '../backlinks/BacklinksPanel';
+import { OutlinePanel } from '../outline/OutlinePanel';
 
 interface PaneViewProps {
     paneId: string;
@@ -42,6 +43,8 @@ export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
 
     const isBacklinksPanelOpen = useAppStore(state => state.isBacklinksPanelOpen);
     const setBacklinksPanelOpen = useAppStore(state => state.setBacklinksPanelOpen);
+    const isOutlinePanelOpen = useAppStore(state => state.isOutlinePanelOpen);
+    const setOutlinePanelOpen = useAppStore(state => state.setOutlinePanelOpen);
 
     return (
         <div
@@ -65,6 +68,15 @@ export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
                     </div>
                 )}
             </div>
+
+            {/* Outline Panel */}
+            {noteId && note && (
+                <OutlinePanel
+                    noteContent={note.content}
+                    isOpen={isOutlinePanelOpen}
+                    onClose={() => setOutlinePanelOpen(false)}
+                />
+            )}
 
             {/* Backlinks Panel */}
             {noteId && (

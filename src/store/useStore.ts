@@ -143,6 +143,10 @@ interface AppState {
     // Backlinks Panel
     isBacklinksPanelOpen: boolean;
     setBacklinksPanelOpen: (isOpen: boolean) => void;
+
+    // Outline Panel
+    isOutlinePanelOpen: boolean;
+    setOutlinePanelOpen: (isOpen: boolean) => void;
     createNote: (title?: string, parentPath?: string, useExactName?: boolean) => Promise<string>;
     createFolder: (name: string, parentPath?: string) => Promise<void>;
     setSelectedFolder: (path: string | null) => void;
@@ -251,6 +255,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     isCommandPaletteOpen: false,
     isSearchModalOpen: false, // Search modal closed by default
     isBacklinksPanelOpen: false, // Backlinks panel closed by default
+    isOutlinePanelOpen: false, // Outline panel closed by default
     dirtyNoteIds: new Set(),
     gitEnabled: false, // Will be checked on vault load
     hasUncommittedChanges: false,
@@ -498,7 +503,19 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     setBacklinksPanelOpen: (isOpen: boolean) => {
-        set({ isBacklinksPanelOpen: isOpen });
+        set((state) => ({
+            isBacklinksPanelOpen: isOpen,
+            // Close outline when opening backlinks
+            isOutlinePanelOpen: isOpen ? false : state.isOutlinePanelOpen,
+        }));
+    },
+
+    setOutlinePanelOpen: (isOpen: boolean) => {
+        set((state) => ({
+            isOutlinePanelOpen: isOpen,
+            // Close backlinks when opening outline
+            isBacklinksPanelOpen: isOpen ? false : state.isBacklinksPanelOpen,
+        }));
     },
 
     updateNote: (id, content) => {

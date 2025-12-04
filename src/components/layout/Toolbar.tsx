@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, Sparkles, Bot, ArrowLeft, ArrowRight, BarChart3, SplitSquareHorizontal, SplitSquareVertical, XCircle, Link2 } from 'lucide-react';
+import { Settings as SettingsIcon, Sparkles, Bot, ArrowLeft, ArrowRight, BarChart3, SplitSquareHorizontal, SplitSquareVertical, XCircle, Link2, List } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { SettingsModal } from '../settings/SettingsModal';
 import { AICommandMenu } from '../ai/AICommandMenu';
@@ -18,7 +18,7 @@ export const Toolbar = () => {
     const [showActivity, setShowActivity] = useState(false);
     const aiButtonRef = useRef<HTMLButtonElement>(null);
     const { toggleOpen: toggleAgent, isOpen: isAgentOpen } = useAgentStore();
-    const { navigateBack, navigateForward, gitEnabled, splitPane, closePane, activePaneId, paneRoot, getActivePane, isBacklinksPanelOpen, setBacklinksPanelOpen } = useAppStore();
+    const { navigateBack, navigateForward, gitEnabled, splitPane, closePane, activePaneId, paneRoot, getActivePane, isBacklinksPanelOpen, setBacklinksPanelOpen, isOutlinePanelOpen, setOutlinePanelOpen } = useAppStore();
 
     const activePane = getActivePane();
     const tabs = activePane?.tabs || [];
@@ -143,6 +143,13 @@ export const Toolbar = () => {
                         title="Toggle Backlinks (Cmd+Opt+B)"
                     >
                         <Link2 className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={() => setOutlinePanelOpen(!isOutlinePanelOpen)}
+                        className={`p-1.5 rounded-md transition-colors ${isOutlinePanelOpen ? 'bg-accent/10 text-accent' : 'hover:bg-accent/10 text-muted-foreground'}`}
+                        title="Toggle Outline (Cmd+Opt+O)"
+                    >
+                        <List className="w-4 h-4" />
                     </button>
                     <GitHubSyncIndicator />
                     <button
