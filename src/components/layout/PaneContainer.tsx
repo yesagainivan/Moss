@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useAppStore } from '../../store/useStore';
+import { usePaneStore } from '../../store/usePaneStore';
 import { PaneNode } from '../../types';
 import { PaneView } from './PaneView';
 import { ResizableSplit } from './ResizableSplit';
@@ -9,8 +9,8 @@ import { ResizableSplit } from './ResizableSplit';
  * Handles both single panes and split layouts
  */
 export const PaneContainer = () => {
-    const paneRoot = useAppStore(state => state.paneRoot);
-    const activePaneId = useAppStore(state => state.activePaneId);
+    const paneRoot = usePaneStore(state => state.paneRoot);
+    const activePaneId = usePaneStore(state => state.activePaneId);
 
     // Memoize renderPane to prevent unnecessary re-renders
     const renderPane = useCallback((node: PaneNode): React.ReactElement => {

@@ -15,6 +15,7 @@ import { TagHighlight } from './extensions/TagHighlight';
 import { TagSuggestion } from './extensions/TagSuggestion';
 import { WikilinkSuggestion } from './extensions/WikilinkSuggestion';
 import { useAppStore, debouncedSaveNote } from '../../store/useStore';
+import { usePaneStore } from '../../store/usePaneStore';
 import 'tippy.js/dist/tippy.css';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useAIStore } from '../../store/useAIStore';
@@ -44,17 +45,10 @@ const markdownCache = new LRUCache<string, string>(100);
 
 export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
     const updateNote = useAppStore(state => state.updateNote);
-    const setTabDirty = useAppStore(state => state.setTabDirty);
     const forceSaveNote = useAppStore(state => state.forceSaveNote);
     const setScrollPosition = useAppStore(state => state.setScrollPosition);
-    const activePaneId = useAppStore(state => state.activePaneId);
+    const activePaneId = usePaneStore(state => state.activePaneId);
 
-    const editorTab = useAppStore(state => {
-        if (!paneId) return undefined;
-        const pane = state.findPaneById(paneId);
-        if (!pane || pane.type !== 'leaf') return undefined;
-        return pane.tabs?.find(t => t.noteId === noteId);
-    });
     const savedScrollPosition = useAppStore(state => state.scrollPositions[noteId]);
 
     const settings = useSettingsStore(state => state.settings);
@@ -370,10 +364,6 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 return;
             }
 
-            // Mark tab as dirty immediately for UI feedback
-            if (editorTab) {
-                setTabDirty(editorTab.id, true);
-            }
 
             // Debounce the heavy serialization and store update
             debouncedUpdate(editor, noteId);
@@ -459,7 +449,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             if (!editor) return;
 
             // CRITICAL: Only respond if this editor is in the active pane
-            const currentActivePaneId = useAppStore.getState().activePaneId;
+            const currentActivePaneId = usePaneStore.getState().activePaneId;
             console.log('[AI Command] Editor checking pane:', { paneId, currentActivePaneId, noteId });
 
             // Strict check: paneId must exist and match activePaneId
@@ -873,9 +863,6 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
 
         // Update store and save
         updateNote(noteId, newContent);
-        if (editorTab) {
-            setTabDirty(editorTab.id, true);
-        }
         debouncedSaveNote(noteId, newContent);
     };
 
@@ -907,10 +894,9 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             setSourceContent(newValue);
             // Update store and save
             updateNote(noteId, newValue);
-            if (editorTab) {
-                setTabDirty(editorTab.id, true);
-            }
-            debouncedSaveNote(noteId, newValue);
+            // Mark tab as dirty
+            // Update global dirty state
+            useAppStore.getState().setSaveState(noteId, { status: 'saving' }); // Use 'saving' or 'idle' instead of 'unsaved' if 'unsaved' is not valid
             // Move cursor after inserted spaces
             const newPos = start + 2;
             target.selectionStart = target.selectionEnd = newPos;

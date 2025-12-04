@@ -20,8 +20,6 @@ describe('Untitled Tab Issue Reproduction', () => {
     beforeEach(() => {
         useAppStore.setState({
             notes: {},
-            tabs: [],
-            activeTabId: null,
             fileTree: [],
             vaultPath: '/test/vault',
             dirtyNoteIds: new Set(),

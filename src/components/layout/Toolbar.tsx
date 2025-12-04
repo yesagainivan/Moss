@@ -4,6 +4,8 @@ import { SettingsModal } from '../settings/SettingsModal';
 import { AICommandMenu } from '../ai/AICommandMenu';
 import { useAgentStore } from '../../store/useAgentStore';
 import { useAppStore } from '../../store/useStore';
+import { usePaneStore } from '../../store/usePaneStore';
+import { useGitStore } from '../../store/useGitStore';
 import { SaveIndicator } from '../editor/SaveIndicator';
 import { UndoAmbreButton } from '../git/UndoAmbreButton';
 import { NoteHistoryModal } from '../git/NoteHistoryModal';
@@ -18,7 +20,9 @@ export const Toolbar = () => {
     const [showActivity, setShowActivity] = useState(false);
     const aiButtonRef = useRef<HTMLButtonElement>(null);
     const { toggleOpen: toggleAgent, isOpen: isAgentOpen } = useAgentStore();
-    const { navigateBack, navigateForward, gitEnabled, splitPane, closePane, activePaneId, paneRoot, getActivePane, isBacklinksPanelOpen, setBacklinksPanelOpen, isOutlinePanelOpen, setOutlinePanelOpen } = useAppStore();
+    const { navigateBack, navigateForward, isBacklinksPanelOpen, setBacklinksPanelOpen, isOutlinePanelOpen, setOutlinePanelOpen } = useAppStore();
+    const { splitPane, closePane, activePaneId, paneRoot, getActivePane } = usePaneStore();
+    const gitEnabled = useGitStore(state => state.gitEnabled);
 
     const activePane = getActivePane();
     const tabs = activePane?.tabs || [];

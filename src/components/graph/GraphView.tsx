@@ -23,7 +23,7 @@ interface GraphData {
 }
 
 const GraphView: React.FC = () => {
-    const vaultPath = useAppStore(state => state.vaultPath);
+    const vaultPath = useSettingsStore(state => state.currentVaultPath);
     const fileTreeGeneration = useAppStore(state => state.fileTreeGeneration); // Increments on file changes
     const openNote = useAppStore(state => state.openNote);
     const [data, setData] = useState<GraphData>({ nodes: [], links: [] });

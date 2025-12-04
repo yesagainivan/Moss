@@ -1,10 +1,11 @@
 import { X, Check, AlertCircle, Loader2 } from 'lucide-react';
-import { useSettingsStore } from '../../store/useSettingsStore';
 import { useThemeStore } from '../../store/useThemeStore';
 import { useAIStore, AIProvider, DEFAULT_PERSONA } from '../../store/useAIStore';
 import { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { useAppStore } from '../../store/useStore';
+import { useGitStore } from '../../store/useGitStore';
 import { VaultHistory } from '../git/VaultHistory';
 import { GitHubLogin } from './GitHubLogin';
 import { ConfirmDialog } from '../common/ConfirmDialog';
@@ -47,7 +48,8 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
     const [isIndexing, setIsIndexing] = useState(false);
     const [indexStatus, setIndexStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [indexMessage, setIndexMessage] = useState('');
-    const { gitEnabled, checkGitStatus, requestConfirmation } = useAppStore();
+    const { requestConfirmation } = useAppStore();
+    const { gitEnabled, checkGitStatus } = useGitStore();
     const [isInitializingGit, setIsInitializingGit] = useState(false);
     const [gitMessage, setGitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [isClosing, setIsClosing] = useState(false);
@@ -1053,7 +1055,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                     if (!confirmed) return;
 
                                                     try {
-                                                        await useAppStore.getState().snapshotVault();
+                                                        await useGitStore.getState().snapshotVault();
                                                         setGitMessage({ type: 'success', text: 'Vault snapshot created successfully!' });
                                                     } catch (e) {
                                                         console.error('Failed to snapshot vault:', e);

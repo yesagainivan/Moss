@@ -8,14 +8,14 @@ interface TabItemProps {
     id: string;
     noteId: string;
     isActive: boolean;
-    isDirty: boolean;
     isPreview: boolean;
     onActivate: (id: string) => void;
     onClose: (id: string) => void;
 }
 
-export const TabItem = memo(({ id, noteId, isActive, isDirty, isPreview, onActivate, onClose }: TabItemProps) => {
+export const TabItem = memo(({ id, noteId, isActive, isPreview, onActivate, onClose }: TabItemProps) => {
     const title = useAppStore(state => state.notes[noteId]?.title || 'Untitled');
+    const isDirty = useAppStore(state => state.dirtyNoteIds.has(noteId));
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
 
     const handleClick = () => {

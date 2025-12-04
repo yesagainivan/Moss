@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { X, Clock, GitCommit, RotateCcw, ArrowLeft, Loader2 } from 'lucide-react';
-import { useAppStore, CommitInfo } from '../../store/useStore';
+import { useAppStore } from '../../store/useStore';
+import { useGitStore } from '../../store/useGitStore';
+import { CommitInfo } from '../../types';
 import * as Diff from 'diff';
 import styles from './NoteHistoryModal.module.css';
 
@@ -11,7 +13,8 @@ interface NoteHistoryModalProps {
 }
 
 export const NoteHistoryModal = ({ isOpen, onClose, notePath }: NoteHistoryModalProps) => {
-    const { getNoteHistory, getNoteContentAtCommit, forceSaveNote, updateNote, requestConfirmation } = useAppStore();
+    const { forceSaveNote, updateNote, requestConfirmation } = useAppStore();
+    const { getNoteHistory, getNoteContentAtCommit } = useGitStore();
     const [history, setHistory] = useState<CommitInfo[]>([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [selectedCommit, setSelectedCommit] = useState<CommitInfo | null>(null);

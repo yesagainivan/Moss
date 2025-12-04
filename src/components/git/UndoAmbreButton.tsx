@@ -1,3 +1,4 @@
+import { useGitStore } from '../../store/useGitStore';
 import { useAppStore } from '../../store/useStore';
 
 /**
@@ -5,7 +6,8 @@ import { useAppStore } from '../../store/useStore';
  * Uses Git revert (safe, non-destructive)
  */
 export const UndoAmbreButton = () => {
-    const { gitEnabled, undoLastAmbreChange } = useAppStore();
+    const { gitEnabled, undoLastAmbreChange } = useGitStore();
+    const { requestConfirmation } = useAppStore();
 
     if (!gitEnabled) {
         return null; // Hide button if Git is not enabled
@@ -13,7 +15,7 @@ export const UndoAmbreButton = () => {
 
     return (
         <button
-            onClick={undoLastAmbreChange}
+            onClick={() => undoLastAmbreChange(requestConfirmation)}
             className="p-2 hover:bg-secondary rounded transition-colors group relative"
             title="Undo last Ambre change"
             aria-label="Undo last change made by Ambre"

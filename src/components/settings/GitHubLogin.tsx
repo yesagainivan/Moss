@@ -5,7 +5,6 @@ import { Github, LogOut, Loader2, XCircle, Settings } from 'lucide-react';
 import { GitHubRepoSelector } from './GitHubRepoSelector';
 import { GitHubSyncStatus } from './GitHubSyncStatus';
 import { useSettingsStore } from '../../store/useSettingsStore';
-import { useAppStore } from '../../store/useStore';
 import { useGitHubStore } from '../../store/useGitHubStore';
 
 interface DeviceCodeResponse {
@@ -21,8 +20,7 @@ interface GitHubLoginProps {
 }
 
 export function GitHubLogin({ clientId }: GitHubLoginProps) {
-    const { vaultPath } = useAppStore();
-    const { githubSync, updateGitHubSync } = useSettingsStore();
+    const { githubSync, updateGitHubSync, currentVaultPath: vaultPath } = useSettingsStore();
     const { user, isLoggedIn, checkLoginStatus, logout: storeLogout } = useGitHubStore();
 
     const [isLoading, setIsLoading] = useState(false);

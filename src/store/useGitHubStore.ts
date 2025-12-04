@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { invoke } from '@tauri-apps/api/core';
 import { useAppStore } from './useStore';
+import { usePaneStore } from './usePaneStore';
 
 export interface GitHubUser {
     login: string;
@@ -144,12 +145,13 @@ export const useGitHubStore = create<GitHubState>((set, get) => ({
 
             // Reload the vault state to reflect synced changes
             const store = useAppStore.getState();
+            const notes = store.notes;
+            const tabs = usePaneStore.getState().getActivePaneTabs();
 
             // Refresh file tree
             await store.refreshFileTree();
 
             // Reload content for all open notes from disk
-            const { tabs, notes } = store;
             // We need to dynamically import this to avoid circular dependencies if possible, 
             // or just assume it's available. The original code imported it.
             // Since we are in a store, we can't easily use dynamic imports that depend on component context,
@@ -224,7 +226,8 @@ export const useGitHubStore = create<GitHubState>((set, get) => ({
             await store.refreshFileTree();
 
             // Reload open notes
-            const { tabs, notes } = store;
+            const notes = store.notes;
+            const tabs = usePaneStore.getState().getActivePaneTabs();
             const { loadNoteContent } = await import('../lib/fs');
 
             for (const tab of tabs) {

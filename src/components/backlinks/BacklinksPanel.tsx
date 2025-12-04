@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { Link2, X, FileText, Loader2 } from 'lucide-react';
 import styles from './BacklinksPanel.module.css';
 import { useAppStore } from '../../store/useStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 
 interface Backlink {
     source_path: string;
@@ -18,7 +19,7 @@ interface BacklinksPanelProps {
 export const BacklinksPanel: React.FC<BacklinksPanelProps> = ({ noteId, isOpen, onClose }) => {
     const [backlinks, setBacklinks] = useState<Backlink[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const vaultPath = useAppStore(state => state.vaultPath);
+    const vaultPath = useSettingsStore(state => state.currentVaultPath);
     const openNote = useAppStore(state => state.openNote);
 
     useEffect(() => {

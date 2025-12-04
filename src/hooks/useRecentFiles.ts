@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAppStore } from '../store/useStore';
+import { usePaneStore } from '../store/usePaneStore';
 import { RecentFile } from '../types/CommandTypes';
 
 const MAX_RECENT_FILES = 10;
@@ -7,8 +8,8 @@ const STORAGE_KEY = 'moss-recent-files';
 
 export const useRecentFiles = () => {
     const [recentFiles, setRecentFiles] = useState<RecentFile[]>([]);
-    const activePaneId = useAppStore(state => state.activePaneId);
-    const paneIndex = useAppStore(state => state.paneIndex);
+    const activePaneId = usePaneStore(state => state.activePaneId);
+    const paneIndex = usePaneStore(state => state.paneIndex);
     const activePane = paneIndex.get(activePaneId || '');
     const activeTabId = activePane?.activeTabId;
     const tabs = activePane?.tabs || [];

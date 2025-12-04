@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useAppStore } from '../../store/useStore';
+import { usePaneStore } from '../../store/usePaneStore';
 import { EditorLoader } from '../editor/EditorLoader';
 import { BacklinksPanel } from '../backlinks/BacklinksPanel';
 import { OutlinePanel } from '../outline/OutlinePanel';
@@ -15,13 +16,13 @@ interface PaneViewProps {
  */
 export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
     // Optimized selector - only fetches this specific pane, not entire tree
-    const pane = useAppStore(
+    const pane = usePaneStore(
         useCallback(
             state => state.findPaneById(paneId),
             [paneId]
         )
     );
-    const setActivePane = useAppStore(state => state.setActivePane);
+    const setActivePane = usePaneStore(state => state.setActivePane);
     const notes = useAppStore(state => state.notes);
 
     // Stable callback reference prevents child re-renders

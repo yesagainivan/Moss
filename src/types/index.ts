@@ -9,7 +9,6 @@ export interface Note {
 export interface Tab {
     id: string;
     noteId: string;
-    isDirty: boolean; // Unsaved changes indicator
     isPreview: boolean; // Preview tab (will be replaced when opening another note)
     history: string[]; // Navigation history stack
     historyIndex: number; // Current position in history stack
@@ -37,10 +36,27 @@ export interface PaneNode {
 
     // For split nodes (contain two child panes)
     direction?: 'horizontal' | 'vertical';
-    children?: [PaneNode, PaneNode];
+    children?: PaneNode[];
     splitRatio?: number; // 0.0 to 1.0, how much space first child gets
+    parentId?: string;
 
     // For leaf nodes (actual editor panes that display content)
     tabs?: Tab[]; // Each leaf pane has its own tabs
     activeTabId?: string | null; // Which tab is displayed in this pane
+}
+
+export interface CommitStats {
+    files_changed: number;
+    insertions: number;
+    deletions: number;
+    file_paths: string[];
+}
+
+export interface CommitInfo {
+    oid: string;
+    message: string;
+    author: string;
+    timestamp: number;
+    is_ambre: boolean;
+    stats?: CommitStats;
 }

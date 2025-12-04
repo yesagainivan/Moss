@@ -1,23 +1,24 @@
 import { useCallback } from 'react';
-import { useAppStore } from '../../store/useStore';
+import { usePaneStore } from '../../store/usePaneStore';
 import { TabItem } from './TabItem';
 
 export const TabBar = () => {
     // Subscribe to paneRoot to react to changes
-    const paneRoot = useAppStore(state => state.paneRoot);
-    const activePaneId = useAppStore(state => state.activePaneId);
-    const findPaneById = useAppStore(state => state.findPaneById);
+    const activePaneId = usePaneStore(state => state.activePaneId);
+    const findPaneById = usePaneStore(state => state.findPaneById);
 
-    const activePane = activePaneId ? findPaneById(activePaneId, paneRoot) : null;
+    const activePane = activePaneId ? findPaneById(activePaneId) : null;
     const tabs = (activePane?.type === 'leaf' ? activePane.tabs : null) || [];
     const activeTabId = activePane?.type === 'leaf' ? activePane.activeTabId : null;
 
-    const setActiveTab = useAppStore(state => state.setActiveTab);
-    const closeTab = useAppStore(state => state.closeTab);
+    const setActiveTab = usePaneStore(state => state.setPaneTab);
+    const closeTab = usePaneStore(state => state.closeTab);
 
     const handleActivate = useCallback((id: string) => {
-        setActiveTab(id);
-    }, [setActiveTab]);
+        if (activePaneId) {
+            setActiveTab(activePaneId, id);
+        }
+    }, [setActiveTab, activePaneId]);
 
     const handleClose = useCallback((id: string) => {
         closeTab(id);
@@ -33,7 +34,6 @@ export const TabBar = () => {
                     id={tab.id}
                     noteId={tab.noteId}
                     isActive={tab.id === activeTabId}
-                    isDirty={tab.isDirty}
                     isPreview={tab.isPreview}
                     onActivate={handleActivate}
                     onClose={handleClose}

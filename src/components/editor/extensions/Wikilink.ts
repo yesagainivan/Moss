@@ -91,6 +91,7 @@ export const Wikilink = Node.create<WikilinkOptions>({
 
                     // Position cursor after the wikilink node
                     // The node is at position 'start' and has nodeSize of 1 (atom)
+                    // @ts-ignore
                     tr.setSelection(state.selection.constructor.near(tr.doc.resolve(start + 1)));
                 },
             }),

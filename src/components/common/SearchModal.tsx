@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Command } from 'cmdk';
 import { useAppStore } from '../../store/useStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { File, Search, Loader2 } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { debounce } from 'lodash-es';
@@ -17,7 +18,7 @@ interface SearchResult {
 export const SearchModal = () => {
     const isOpen = useAppStore(state => state.isSearchModalOpen);
     const setIsOpen = useAppStore(state => state.setSearchModalOpen);
-    const vaultPath = useAppStore(state => state.vaultPath);
+    const vaultPath = useSettingsStore(state => state.currentVaultPath);
     const openNote = useAppStore(state => state.openNote);
 
     const [isClosing, setIsClosing] = useState(false);

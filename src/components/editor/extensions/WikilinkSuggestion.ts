@@ -4,6 +4,8 @@ import { ReactRenderer } from '@tiptap/react';
 import tippy, { Instance as TippyInstance } from 'tippy.js';
 import { WikilinkSuggestionList } from './WikilinkSuggestionList';
 import { useAppStore } from '../../../store/useStore';
+import { usePaneStore } from '../../../store/usePaneStore';
+import { useSettingsStore } from '../../../store/useSettingsStore';
 import { PluginKey } from '@tiptap/pm/state';
 
 export interface WikilinkSuggestionOptions {
@@ -70,6 +72,7 @@ export const WikilinkSuggestion = Extension.create<WikilinkSuggestionOptions>({
                     }
 
                     // Use a command to have full control over the transaction
+                    // @ts-ignore
                     editor.commands.command(({ tr, state }) => {
                         // Delete the trigger range ([[)
                         tr.delete(range.from, range.to);
@@ -108,10 +111,12 @@ export const WikilinkSuggestion = Extension.create<WikilinkSuggestionOptions>({
 
                 items: ({ query }) => {
                     const store = useAppStore.getState();
+                    const paneStore = usePaneStore.getState();
+                    const settingsStore = useSettingsStore.getState();
                     const fileTree = store.fileTree;
-                    const paneIndex = store.paneIndex;
-                    const activePaneId = store.activePaneId;
-                    const vaultPath = store.vaultPath;
+                    const paneIndex = paneStore.paneIndex;
+                    const activePaneId = paneStore.activePaneId;
+                    const vaultPath = settingsStore.currentVaultPath;
 
                     if (!fileTree || fileTree.length === 0) return [];
 

@@ -1,6 +1,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { X, Calendar, Loader2, Trophy, Flame, GitCommit } from 'lucide-react';
-import { useAppStore, CommitInfo } from '../../store/useStore';
+import { useAppStore } from '../../store/useStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { CommitInfo } from '../../types';
 import { ActivityCalendarGrid } from './ActivityCalendarGrid';
 import { Select } from '../common/Select';
 import styles from './ActivityCalendar.module.css';
@@ -13,7 +15,8 @@ interface ActivityCalendarProps {
 type TimeRange = '3months' | '6months' | '12months' | 'thisyear' | 'alltime';
 
 export const ActivityCalendar = ({ isOpen, onClose }: ActivityCalendarProps) => {
-    const { vaultPath, openNote } = useAppStore();
+    const { openNote } = useAppStore();
+    const { currentVaultPath: vaultPath } = useSettingsStore();
     const [commits, setCommits] = useState<CommitInfo[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [timeRange, setTimeRange] = useState<TimeRange>('12months');

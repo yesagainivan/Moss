@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { RefreshCw, CheckCircle, AlertCircle, Clock, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
-import { useAppStore } from '../../store/useStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { useGitHubStore } from '../../store/useGitHubStore';
 import { ConflictResolutionModal } from '../git/ConflictResolutionModal';
 
@@ -10,7 +10,7 @@ interface GitHubSyncStatusProps {
 }
 
 export function GitHubSyncStatus({ repoOwner, repoName }: GitHubSyncStatusProps) {
-    const { vaultPath } = useAppStore();
+    const { currentVaultPath: vaultPath } = useSettingsStore();
     const {
         syncStatus,
         isSyncing,

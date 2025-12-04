@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { useAppStore } from '../store/useStore';
+import { usePaneStore } from '../store/usePaneStore';
+import { useGitStore } from '../store/useGitStore';
 
 export const useGlobalShortcuts = () => {
     const toggleSidebar = useAppStore(state => state.toggleSidebar);
@@ -79,15 +81,16 @@ export const useGlobalShortcuts = () => {
                 if (e.altKey) {
                     // Cmd+Alt+S: Snapshot Vault
                     e.preventDefault();
-                    state.snapshotVault();
+                    useGitStore.getState().snapshotVault();
                     return;
                 } else if (e.shiftKey) {
                     // Cmd+Shift+S: Snapshot Active Note
                     e.preventDefault();
-                    const activePane = state.getActivePane();
+                    const paneState = usePaneStore.getState();
+                    const activePane = paneState.getActivePane();
                     const activeTab = activePane?.tabs?.find(t => t.id === activePane.activeTabId);
                     if (activeTab && activeTab.noteId) {
-                        state.snapshotNote(activeTab.noteId);
+                        useGitStore.getState().snapshotNote(activeTab.noteId, state.forceSaveNote, state.setSaveState);
                     }
                     return;
                 }
@@ -96,18 +99,18 @@ export const useGlobalShortcuts = () => {
 
             if ((e.metaKey || e.ctrlKey) && e.key === 'w') {
                 e.preventDefault();
-                const state = useAppStore.getState();
+                const paneState = usePaneStore.getState();
 
                 // If we have multiple panes, close the active pane
                 // Otherwise close the tab
-                if (state.paneRoot.type === 'split') {
-                    if (state.activePaneId) {
-                        state.closePane(state.activePaneId);
+                if (paneState.paneRoot.type === 'split') {
+                    if (paneState.activePaneId) {
+                        paneState.closePane(paneState.activePaneId);
                     }
                 } else {
-                    const activePane = state.getActivePane();
+                    const activePane = paneState.getActivePane();
                     if (activePane && activePane.activeTabId) {
-                        state.closeTab(activePane.activeTabId);
+                        paneState.closeTab(activePane.activeTabId);
                     }
                 }
             }
@@ -116,31 +119,31 @@ export const useGlobalShortcuts = () => {
             // Cmd+\ : Split Vertical
             if ((e.metaKey || e.ctrlKey) && e.key === '\\' && !e.shiftKey) {
                 e.preventDefault();
-                const state = useAppStore.getState();
-                if (state.activePaneId) {
-                    state.splitPane(state.activePaneId, 'vertical');
+                const paneState = usePaneStore.getState();
+                if (paneState.activePaneId) {
+                    paneState.splitPane(paneState.activePaneId, 'vertical');
                 }
             }
 
             // Cmd+Shift+\ : Split Horizontal
             if ((e.metaKey || e.ctrlKey) && e.key === '|' || ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === '\\')) {
                 e.preventDefault();
-                const state = useAppStore.getState();
-                if (state.activePaneId) {
-                    state.splitPane(state.activePaneId, 'horizontal');
+                const paneState = usePaneStore.getState();
+                if (paneState.activePaneId) {
+                    paneState.splitPane(paneState.activePaneId, 'horizontal');
                 }
             }
 
             // Pane Focus Switching (Cmd+1, Cmd+2)
             if ((e.metaKey || e.ctrlKey) && (e.key === '1' || e.key === '2')) {
                 e.preventDefault();
-                const state = useAppStore.getState();
-                const leafPanes = state.getAllLeafPanes();
+                const paneState = usePaneStore.getState();
+                const leafPanes = paneState.getAllLeafPanes();
 
                 if (e.key === '1' && leafPanes.length > 0) {
-                    state.setActivePane(leafPanes[0].id);
+                    paneState.setActivePane(leafPanes[0].id);
                 } else if (e.key === '2' && leafPanes.length > 1) {
-                    state.setActivePane(leafPanes[1].id);
+                    paneState.setActivePane(leafPanes[1].id);
                 }
             }
 

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Cloud, CloudOff, ArrowUp, ArrowDown, Loader2, AlertCircle, Check } from 'lucide-react';
-import { useAppStore } from '../../store/useStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useGitHubStore } from '../../store/useGitHubStore';
+import { useGitStore } from '../../store/useGitStore';
 
 export function GitHubSyncIndicator() {
-    const { vaultPath, gitEnabled } = useAppStore();
-    const { githubSync } = useSettingsStore();
+    const { gitEnabled } = useGitStore();
+    const { githubSync, currentVaultPath: vaultPath } = useSettingsStore();
     const {
         isLoggedIn,
         syncStatus,

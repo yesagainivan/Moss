@@ -3,7 +3,9 @@ import {
     Command,
     CommandCategory
 } from '../types/CommandTypes';
-import { useAppStore } from '../store/useStore';
+import { useAppStore, useActiveTabId, useTabs } from '../store/useStore';
+import { usePaneStore } from '../store/usePaneStore';
+import { useGitStore } from '../store/useGitStore';
 import { useThemeStore } from '../store/useThemeStore';
 import {
     Home,
@@ -44,19 +46,28 @@ export const useCommandRegistry = (): Command[] => {
         createNote,
         openNote,
         deleteNote,
-        closeTab,
-        closeAllTabs,
-        closeOtherTabs,
-        snapshotNote,
-        snapshotVault,
-        undoLastAmbreChange,
-        activeTabId,
-        tabs,
+        forceSaveNote,
+        setSaveState,
         vaultPath,
         collapseAllFolders,
         expandAllFolders,
         duplicateNote,
     } = useAppStore();
+
+    const {
+        closeTab,
+        closeAllTabs,
+        closeOtherTabs,
+    } = usePaneStore();
+
+    const {
+        snapshotNote,
+        snapshotVault,
+        undoLastAmbreChange,
+    } = useGitStore();
+
+    const activeTabId = useActiveTabId();
+    const tabs = useTabs();
 
     const activeTab = tabs.find(t => t.id === activeTabId);
     const currentNoteId = activeTab?.noteId;
@@ -193,7 +204,7 @@ export const useCommandRegistry = (): Command[] => {
                 category: CommandCategory.Git,
                 action: async () => {
                     if (currentNoteId) {
-                        await snapshotNote(currentNoteId);
+                        await snapshotNote(currentNoteId, forceSaveNote, setSaveState);
                     }
                 },
                 condition: () => !!currentNoteId && !!vaultPath,
@@ -226,7 +237,9 @@ export const useCommandRegistry = (): Command[] => {
                 description: 'Revert the last AI-made change',
                 icon: RotateCcw,
                 category: CommandCategory.Git,
-                action: undoLastAmbreChange,
+                action: async () => {
+                    await undoLastAmbreChange(useAppStore.getState().requestConfirmation);
+                },
                 condition: () => !!vaultPath,
             },
 

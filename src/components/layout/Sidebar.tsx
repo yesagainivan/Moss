@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useAppStore, useFileActions } from '../../store/useStore';
+import { usePaneStore } from '../../store/usePaneStore';
 import { Plus, File, Edit2, FolderOpen, FolderPlus, Folder, Trash2, GripVertical, Network } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { checkExists } from '../../lib/fs';
@@ -99,7 +100,7 @@ const FileTreeRow = ({
     const setSelectedFolder = useAppStore(state => state.setSelectedFolder);
 
     // Selective subscriptions
-    const isActiveNote = useAppStore(state => {
+    const isActiveNote = usePaneStore(state => {
         if (!node.noteId) return false;
         const activePaneId = state.activePaneId;
         const activePane = state.paneIndex.get(activePaneId || '');
@@ -363,8 +364,8 @@ export const Sidebar = () => {
     const expandedPaths = useAppStore(state => state.expandedPaths);
     const toggleFolder = useAppStore(state => state.toggleFolder);
     const revealTrigger = useAppStore(state => state.revealTrigger); // Subscribe to trigger
-    const activePaneId = useAppStore(state => state.activePaneId);
-    const paneIndex = useAppStore(state => state.paneIndex);
+    const activePaneId = usePaneStore(state => state.activePaneId);
+    const paneIndex = usePaneStore(state => state.paneIndex);
     const activePane = paneIndex.get(activePaneId || '');
     const activeTabId = activePane?.activeTabId;
     const tabs = activePane?.tabs || [];

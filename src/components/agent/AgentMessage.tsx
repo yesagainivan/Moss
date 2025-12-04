@@ -3,6 +3,7 @@ import { AgentMessage } from '../../lib/agent/types';
 import { Bot, User, Wrench, CheckCircle2, AlertCircle } from 'lucide-react';
 import { marked } from 'marked';
 import { useAppStore } from '../../store/useStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { FileNode } from '../../types';
 
 interface AgentMessageProps {
@@ -11,7 +12,8 @@ interface AgentMessageProps {
 }
 
 export const AgentMessageItem: React.FC<AgentMessageProps> = ({ message, isLast }) => {
-    const { openNote, fileTree, vaultPath } = useAppStore();
+    const { openNote, fileTree } = useAppStore();
+    const { currentVaultPath: vaultPath } = useSettingsStore();
     const isUser = message.role === 'user';
     const isTool = message.role === 'tool';
 

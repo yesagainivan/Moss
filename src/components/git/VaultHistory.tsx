@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useAppStore, CommitInfo } from '../../store/useStore';
+import { useGitStore } from '../../store/useGitStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
+import { CommitInfo } from '../../types';
 import { RotateCcw, Clock, AlertCircle, ChevronDown, ChevronRight, FilePlus, FileEdit, FileX } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 
@@ -26,7 +28,7 @@ export const VaultHistory = ({ requestConfirmation, setGitMessage }: VaultHistor
     const loadVaultHistory = async () => {
         setIsLoading(true);
         try {
-            const history = await useAppStore.getState().getVaultHistory();
+            const history = await useGitStore.getState().getVaultHistory();
             setVaultHistory(history);
         } catch (error) {
             console.error('Failed to load vault history:', error);
@@ -45,7 +47,7 @@ export const VaultHistory = ({ requestConfirmation, setGitMessage }: VaultHistor
 
         setLoadingChanges(commitOid);
         try {
-            const { vaultPath } = useAppStore.getState();
+            const { currentVaultPath: vaultPath } = useSettingsStore.getState();
             if (!vaultPath) return;
 
             const changes = await invoke<FileChange[]>('git_get_commit_changes', {
@@ -68,7 +70,7 @@ export const VaultHistory = ({ requestConfirmation, setGitMessage }: VaultHistor
 
     const handleRestore = async (commit: CommitInfo) => {
         // Check for uncommitted changes first
-        const { vaultPath } = useAppStore.getState();
+        const { currentVaultPath: vaultPath } = useSettingsStore.getState();
 
         if (!vaultPath) {
             setGitMessage({ type: 'error', text: 'No vault is open' });
@@ -93,7 +95,7 @@ export const VaultHistory = ({ requestConfirmation, setGitMessage }: VaultHistor
 
                 // Create a snapshot of current state
                 try {
-                    await useAppStore.getState().snapshotVault();
+                    await useGitStore.getState().snapshotVault();
                     setGitMessage({ type: 'success', text: 'Snapshot created. Now restoring...' });
                     // Wait a moment for the message to be visible
                     await new Promise(resolve => setTimeout(resolve, 500));
@@ -111,7 +113,7 @@ export const VaultHistory = ({ requestConfirmation, setGitMessage }: VaultHistor
             if (!confirmed) return;
 
             setIsRestoring(true);
-            await useAppStore.getState().restoreVault(commit.oid);
+            await useGitStore.getState().restoreVault(commit.oid);
             setGitMessage({ type: 'success', text: `Vault restored to: ${commit.message}` });
             // Reload history to show the new "Restored to..." commit
             await loadVaultHistory();
