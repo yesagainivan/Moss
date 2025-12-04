@@ -20,6 +20,14 @@ export const WikilinkSuggestionList = forwardRef((props: WikilinkSuggestionListP
         setSelectedIndex(0);
     }, [props.items]);
 
+    // Auto-scroll selected item into view
+    useEffect(() => {
+        const selectedElement = document.querySelector('.wikilink-suggestion-item.is-selected');
+        if (selectedElement) {
+            selectedElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+    }, [selectedIndex]);
+
     const selectItem = (index: number) => {
         const item = props.items[index];
         if (item) {
