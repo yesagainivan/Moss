@@ -12,7 +12,9 @@ import { TaskList } from '@tiptap/extension-list/task-list';
 import { TaskItem } from '@tiptap/extension-list/task-item';
 import { ImageWithMarkdown } from './extensions/ImageWithMarkdown';
 import { TagHighlight } from './extensions/TagHighlight';
+import { TagSuggestion } from './extensions/TagSuggestion';
 import { useAppStore, debouncedSaveNote } from '../../store/useStore';
+import 'tippy.js/dist/tippy.css';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useAIStore } from '../../store/useAIStore';
 import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
@@ -242,6 +244,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 },
             }),
             TagHighlight,
+            TagSuggestion,
             Callout,
             ImageWithMarkdown.configure({
                 inline: false, // Block mode for note-taking (like Obsidian/Notion)
