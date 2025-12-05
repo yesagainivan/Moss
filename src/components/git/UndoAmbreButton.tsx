@@ -16,7 +16,7 @@ export const UndoAmbreButton = () => {
     return (
         <button
             onClick={() => undoLastAmbreChange(requestConfirmation)}
-            className="p-2 hover:bg-secondary rounded transition-colors group relative"
+            className="p-2 hover:bg-black/10 rounded transition-colors group relative"
             title="Undo last Ambre change"
             aria-label="Undo last change made by Ambre"
         >

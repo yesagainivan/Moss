@@ -368,7 +368,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             // Debounce the heavy serialization and store update
             debouncedUpdate(editor, noteId);
         },
-    });
+    }, [settings.fontSize, settings.lineHeight, settings.showDiffPanel, noteId, updateNote, debouncedSaveNote, forceSaveNote]);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -774,10 +774,12 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         return () => {
             isMounted = false;
             unlistenFunctions.forEach(fn => {
-                try {
-                    fn();
-                } catch (e) {
-                    console.error('Error unlistening:', e);
+                if (fn) {
+                    try {
+                        fn();
+                    } catch (e) {
+                        console.warn('Error unlistening (safe to ignore):', e);
+                    }
                 }
             });
         };

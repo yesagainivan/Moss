@@ -39,7 +39,7 @@ pub async fn watch_vault(
 
     // Create a new debouncer
     let mut debouncer = new_debouncer(
-        Duration::from_secs(2),
+        Duration::from_millis(500),
         None,
         move |result: Result<Vec<DebouncedEvent>, _>| {
             match result {

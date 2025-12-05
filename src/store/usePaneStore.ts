@@ -270,7 +270,26 @@ export const usePaneStore = create<PaneState>((set, get) => ({
     // Pane-aware tab helpers
     getActivePane: () => {
         const { activePaneId, paneIndex } = get();
-        return activePaneId ? paneIndex.get(activePaneId) || null : null;
+
+        // Try current activePaneId
+        if (activePaneId) {
+            const pane = paneIndex.get(activePaneId);
+            if (pane && pane.type === 'leaf') {
+                return pane;
+            }
+        }
+
+        // Auto-recover: find first leaf pane
+        const leaves = Array.from(paneIndex.values()).filter(n => n.type === 'leaf');
+        if (leaves.length > 0) {
+            // Update activePaneId to the recovered pane
+            console.warn(`[PaneStore] Auto-recovering activePaneId from ${activePaneId} to ${leaves[0].id}`);
+            set({ activePaneId: leaves[0].id });
+            return leaves[0];
+        }
+
+        console.warn('[PaneStore] No leaf panes found, returning null');
+        return null;
     },
 
     getActivePaneTabs: () => {

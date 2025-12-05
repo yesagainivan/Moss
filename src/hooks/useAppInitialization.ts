@@ -53,10 +53,12 @@ export const useAppInitialization = () => {
                 };
 
                 // Listen for changes
-                const unlisten = await listen('file-changed', () => {
-                    // console.log('[WATCHER] file-changed event received');
+                const unlisten = await listen('file-changed', (event) => {
+                    console.log('[WATCHER] file-changed event received', event);
                     debouncedRefresh();
                 });
+
+                console.log('[WATCHER] Setup complete for:', vaultPath);
 
                 if (isMounted) {
                     unlistenFn = unlisten;
@@ -71,6 +73,7 @@ export const useAppInitialization = () => {
         setupWatcher();
 
         return () => {
+            console.log('[WATCHER] Cleaning up watcher for:', vaultPath);
             isMounted = false;
             if (debounceTimer) clearTimeout(debounceTimer);
             if (unlistenFn) unlistenFn();

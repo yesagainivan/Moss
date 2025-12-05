@@ -150,7 +150,25 @@ export const useAppStore = create<AppState>((set, get) => ({
 
                 // Initialize Pane Store
                 if (paneLayout) {
-                    usePaneStore.getState().setPaneLayout(paneLayout.paneRoot, paneLayout.activePaneId);
+                    // Clear all tabs on load (User preference: Fresh start)
+                    const clearTabsInTree = (node: any): any => {
+                        if (node.tabs) {
+                            return {
+                                ...node,
+                                tabs: [],
+                                activeTabId: null
+                            };
+                        }
+                        if (node.children) {
+                            return {
+                                ...node,
+                                children: node.children.map(clearTabsInTree)
+                            };
+                        }
+                        return node;
+                    };
+                    const cleanedRoot = clearTabsInTree(paneLayout.paneRoot);
+                    usePaneStore.getState().setPaneLayout(cleanedRoot, paneLayout.activePaneId);
                 }
 
                 // Restore notes for all tabs in the pane tree
@@ -673,12 +691,23 @@ export const useAppStore = create<AppState>((set, get) => ({
         }
 
         // 2. Handle Pane/Tab Logic
-        const activePane = paneStore.getActivePane();
+        let activePane = paneStore.getActivePane();
 
         if (!activePane) {
-            // Should not happen if initialized correctly
-            console.warn('No active pane found');
-            return;
+            // Should not happen if initialized correctly, but as a fallback:
+            console.warn('No active pane found, resetting to default layout');
+            paneStore.setPaneLayout({
+                id: 'root',
+                type: 'leaf',
+                tabs: [],
+                activeTabId: null
+            }, 'root');
+            activePane = paneStore.getActivePane();
+
+            if (!activePane) {
+                console.error('Failed to recover active pane');
+                return;
+            }
         }
 
         // Check if note is already open in the active pane

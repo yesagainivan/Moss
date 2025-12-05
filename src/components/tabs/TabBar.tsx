@@ -3,11 +3,13 @@ import { usePaneStore } from '../../store/usePaneStore';
 import { TabItem } from './TabItem';
 
 export const TabBar = () => {
-    // Subscribe to paneRoot to react to changes
-    const activePaneId = usePaneStore(state => state.activePaneId);
-    const findPaneById = usePaneStore(state => state.findPaneById);
+    // Subscribe to the active pane directly so we re-render when its content (tabs) changes
+    const activePane = usePaneStore(state => {
+        const activeId = state.activePaneId;
+        if (!activeId) return null;
+        return state.paneIndex.get(activeId) || null;
+    });
 
-    const activePane = activePaneId ? findPaneById(activePaneId) : null;
     const tabs = (activePane?.type === 'leaf' ? activePane.tabs : null) || [];
     const activeTabId = activePane?.type === 'leaf' ? activePane.activeTabId : null;
 
@@ -15,10 +17,10 @@ export const TabBar = () => {
     const closeTab = usePaneStore(state => state.closeTab);
 
     const handleActivate = useCallback((id: string) => {
-        if (activePaneId) {
-            setActiveTab(activePaneId, id);
+        if (activePane?.id) {
+            setActiveTab(activePane.id, id);
         }
-    }, [setActiveTab, activePaneId]);
+    }, [setActiveTab, activePane]);
 
     const handleClose = useCallback((id: string) => {
         closeTab(id);
