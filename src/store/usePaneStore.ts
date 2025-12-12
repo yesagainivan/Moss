@@ -3,7 +3,7 @@ import { PaneNode, Tab } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { savePaneLayout } from '../lib/fs';
 import { debounce } from 'lodash-es';
-import { updatePaneIndex, clonePaneTree } from './helpers/paneHelpers';
+import { updatePaneIndex, clonePaneTree, validatePaneIndex } from './helpers/paneHelpers';
 import { useSettingsStore } from './useSettingsStore';
 
 // Debounced helper to persist pane layout to vault's .moss directory
@@ -39,6 +39,9 @@ interface PaneState {
     closeTab: (tabId: string) => void;
     closeAllTabs: () => void;
     closeOtherTabs: (tabId: string) => void;
+
+    // Debug & Safety
+    validateState: () => boolean;
 }
 
 export const usePaneStore = create<PaneState>((set, get) => ({
@@ -453,5 +456,19 @@ export const usePaneStore = create<PaneState>((set, get) => ({
         if (vaultPath) {
             persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId });
         }
+    },
+
+    validateState: () => {
+        const { paneRoot, paneIndex } = get();
+        const isValid = validatePaneIndex(paneRoot, paneIndex);
+        if (!isValid) {
+            console.error('[PaneStore] State validation failed! Rebuilding index...');
+            // Auto-heal
+            const newIndex = updatePaneIndex(paneRoot);
+            set({ paneIndex: newIndex });
+            return false;
+        }
+        console.log('[PaneStore] State is valid');
+        return true;
     }
 }));

@@ -63,3 +63,41 @@ export const updatePaneTabsForPathChange = (
     traverse(newRoot);
     return { newRoot, changed };
 };
+
+/**
+ * Validates that the pane index is consistent with the pane tree.
+ * Checks for:
+ * 1. Completeness: All tree nodes are in the index
+ * 2. Correctness: All index nodes are in the tree
+ * 3. Integrity: No phantom nodes
+ */
+export const validatePaneIndex = (root: PaneNode, index: Map<string, PaneNode>): boolean => {
+    const treeIds = new Set<string>();
+
+    // 1. Collect all IDs from the tree
+    const traverse = (node: PaneNode) => {
+        treeIds.add(node.id);
+        if (node.children) {
+            node.children.forEach(traverse);
+        }
+    };
+    traverse(root);
+
+    // 2. Check index has all tree nodes
+    for (const id of treeIds) {
+        if (!index.has(id)) {
+            console.error(`[PaneValidation] Node ${id} from tree is missing in index`);
+            return false;
+        }
+    }
+
+    // 3. Check index doesn't have extra nodes
+    for (const id of index.keys()) {
+        if (!treeIds.has(id)) {
+            console.error(`[PaneValidation] Index has phantom node ${id} which is not in tree`);
+            return false;
+        }
+    }
+
+    return true;
+};

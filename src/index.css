@@ -1062,3 +1062,7 @@ li[data-type="taskItem"]>div>p {
 .dark .tag-highlight {
   background-color: color-mix(in srgb, var(--primary), transparent 90%);
 }
+
+td {
+  color: var(--muted-foreground);
+} 
