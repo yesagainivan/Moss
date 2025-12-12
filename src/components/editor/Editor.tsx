@@ -58,6 +58,8 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
     const savedScrollPosition = useAppStore(state => state.scrollPositions[noteId]);
     const settings = useSettingsStore(state => state.settings);
 
+    const vaultPath = useAppStore(state => state.vaultPath);
+
     // ... AI Store selectors ...
     const selectedProvider = useAIStore(state => state.selectedProvider);
     const setStreaming = useAIStore(state => state.setStreaming);
@@ -262,6 +264,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             ImageWithMarkdown.configure({
                 inline: false, // Block mode for note-taking (like Obsidian/Notion)
                 allowBase64: false, // Only allow URL-based images for now
+                vaultPath: vaultPath || '',
             }),
             Table.configure({
                 resizable: true,
@@ -372,6 +375,115 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 }
                 return false;
             },
+            handlePaste: (view, event) => {
+                const items = Array.from(event.clipboardData?.items || []);
+                const imageItem = items.find(item => item.type.startsWith('image/'));
+
+                if (imageItem) {
+                    event.preventDefault();
+
+                    const file = imageItem.getAsFile();
+                    if (!file) return true;
+
+                    // Read file and upload
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const buffer = e.target?.result as ArrayBuffer;
+                        if (!buffer) return;
+
+                        try {
+                            const uint8Array = new Uint8Array(buffer);
+                            const vaultPath = useAppStore.getState().vaultPath;
+
+                            console.log('DEBUG: Pasting image', {
+                                vaultPath,
+                                fileName: file.name,
+                                type: file.type,
+                                size: buffer.byteLength
+                            });
+
+                            // Generate unique filename if paste (usually "image.png" from clipboard)
+                            const timestamp = Date.now();
+                            const fileName = file.name === 'image.png'
+                                ? `pasted_image_${timestamp}.png`
+                                : file.name;
+
+                            // Call Rust backend
+                            const relativePath = await invoke<string>('save_image', {
+                                vaultPath,
+                                fileName,
+                                imageData: Array.from(uint8Array)
+                            });
+
+                            // Insert image markdown at current selection
+                            const tr = view.state.tr.replaceSelectionWith(
+                                view.state.schema.text(`![${fileName}](${relativePath})`)
+                            );
+                            view.dispatch(tr);
+                        } catch (error) {
+                            console.error('Failed to save pasted image:', error);
+                            alert('Failed to save image');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                    return true;
+                }
+                return false;
+            },
+            handleDrop: (view, event, _slice, moved) => {
+                if (moved) return false; // Handled by standard drag/drop
+
+                const hasFiles = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0;
+                if (!hasFiles) return false;
+
+                const images = Array.from(event.dataTransfer?.files || []).filter(file => file.type.startsWith('image/'));
+                if (images.length === 0) return false;
+
+                event.preventDefault();
+
+                // Handle first image for now
+                const file = images[0];
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const buffer = e.target?.result as ArrayBuffer;
+                    if (!buffer) return;
+
+                    try {
+                        const uint8Array = new Uint8Array(buffer);
+                        const vaultPath = useAppStore.getState().vaultPath;
+
+                        console.log('DEBUG: Dropping image', {
+                            vaultPath,
+                            fileName: file.name,
+                            type: file.type,
+                            size: buffer.byteLength
+                        });
+
+                        // Call Rust backend
+                        const relativePath = await invoke<string>('save_image', {
+                            vaultPath,
+                            fileName: file.name,
+                            imageData: Array.from(uint8Array)
+                        });
+
+                        // Insert image markdown at drop position
+                        const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+                        if (coordinates) {
+                            const tr = view.state.tr.insert(
+                                coordinates.pos,
+                                view.state.schema.text(`![${file.name}](${relativePath})`)
+                            );
+                            view.dispatch(tr);
+                        }
+                    } catch (error) {
+                        console.error('Failed to save dropped image:', error);
+                        alert('Failed to save image');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+
+                return true;
+            },
         },
         onUpdate: ({ editor, transaction }) => {
             // CRITICAL: Don't save if we haven't initialized content yet!
@@ -387,7 +499,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             // Debounce the heavy serialization and store update
             debouncedUpdate(editor);
         },
-    }, [settings.fontSize, settings.lineHeight, settings.showDiffPanel, updateNote, debouncedSaveNote, forceSaveNote]);
+    }, [settings.fontSize, settings.lineHeight, settings.showDiffPanel, updateNote, debouncedSaveNote, forceSaveNote, vaultPath]);
 
     const containerRef = useRef<HTMLDivElement>(null);
 

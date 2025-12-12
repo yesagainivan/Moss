@@ -146,3 +146,72 @@ pub async fn file_exists(path: String) -> Result<bool, String> {
     let p = Path::new(&path);
     Ok(p.exists())
 }
+
+#[command]
+pub async fn save_image(
+    vault_path: String,
+    file_name: String,
+    image_data: Vec<u8>,
+) -> Result<String, String> {
+    let vault_p = Path::new(&vault_path);
+    println!(
+        "DEBUG: save_image called. Vault: {}, File: {}, Data size: {}",
+        vault_path,
+        file_name,
+        image_data.len()
+    );
+
+    if !vault_p.exists() {
+        println!("DEBUG: Vault path does not exist!");
+        return Err("Vault path does not exist".to_string());
+    }
+
+    // 1. Ensure assets directory exists
+    let assets_dir = vault_p.join("assets");
+    if !assets_dir.exists() {
+        println!("DEBUG: Creating assets directory at {:?}", assets_dir);
+        fs::create_dir(&assets_dir)
+            .map_err(|e| format!("Failed to create assets directory: {}", e))?;
+    }
+
+    // 2. Handle filename collisions
+    let mut safe_name = file_name.clone();
+    let mut file_path = assets_dir.join(&safe_name);
+
+    // Simple sanitization
+    safe_name = safe_name
+        .replace(" ", "_")
+        .replace("/", "_")
+        .replace("\\", "_");
+
+    if file_path.exists() {
+        // Append timestamp if file exists
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis();
+
+        let path_obj = Path::new(&safe_name);
+        let stem = path_obj
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("image");
+        let ext = path_obj
+            .extension()
+            .and_then(|s| s.to_str())
+            .unwrap_or("png");
+
+        safe_name = format!("{}_{}.{}", stem, timestamp, ext);
+        file_path = assets_dir.join(&safe_name);
+    }
+
+    println!("DEBUG: Writing to file: {:?}", file_path);
+
+    // 3. Write file
+    fs::write(&file_path, image_data).map_err(|e| format!("Failed to write image file: {}", e))?;
+
+    println!("DEBUG: Write success!");
+
+    // 4. Return relative path for Markdown link
+    Ok(format!("assets/{}", safe_name))
+}

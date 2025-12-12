@@ -841,6 +841,7 @@ pub fn run() {
             restore_vault,
             fs_extra::rename_note,
             fs_extra::file_exists,
+            fs_extra::save_image,
             watcher::watch_vault,
             github_start_device_flow,
             github_poll_token,
