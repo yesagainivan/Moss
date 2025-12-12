@@ -4,6 +4,8 @@ import { cn } from '../../lib/utils';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { useAppStore } from '../../store/useStore';
 import { TabContextMenu } from './TabContextMenu';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface TabItemProps {
     id: string;
@@ -20,6 +22,22 @@ export const TabItem = memo(({ id, noteId, isActive, isPreview, isPinned, onActi
     const isDirty = useAppStore(state => state.dirtyNoteIds.has(noteId));
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
     const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+
+    // Sortable hook
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
 
     const handleClick = () => {
         onActivate(id);
@@ -52,12 +70,17 @@ export const TabItem = memo(({ id, noteId, isActive, isPreview, isPinned, onActi
     return (
         <>
             <div
+                ref={setNodeRef}
+                style={style}
+                {...attributes}
+                {...listeners}
                 onClick={handleClick}
                 onContextMenu={handleContextMenu}
                 className={cn(
                     "group flex items-center gap-2 px-3 py-2 text-sm border-r border-border cursor-pointer select-none min-w-[120px] max-w-[200px] h-full transition-colors",
                     isActive ? "bg-background text-foreground font-medium border-t-2 border-t-accent" : "bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground",
-                    isPinned && "bg-accent/5 border-b-2 border-b-accent/50"
+                    isPinned && "bg-accent/5 border-b-2 border-b-accent/50",
+                    isDragging && "z-50"
                 )}
             >
                 {isPinned && (
