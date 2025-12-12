@@ -172,6 +172,12 @@ export const useGlobalShortcuts = () => {
                 e.preventDefault();
                 window.dispatchEvent(new CustomEvent('open-settings-modal'));
             }
+
+            // Cmd+/ or Cmd+? (Shortcuts Help)
+            if ((e.metaKey || e.ctrlKey) && (e.key === '/' || e.key === '?')) {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent('open-shortcuts-modal'));
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);

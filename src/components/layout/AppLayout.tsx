@@ -6,6 +6,7 @@ import { ConfirmDialog } from '../common/ConfirmDialog';
 import { TitleBar } from './TitleBar';
 import { CommandPalette } from '../common/CommandPalette';
 import { SearchModal } from '../common/SearchModal';
+import { ShortcutsModal } from '../common/ShortcutsModal';
 import { TemplatePicker } from '../templates/TemplatePicker';
 import { useAppInitialization } from '../../hooks/useAppInitialization';
 import { useGlobalShortcuts } from '../../hooks/useGlobalShortcuts';
@@ -48,6 +49,7 @@ export const AppLayout = () => {
             />
             <CommandPalette />
             <SearchModal />
+            <ShortcutsModal />
             <TemplatePicker
                 isOpen={isTemplatePickerOpen}
                 onClose={() => setTemplatePickerOpen(false)}

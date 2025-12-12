@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useAppStore, useFileActions } from '../../store/useStore';
 import { usePaneStore } from '../../store/usePaneStore';
-import { Plus, File, Edit2, FolderOpen, FolderPlus, Folder, Trash2, GripVertical, Network } from 'lucide-react';
+import { Plus, File, Edit2, FolderOpen, FolderPlus, Folder, Trash2, GripVertical, Network, Keyboard } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { checkExists } from '../../lib/fs';
 import { FileNode } from '../../types';
@@ -721,6 +721,13 @@ export const Sidebar = () => {
                             title="New Note"
                         >
                             <Plus className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => window.dispatchEvent(new CustomEvent('open-shortcuts-modal'))}
+                            className="p-1 hover:bg-accent/10 rounded-md transition-colors"
+                            title="Keyboard Shortcuts (Cmd+/)"
+                        >
+                            <Keyboard className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
