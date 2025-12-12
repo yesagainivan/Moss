@@ -153,7 +153,7 @@ ul {
     padding: 0.875rem 1.75rem;
     border-radius: 8px;
     font-weight: 500;
-    transition: all var(--transition-fast);
+    transition: all var(--transition-smooth);
     cursor: pointer;
     font-size: 0.95rem;
     letter-spacing: 0.01em;
@@ -333,32 +333,38 @@ ul {
     backdrop-filter: blur(12px);
 }
 
-.hero-image-placeholder,
-.image-placeholder {
+.hero-image,
+.showcase-img {
     width: 100%;
-    aspect-ratio: 16 / 9;
-    background-color: #0f0e0d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    border-radius: 4px;
-    /* Slightly smaller radius inside bezel */
-    font-family: var(--font-mono);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    position: relative;
-    overflow: hidden;
+    height: auto;
+    display: block;
 }
 
-/* Add a subtle shine to placeholders */
-.hero-image-placeholder::after,
-.image-placeholder::after {
-    content: '';
+/* Shine Overlay */
+.shine-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+    /* Reduced opacity to be more subtle */
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.015), transparent);
     transform: translateX(-100%);
-    animation: shimmer 3s infinite;
+    animation: shimmer 5s infinite;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Add pseudo-randomness to animations */
+.hero-image-wrapper .shine-overlay {
+    animation-delay: 0.5s;
+}
+
+.showcase-item:nth-of-type(odd) .shine-overlay {
+    animation-delay: 2s;
+    animation-duration: 6s;
+}
+
+.showcase-item:nth-of-type(even) .shine-overlay {
+    animation-delay: 4s;
+    animation-duration: 7s;
 }
 
 @keyframes shimmer {
@@ -426,7 +432,25 @@ ul {
 .feature-icon {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: rgba(107, 127, 108, 0.1);
+    border-radius: 12px;
+    color: var(--accent);
+}
+
+.feature-icon svg {
+    width: 32px;
+    height: 32px;
+    stroke-width: 2;
+    transition: transform var(--transition-fast);
+}
+
+.feature-card:hover .feature-icon svg {
+    transform: scale(1.1);
 }
 
 .feature-card h3 {

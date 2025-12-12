@@ -90,7 +90,7 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
                                     value={value as string}
                                     onChange={(e) => handleUpdateProperty(key, e.target.value)}
                                     placeholder="Value"
-                                    className="flex-1 bg-transparent text-xs text-primary border border-border focus:border-accent rounded px-2 py-1 outline-none"
+                                    className="flex-1 bg-transparent text-xs text-primary border border-border focus:border-accent rounded px-2 py-1 outline-none placeholder:text-muted-foreground"
                                 />
                                 <button
                                     onClick={() => handleDeleteProperty(key)}
@@ -112,7 +112,7 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
                                 if (e.key === 'Enter') handleAddProperty();
                             }}
                             placeholder="New property name"
-                            className="bg-transparent text-xs text-secondary/70 border border-transparent focus:border-accent rounded px-2 py-1 outline-none w-1/3"
+                            className="bg-transparent text-xs text-secondary/70 border border-transparent focus:border-accent rounded px-2 py-1 outline-none w-1/3 placeholder:text-muted-foreground"
                         />
                         <button
                             onClick={handleAddProperty}

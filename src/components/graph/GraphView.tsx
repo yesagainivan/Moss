@@ -149,7 +149,7 @@ const GraphView: React.FC = () => {
     }, [settings.graphShowLabels]);
 
     return (
-        <div className="w-full h-full flex flex-col overflow-hidden bg-background">
+        <div className="w-full h-full flex flex-col overflow-hidden bg-background rounded-lg">
             <div className="h-14 border-b border-l border-border flex justify-between items-center px-4 shrink-0 bg-secondary/30">
                 <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
                     Knowledge Graph
