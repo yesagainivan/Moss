@@ -57,9 +57,8 @@ Moss is your new second brain. It's designed to be simple, fast, and beautiful.
 
 ## Tips
 
-- Use \`/\` to trigger the AI assistant.
-- Use \`@\` to link to other notes or files.
 - Drag and drop images directly into the editor.
+- Use \`Cmd+Opt+B\` to toggle headings.
 
 Enjoy writing!
 `;
