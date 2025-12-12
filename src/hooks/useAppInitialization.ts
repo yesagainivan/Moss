@@ -53,8 +53,8 @@ export const useAppInitialization = () => {
                 };
 
                 // Listen for changes
-                const unlisten = await listen('file-changed', (event) => {
-                    console.log('[WATCHER] file-changed event received', event);
+                const unlisten = await listen('file-changed', (_event) => {
+                    // console.log('[WATCHER] file-changed event received', event);
                     debouncedRefresh();
                 });
 

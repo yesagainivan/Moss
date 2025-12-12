@@ -94,9 +94,12 @@ export const TagSuggestion = Extension.create<TagSuggestionOptions>({
                                 return;
                             }
 
-                            popup?.[0]?.setProps({
-                                getReferenceClientRect: props.clientRect as any,
-                            });
+                            const tippyInstance = popup?.[0];
+                            if (tippyInstance && !tippyInstance.state.isDestroyed) {
+                                tippyInstance.setProps({
+                                    getReferenceClientRect: props.clientRect as any,
+                                });
+                            }
                         },
 
                         onKeyDown(props) {
