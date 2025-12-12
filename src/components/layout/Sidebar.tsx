@@ -379,7 +379,7 @@ export const Sidebar = () => {
     const [activeId, setActiveId] = useState<string | null>(null);
     const [sidebarContextMenu, setSidebarContextMenu] = useState<{ x: number; y: number } | null>(null);
     const [rowContextMenu, setRowContextMenu] = useState<{ x: number; y: number; node: FileNode } | null>(null);
-    const [isTagsPanelCollapsed, setIsTagsPanelCollapsed] = useState(false);
+    const [isTagsPanelCollapsed, setIsTagsPanelCollapsed] = useState(true);
 
     // Drag & Drop sensors
     const sensors = useSensors(

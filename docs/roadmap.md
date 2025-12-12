@@ -4,28 +4,37 @@ This document tracks planned improvements and feature ideas for the Amber note-t
 
 ## 🚀 Performance Optimizations
 
-### Graph View Caching
-- **Problem**: The Knowledge Graph is rebuilt from scratch on every load, scanning all files. This is slow for large vaults.
-- **Solution**: Cache the graph data (nodes and links) and only update it incrementally when files change.
-
 ### Search Indexing
 - **Problem**: Search performs a linear scan of all file contents.
 - **Solution**: Implement a search index (e.g., using a lightweight indexing library or custom implementation) to speed up queries.
 
+
 ## 🧠 AI & Agent Enhancements
 
-### Vector Search / RAG (Retrieval-Augmented Generation)
-- **Goal**: Allow the agent to "read" the entire vault semantically, not just by keyword search.
-- **Implementation**: Embed notes into vectors and use a vector store to retrieve relevant context for user queries.
-
 ### Agent Context Management (In Progress)
-- **Goal**: Prevent token limit issues.
-- **Implementation**: Sliding window of recent messages.
+- **Goal**: Prevent token limit issues and improve conversation continuity.
+- **Implementation**: Sliding window of recent messages with intelligent summarization of older context.
+
+### Long-term AI Goals
+- **Personalized Fine-tuning**: Allow users to fine-tune small models on their own notes.
+- **Multi-modal Support**: Analyze images and diagrams within notes.
 
 ## ✨ UI/UX Improvements
 
-### Tabs System
-- **Goal**: Allow multiple notes to be open simultaneously.
-
 ### Mobile Support
-- **Goal**: Optimize layout for smaller screens (if Tauri mobile target is desired).
+- **Goal**: Optimize layout for smaller screens (iOS/Android).
+- **Implementation**: Responsive design updates and touch-friendly controls.
+
+### Canvas / Whiteboard
+- **Goal**: Infinite canvas for spatial thinking and diagramming.
+- **Implementation**: Node-based editor for connecting notes visually.
+
+## 🔌 Extensibility
+
+### Plugin API
+- **Goal**: Allow community extensions.
+- **Implementation**: WASM-based plugin system for safe execution of third-party code.
+
+### Advanced Search Filters
+- **Goal**: Powerful query language for filtering notes.
+- **Implementation**:  Support for `tag:foo`, `created:today`, and boolean operators.

@@ -8,7 +8,6 @@ import { usePaneStore } from '../../store/usePaneStore';
 import { useGitStore } from '../../store/useGitStore';
 import { SaveIndicator } from '../editor/SaveIndicator';
 import { UndoAmbreButton } from '../git/UndoAmbreButton';
-import { NoteHistoryModal } from '../git/NoteHistoryModal';
 import { ActivityCalendar } from '../git/ActivityCalendar';
 import { Clock } from 'lucide-react';
 import { GitHubSyncIndicator } from '../toolbar/GitHubSyncIndicator';
@@ -16,7 +15,6 @@ import { GitHubSyncIndicator } from '../toolbar/GitHubSyncIndicator';
 export const Toolbar = () => {
     const [showSettings, setShowSettings] = useState(false);
     const [showAIMenu, setShowAIMenu] = useState(false);
-    const [showHistory, setShowHistory] = useState(false);
     const [showActivity, setShowActivity] = useState(false);
     const aiButtonRef = useRef<HTMLButtonElement>(null);
     const { toggleOpen: toggleAgent, isOpen: isAgentOpen } = useAgentStore();
@@ -34,16 +32,7 @@ export const Toolbar = () => {
     // Check if we can close the current pane (must have more than one pane)
     const canClosePane = paneRoot.type === 'split';
 
-    // Listen for global shortcut
-    useEffect(() => {
-        const handleOpenHistory = () => {
-            if (gitEnabled && activeTab) {
-                setShowHistory(prev => !prev); // Toggle instead of just opening
-            }
-        };
-        window.addEventListener('open-history-modal', handleOpenHistory);
-        return () => window.removeEventListener('open-history-modal', handleOpenHistory);
-    }, [gitEnabled, activeTab]);
+
 
     // Listen for settings shortcut
     useEffect(() => {
@@ -107,7 +96,7 @@ export const Toolbar = () => {
 
                     {gitEnabled && activeTab && (
                         <button
-                            onClick={() => setShowHistory(true)}
+                            onClick={() => window.dispatchEvent(new CustomEvent('open-history-modal'))}
                             className="p-1.5 hover:bg-accent/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
                             title="View History"
                         >
@@ -184,13 +173,7 @@ export const Toolbar = () => {
                 anchorRef={aiButtonRef}
             />
 
-            {activeTab && (
-                <NoteHistoryModal
-                    isOpen={showHistory}
-                    onClose={() => setShowHistory(false)}
-                    notePath={activeTab.noteId}
-                />
-            )}
+
 
             <ActivityCalendar
                 isOpen={showActivity}

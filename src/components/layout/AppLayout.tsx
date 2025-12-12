@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sidebar } from './Sidebar';
 import { MainContent } from './MainContent';
 import { useAppStore } from '../../store/useStore';
@@ -29,20 +29,37 @@ export const AppLayout = () => {
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [historyNotePath, setHistoryNotePath] = useState<string | null>(null);
 
+    // Track open state in ref for event listener
+    const isHistoryOpenRef = useRef(isHistoryOpen);
+    useEffect(() => {
+        isHistoryOpenRef.current = isHistoryOpen;
+    }, [isHistoryOpen]);
+
     // Handle open-history-modal event
     useEffect(() => {
         const handleOpenHistory = () => {
-            // Get active note
-            import('../../store/usePaneStore').then(({ usePaneStore }) => {
-                const paneStore = usePaneStore.getState();
-                const activePane = paneStore.getActivePane();
-                if (activePane && activePane.activeTabId) {
-                    const tab = activePane.tabs?.find(t => t.id === activePane.activeTabId);
-                    if (tab && tab.noteId) {
-                        setHistoryNotePath(tab.noteId);
-                        setIsHistoryOpen(true);
+            // Toggle if already open
+            if (isHistoryOpenRef.current) {
+                setIsHistoryOpen(false);
+                return;
+            }
+
+            // Check if git is enabled first
+            import('../../store/useGitStore').then(({ useGitStore }) => {
+                if (!useGitStore.getState().gitEnabled) return;
+
+                // Get active note
+                import('../../store/usePaneStore').then(({ usePaneStore }) => {
+                    const paneStore = usePaneStore.getState();
+                    const activePane = paneStore.getActivePane();
+                    if (activePane && activePane.activeTabId) {
+                        const tab = activePane.tabs?.find(t => t.id === activePane.activeTabId);
+                        if (tab && tab.noteId) {
+                            setHistoryNotePath(tab.noteId);
+                            setIsHistoryOpen(true);
+                        }
                     }
-                }
+                });
             });
         };
 
