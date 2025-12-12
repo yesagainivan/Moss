@@ -292,7 +292,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         editorProps: {
             attributes: {
                 class: 'prose max-w-none focus:outline-none p-8 pb-32 prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-accent prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-a:text-accent prose-blockquote:border-l-accent',
-                style: `font-size: ${settings.fontSize * 1.2}px; line-height: ${settings.lineHeight};`,
+                style: `font-size: ${settings.editorFontSize}px; line-height: ${settings.lineHeight};`,
             },
             handleClick: (_view, _pos, event) => {
                 const target = event.target as HTMLElement;
@@ -523,7 +523,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             // Debounce the heavy serialization and store update
             debouncedUpdate(editor);
         },
-    }, [settings.fontSize, settings.lineHeight, settings.showDiffPanel, updateNote, debouncedSaveNote, forceSaveNote, vaultPath]);
+    }, [settings.lineHeight, settings.showDiffPanel, updateNote, debouncedSaveNote, forceSaveNote, vaultPath]);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -554,6 +554,17 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             }, 50);
         }
     }, [initialHtml, editor, savedScrollPosition]);
+
+    // Dynamically update editor font size without re-mounting
+    // This prevents the "text disappearing" bug
+    useEffect(() => {
+        if (editor && editor.view && editor.view.dom) {
+            const editorElement = editor.view.dom;
+            editorElement.style.fontSize = `${settings.editorFontSize}px`;
+            editorElement.style.lineHeight = `${settings.lineHeight}`;
+        }
+    }, [editor, settings.editorFontSize, settings.lineHeight]);
+
 
     // Listen for external updates (e.g. from Agent)
     // CRITICAL: Only respond if this editor is in the active pane
@@ -1131,7 +1142,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                             onKeyDown={handleSourceKeyDown}
                             className="w-full h-full p-8 pb-32 bg-transparent border-none outline-none resize-none font-mono"
                             style={{
-                                fontSize: `${settings.fontSize}px`,
+                                fontSize: `${settings.editorFontSize}px`,
                                 lineHeight: settings.lineHeight,
                             }}
                             spellCheck={settings.spellCheck}

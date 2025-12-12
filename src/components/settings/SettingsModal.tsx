@@ -368,25 +368,61 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
 
                                         <div className="w-full h-[1px] bg-border my-2"></div>
 
-                                        {/* Font Size */}
+                                        {/* UI Font Size */}
                                         <div>
-                                            <label className="block text-sm font-medium text-foreground mb-2">
-                                                Font Size: {settings.fontSize}px
-                                            </label>
+                                            <div className="flex items-start justify-between mb-2">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground">
+                                                        UI Font Size: {settings.uiFontSize}px
+                                                    </label>
+                                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                                        Controls sidebars, panels, and menus
+                                                    </p>
+                                                </div>
+                                            </div>
                                             <input
                                                 type="range"
                                                 min="12"
-                                                max="20"
+                                                max="18"
                                                 step="1"
-                                                value={settings.fontSize}
+                                                value={settings.uiFontSize}
                                                 onChange={(e) =>
-                                                    updateSettings({ fontSize: parseInt(e.target.value) })
+                                                    updateSettings({ uiFontSize: parseInt(e.target.value) })
                                                 }
                                                 className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
                                             />
                                             <div className="flex justify-between text-xs text-muted-foreground mt-1">
                                                 <span>12px</span>
-                                                <span>20px</span>
+                                                <span>18px</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Editor Font Size */}
+                                        <div>
+                                            <div className="flex items-start justify-between mb-2">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground">
+                                                        Editor Font Size: {settings.editorFontSize}px
+                                                    </label>
+                                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                                        Controls note content size
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="14"
+                                                max="24"
+                                                step="1"
+                                                value={settings.editorFontSize}
+                                                onChange={(e) =>
+                                                    updateSettings({ editorFontSize: parseInt(e.target.value) })
+                                                }
+                                                className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                                            />
+                                            <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                                                <span>14px</span>
+                                                <span>24px</span>
                                             </div>
                                         </div>
 

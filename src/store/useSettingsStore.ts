@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 
 export interface EditorSettings {
-    fontSize: number;        // 12-20px
+    uiFontSize: number;      // 12-18px (controls UI elements: sidebars, panels, menus)
+    editorFontSize: number;  // 14-24px (controls editor content)
     lineHeight: number;      // 1.4-2.0
     autoSaveDelay: number;   // milliseconds (0 = instant, 1000 = 1s, etc.)
     spellCheck: boolean;
@@ -43,7 +44,8 @@ interface SettingsState {
 }
 
 const DEFAULT_SETTINGS: EditorSettings = {
-    fontSize: 16,
+    uiFontSize: 14,
+    editorFontSize: 16,
     lineHeight: 1.6,
     autoSaveDelay: 1000,
     spellCheck: true,
@@ -77,7 +79,20 @@ const loadSettings = (): EditorSettings => {
     try {
         const saved = localStorage.getItem('moss-settings');
         if (saved) {
-            return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+            const parsed = JSON.parse(saved) as any;
+
+            // Migration: Convert old fontSize to editorFontSize
+            if (parsed.fontSize !== undefined && parsed.editorFontSize === undefined) {
+                parsed.editorFontSize = parsed.fontSize;
+                delete parsed.fontSize;
+            }
+
+            // Set default uiFontSize if not present
+            if (parsed.uiFontSize === undefined) {
+                parsed.uiFontSize = DEFAULT_SETTINGS.uiFontSize;
+            }
+
+            return { ...DEFAULT_SETTINGS, ...parsed };
         }
     } catch (e) {
         console.error('Failed to load settings', e);

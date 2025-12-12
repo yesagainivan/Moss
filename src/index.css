@@ -80,6 +80,18 @@
     --input: #dcd6c8;
     --ring: var(--color-moss);
 
+    /* ============================================
+       FONT SIZES
+       ============================================ */
+    --font-size-ui: 14px;
+    --font-size-editor: 16px;
+
+    /* Derived semantic sizes */
+    --font-size-ui-xs: calc(var(--font-size-ui) * 0.75);
+    --font-size-ui-sm: calc(var(--font-size-ui) * 0.875);
+    --font-size-ui-lg: calc(var(--font-size-ui) * 1.125);
+    --font-size-ui-xl: calc(var(--font-size-ui) * 1.25);
+
     --radius: 0.5rem;
   }
 
@@ -162,6 +174,7 @@
   body {
     @apply bg-transparent text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-size: var(--font-size-ui);
     overflow: hidden;
     height: 100%;
     cursor: default;

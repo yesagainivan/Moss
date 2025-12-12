@@ -47,8 +47,7 @@
                 </div>
 
                 <div class="hero-image-wrapper animate-fade-up delay-300">
-                    <img src="assets/hero-editor.png" alt="Moss Editor Interface" class="hero-image">
-                    <div class="shine-overlay"></div>
+                    <img src="./assets/hero-editor.png" alt="Moss Editor Interface" class="hero-image">
                 </div>
             </div>
         </section>
@@ -166,8 +165,7 @@
                             horizontal splits.</p>
                     </div>
                     <div class="showcase-image">
-                        <img src="assets/feature-split.png" alt="Split Panes" class="showcase-img">
-                        <div class="shine-overlay"></div>
+                        <img src="./assets/feature-split.png" alt="Split Panes" class="showcase-img">
                     </div>
                 </div>
 
@@ -177,8 +175,29 @@
                         <p>The interactive graph view helps you find hidden connections in your knowledge base.</p>
                     </div>
                     <div class="showcase-image">
-                        <img src="assets/feature-graph.png" alt="Graph View" class="showcase-img">
-                        <div class="shine-overlay"></div>
+                        <img src="./assets/feature-graph.png" alt="Graph View" class="showcase-img">
+                    </div>
+                </div>
+
+                <div class="showcase-item animate-fade-up delay-300">
+                    <div class="showcase-content">
+                        <h3>AI That Understands You</h3>
+                        <p>Use the intelligent command palette to rewrite, summarize, or brainstorm ideas without
+                            leaving your flow.</p>
+                    </div>
+                    <div class="showcase-image">
+                        <img src="./assets/feature-ai.png" alt="AI Command Palette" class="showcase-img">
+                    </div>
+                </div>
+
+                <div class="showcase-item reverse animate-fade-up delay-200">
+                    <div class="showcase-content">
+                        <h3>Elegantly Simple</h3>
+                        <p>Start with a clean slate. The zero-inbox state is designed to give you clarity before you
+                            begin.</p>
+                    </div>
+                    <div class="showcase-image">
+                        <img src="./assets/feature-empty.png" alt="Empty State" class="showcase-img">
                     </div>
                 </div>
             </div>
@@ -213,6 +232,33 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Intersection Observer for scroll-triggered animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all animated elements except hero (hero should animate immediately)
+            const animatedElements = document.querySelectorAll('.features .animate-fade-up, .showcase .animate-fade-up, .cta .animate-fade-up');
+            animatedElements.forEach(el => {
+                el.style.animationPlayState = 'paused';
+                observer.observe(el);
+            });
+        });
+    </script>
 </body>
+
 
 </html>
