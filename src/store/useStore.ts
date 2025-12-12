@@ -179,25 +179,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
                 // Initialize Pane Store
                 if (paneLayout) {
-                    // Clear all tabs on load (User preference: Fresh start)
-                    const clearTabsInTree = (node: any): any => {
-                        if (node.tabs) {
-                            return {
-                                ...node,
-                                tabs: [],
-                                activeTabId: null
-                            };
-                        }
-                        if (node.children) {
-                            return {
-                                ...node,
-                                children: node.children.map(clearTabsInTree)
-                            };
-                        }
-                        return node;
-                    };
-                    const cleanedRoot = clearTabsInTree(paneLayout.paneRoot);
-                    usePaneStore.getState().setPaneLayout(cleanedRoot, paneLayout.activePaneId);
+                    // Restore the saved layout directly
+                    usePaneStore.getState().setPaneLayout(paneLayout.paneRoot, paneLayout.activePaneId);
                 }
 
                 // Restore notes for all tabs in the pane tree

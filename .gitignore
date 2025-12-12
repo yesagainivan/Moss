@@ -26,3 +26,9 @@ dist-ssr
 # Moss
 .moss/
 /src-tauri/target
+
+.env
+.DS_Store
+src-tauri/target/
+node_modules/
+.moss/
