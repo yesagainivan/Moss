@@ -1,4 +1,4 @@
-import { FilePlus, Search, Terminal, Command } from 'lucide-react';
+import { FilePlus, Search, Command } from 'lucide-react';
 import { useAppStore } from '../../store/useStore';
 
 export const EmptyState = () => {
@@ -29,8 +29,20 @@ export const EmptyState = () => {
 
                 {/* Logo / Branding */}
                 <div className="flex flex-col items-center space-y-4">
-                    <div className="p-4 bg-primary/10 rounded-2xl ring-1 ring-primary/20 shadow-xl shadow-primary/5">
-                        <Terminal className="w-12 h-12 text-primary" />
+                    <div className="p-6 bg-primary/10 rounded-full ring-1 ring-border shadow-xl shadow-primary/5">
+                        <div
+                            className="w-14 h-14 bg-primary"
+                            style={{
+                                maskImage: 'url(/Moss_logo_dark.svg)',
+                                maskSize: 'contain',
+                                maskRepeat: 'no-repeat',
+                                maskPosition: 'center',
+                                WebkitMaskImage: 'url(/Moss_logo_dark.svg)',
+                                WebkitMaskSize: 'contain',
+                                WebkitMaskRepeat: 'no-repeat',
+                                WebkitMaskPosition: 'center'
+                            }}
+                        />
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent">
                         Moss
@@ -46,7 +58,7 @@ export const EmptyState = () => {
                         onClick={handleNewNote}
                         className="flex flex-col items-center justify-center p-4 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-accent transition-all duration-200 group"
                     >
-                        <FilePlus className="w-6 h-6 mb-2 text-primary group-hover:scale-110 transition-transform" />
+                        <FilePlus className="w-6 h-6 mb-2 text-primary transition-transform" />
                         <span className="font-medium text-sm">New Note</span>
                         <span className="text-xs text-muted-foreground mt-1 bg-muted/50 px-1.5 py-0.5 rounded text-[10px]">Cmd + N</span>
                     </button>
@@ -55,7 +67,7 @@ export const EmptyState = () => {
                         onClick={() => setCommandPaletteOpen(true)}
                         className="flex flex-col items-center justify-center p-4 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-accent transition-all duration-200 group"
                     >
-                        <Command className="w-6 h-6 mb-2 text-primary group-hover:scale-110 transition-transform" />
+                        <Command className="w-6 h-6 mb-2 text-primary transition-transform" />
                         <span className="font-medium text-sm">Commands</span>
                         <span className="text-xs text-muted-foreground mt-1 bg-muted/50 px-1.5 py-0.5 rounded text-[10px]">Cmd + P</span>
                     </button>
@@ -73,11 +85,11 @@ export const EmptyState = () => {
                 {/* Shortcuts Hint */}
                 <div className="pt-4 flex flex-wrap justify-center gap-4 text-xs text-muted-foreground/60">
                     <div className="flex items-center gap-1.5">
-                        <kbd className="px-1.5 py-0.5 bg-muted rounded border border-border font-mono text-[10px]">Cmd + /</kbd>
+                        <kbd className="px-1.5 py-0.5 bg-background rounded border border-border font-mono text-[10px]">Cmd + /</kbd>
                         <span>Shortcuts</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                        <kbd className="px-1.5 py-0.5 bg-muted rounded border border-border font-mono text-[10px]">Cmd + Shift + D</kbd>
+                        <kbd className="px-1.5 py-0.5 bg-background rounded border border-border font-mono text-[10px]">Cmd + Shift + D</kbd>
                         <span>Daily Note</span>
                     </div>
                 </div>
