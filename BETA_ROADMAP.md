@@ -96,10 +96,10 @@ See "Pre-Beta Must-Have Features" below
 **Effort**: Medium (ongoing)
 **Impact**: High (stability)
 
-#### 8. Tab Management Polish
+#### 8. Tab Management Polish ✅ **COMPLETE**
 **Why**: Complete the existing tab system
 **Features Needed**: Pin tabs, reorder tabs, close tabs to right
-**Status**: Basic tabs exist
+**Status**: ✅ Implemented (2025-12-11)
 **Effort**: Low (1 day)
 **Impact**: Medium
 
@@ -163,8 +163,8 @@ See "Pre-Beta Must-Have Features" below
 - [x] **Split view/multiple panes** ✅ (3 days)
 - [x] **Tags system** ✅ (2 days)
 - [x] **Global search UI** ✅ (1 day)
-- [ ] Basic export (markdown) (0.5 days)
-- [ ] Tab management polish (1 day)
+- [ ] Basic export (markdown) (0.5 days) - SKIPPED (vault IS the export)
+- [x] **Tab management polish** ✅ (1 day)
 
 **Week 2-3**
 - [ ] Performance testing with large vaults (2 days)
