@@ -10,6 +10,7 @@ import { openVault, readVault, loadNoteContent, saveNoteContent, createFile, ren
 import { debounce } from 'lodash-es';
 import { sortFileNodes, insertNode, removeNode, updateNode } from './helpers/fileTreeHelpers';
 import { updatePaneTabsForPathChange } from './helpers/paneHelpers';
+import matter from 'gray-matter';
 
 // Export types for backward compatibility or use in other files
 export type { CommitInfo, CommitStats } from '../types';
@@ -100,6 +101,7 @@ interface AppState {
     toggleFolder: (path: string) => void; // Toggle folder expansion
     saveAllDirtyNotes: () => Promise<void>; // Save all dirty notes
     setSaveState: (noteId: string, state: Partial<SaveState>) => void;
+    setNoteProperties: (id: string, properties: Record<string, any>) => void;
 
     // View Management
     setCurrentView: (view: 'editor' | 'graph') => void;
@@ -359,7 +361,6 @@ export const useAppStore = create<AppState>((set, get) => ({
                 };
             }
 
-            // Update tab dirty state in PaneStore
             const paneStore = usePaneStore.getState();
             const leafPanes = paneStore.getAllLeafPanes();
             for (const pane of leafPanes) {
@@ -368,6 +369,23 @@ export const useAppStore = create<AppState>((set, get) => ({
                     paneStore.updateTabInPane(pane.id, tab.id, { isPreview: false });
                 }
             }
+
+            return {
+                notes: { ...state.notes, [id]: newNoteEntry },
+                dirtyNoteIds: newDirtyIds
+            };
+        });
+    },
+
+    setNoteProperties: (id: string, properties: Record<string, any>) => {
+        set((state) => {
+            const existingNote = state.notes[id];
+            if (!existingNote) return {};
+
+            const newDirtyIds = new Set(state.dirtyNoteIds);
+            newDirtyIds.add(id);
+
+            const newNoteEntry = { ...existingNote, properties, updatedAt: Date.now() };
 
             return {
                 notes: { ...state.notes, [id]: newNoteEntry },
@@ -674,10 +692,15 @@ export const useAppStore = create<AppState>((set, get) => ({
             try {
                 const content = await loadNoteContent(noteId);
                 const name = noteId.split('/').pop() || 'Untitled';
+
+                // Parse frontmatter
+                const { content: body, data } = matter(content);
+
                 const newNote: Note = {
                     id: noteId,
                     title: name,
-                    content,
+                    content: body, // Store only body in content
+                    properties: data, // Store frontmatter in properties
                     createdAt: Date.now(),
                     updatedAt: Date.now(),
                 };
@@ -920,7 +943,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
         const saveLoop = async () => {
             while (pendingSaves.has(noteId)) {
-                const contentToSave = pendingSaves.get(noteId)!;
+                const rawContent = pendingSaves.get(noteId)!;
                 pendingSaves.delete(noteId);
 
                 setSaveState(noteId, { status: 'saving', error: null });
@@ -929,9 +952,20 @@ export const useAppStore = create<AppState>((set, get) => ({
                 const maxRetries = 3;
                 let success = false;
 
+                // Prepare content with frontmatter
+                const note = get().notes[noteId];
+                const properties = note?.properties || {};
+                // If we have properties, use gray-matter to stringify.
+                // Note: content passed to saveNote is usually just the body.
+                // But we must be careful not to double-stringify if content already has frontmatter.
+                // However, Editor passes body content.
+                const fileContentToSave = Object.keys(properties).length > 0
+                    ? matter.stringify(rawContent, properties)
+                    : rawContent;
+
                 for (let attempt = 0; attempt < maxRetries; attempt++) {
                     try {
-                        await saveNoteContent(noteId, contentToSave);
+                        await saveNoteContent(noteId, fileContentToSave);
                         success = true;
                         break;
                     } catch (e) {

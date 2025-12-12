@@ -16,6 +16,8 @@ import { TagSuggestion } from './extensions/TagSuggestion';
 import { WikilinkSuggestion } from './extensions/WikilinkSuggestion';
 import { useAppStore, debouncedSaveNote } from '../../store/useStore';
 import { usePaneStore } from '../../store/usePaneStore';
+import { PropertiesEditor } from './PropertiesEditor';
+import styles from './Editor.module.css';
 import 'tippy.js/dist/tippy.css';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useAIStore } from '../../store/useAIStore';
@@ -906,6 +908,10 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         }
     };
 
+    const handleEditorClick = useCallback(() => {
+        editor?.commands.focus();
+    }, [editor]);
+
     if (!editor || (initialContent && !initialHtml)) {
         return (
             <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -917,55 +923,72 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         );
     }
 
+    // Constraint for max width style
+    const containerStyle = settings.enableMaxWidth ? {
+        maxWidth: `${settings.maxWidth}px`,
+        margin: '0 auto',
+        width: '100%',
+    } : {
+        width: '100%',
+    };
+
     return (
-        <>
+        <div className="flex flex-col h-full bg-background relative" onClick={handleEditorClick}>
+            {/* Properties Editor - Fixed at top, supports width constraint if desired, or full width */}
+            {!isSourceMode && (
+                <div style={containerStyle} className="px-0">
+                    <PropertiesEditor noteId={noteId} />
+                </div>
+            )}
+
+            {/* Scrollable Editor Container */}
             <div
                 ref={containerRef}
                 onScroll={handleScroll}
-                className="h-full overflow-y-auto bg-background select-text"
-                style={{
-                    fontSize: `${settings.fontSize}px`,
-                    lineHeight: settings.lineHeight,
-                    cursor: 'text',
-                }}
+                className="flex-1 overflow-y-auto"
+                style={{ cursor: 'text' }}
             >
                 {isSourceMode ? (
-                    <textarea
-                        ref={textareaRef}
-                        value={sourceContent}
-                        onChange={handleSourceChange}
-                        onKeyDown={handleSourceKeyDown}
-                        className="w-full h-full p-8 pb-32 bg-transparent resize-none focus:outline-none font-mono"
-                        style={{
-                            ...(settings.enableMaxWidth && {
-                                maxWidth: `${settings.maxWidth}px`,
-                                margin: '0 auto',
-                                display: 'block',
-                            }),
-                        }}
-                        spellCheck={settings.spellCheck}
-                    />
+                    <div style={containerStyle} className="h-full min-h-full pb-32">
+                        <textarea
+                            ref={textareaRef}
+                            value={sourceContent}
+                            onChange={(e) => setSourceContent(e.target.value)}
+                            className="w-full h-full p-8 bg-transparent border-none outline-none resize-none font-mono"
+                            style={{
+                                fontSize: `${settings.fontSize}px`,
+                                lineHeight: settings.lineHeight,
+                            }}
+                            spellCheck={settings.spellCheck}
+                        />
+                    </div>
                 ) : (
-                    <EditorContent
-                        editor={editor}
-                        className="h-full"
-                        style={{
-                            ...(settings.enableMaxWidth && {
-                                maxWidth: `${settings.maxWidth}px`,
-                                margin: '0 auto',
-                            }),
-                        }}
-                        spellCheck={settings.spellCheck}
-                        onKeyDown={(e) => {
-                            // Cmd+T: Toggle Source Mode
-                            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 't') {
-                                e.preventDefault();
-                                toggleSourceMode();
-                            }
-                        }}
-                    />
+                    <div style={containerStyle} className="h-full">
+                        <EditorContent
+                            editor={editor}
+                            className="h-full"
+                            spellCheck={settings.spellCheck}
+                            onKeyDown={(e) => {
+                                // Cmd+T: Toggle Source Mode
+                                if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 't') {
+                                    e.preventDefault();
+                                    toggleSourceMode();
+                                }
+                            }}
+                        />
+                    </div>
                 )}
+
+                {/* Clickable area at bottom for easy focus */}
+                <div
+                    className="h-[30vh]"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        editor?.commands.focus('end');
+                    }}
+                />
             </div>
+
             <ErrorDialog
                 isOpen={error !== null}
                 title={error?.title || ''}
@@ -1000,8 +1023,6 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     onDiscard={handleDiscard}
                 />
             )}
-
-        </>
+        </div>
     );
 };
-

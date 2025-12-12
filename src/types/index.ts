@@ -2,6 +2,7 @@ export interface Note {
     id: string;
     title: string;
     content: string;
+    properties?: Record<string, any>; // Parsed frontmatter
     createdAt: number;
     updatedAt: number;
 }
