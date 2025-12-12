@@ -160,9 +160,9 @@ See "Pre-Beta Must-Have Features" below
 
 **Week 1-2**
 - [x] ~~Existing features~~ (already built)
-- [ ] **Split view/multiple panes** ⭐ (3 days)
-- [ ] **Tags system** ⭐ (2 days)
-- [ ] **Global search UI** ⭐ (1 day)
+- [x] **Split view/multiple panes** ⭐ (3 days)
+- [x] **Tags system** ⭐ (2 days)
+- [x] **Global search UI** ⭐ (1 day)
 - [ ] Basic export (markdown) (0.5 days)
 - [ ] Tab management polish (1 day)
 
