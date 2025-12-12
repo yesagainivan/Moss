@@ -170,4 +170,44 @@ export const useAppInitialization = () => {
         window.addEventListener('force-cursor-update', handleCursorUpdate);
         return () => window.removeEventListener('force-cursor-update', handleCursorUpdate);
     }, []);
+    const fileTreeGeneration = useAppStore(state => state.fileTreeGeneration);
+
+    // Check for deleted files after refresh
+    useEffect(() => {
+        const checkDeletedTabs = async () => {
+            if (!vaultPath) return;
+
+            // Get all open tabs
+            const { usePaneStore } = await import('../store/usePaneStore');
+            const { checkExists } = await import('../lib/fs');
+            const { showToast } = await import('../contexts/ToastContext');
+
+            const paneStore = usePaneStore.getState();
+            const allTabs = paneStore.getAllLeafPanes().flatMap(p => p.tabs || []);
+
+            for (const tab of allTabs) {
+                // Skip if it's not a file path (e.g. internal pages if any)
+                if (!tab.noteId.includes('/')) continue;
+
+                const exists = await checkExists(tab.noteId);
+                if (!exists) {
+                    // File deleted externally
+                    console.log(`[WATCHER] File deleted externally: ${tab.noteId}`);
+
+                    // Close the tab
+                    // We need to find which pane it belongs to
+                    const pane = paneStore.getAllLeafPanes().find(p => p.tabs?.some(t => t.id === tab.id));
+                    if (pane) {
+                        paneStore.removeTabFromPane(pane.id, tab.id);
+                        showToast(`File deleted: ${tab.noteId.split('/').pop()}`, 'warning');
+                    }
+                }
+            }
+        };
+
+        if (fileTreeGeneration > 0) { // Skip initial load
+            checkDeletedTabs();
+        }
+
+    }, [fileTreeGeneration, vaultPath]);
 };

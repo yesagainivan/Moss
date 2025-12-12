@@ -3,6 +3,7 @@ import { CommitInfo } from '../types';
 import { invoke } from '@tauri-apps/api/core';
 import { logger } from '../lib/logger';
 import { useSettingsStore } from './useSettingsStore';
+import { showToast } from '../contexts/ToastContext';
 
 
 interface GitState {
@@ -56,8 +57,10 @@ export const useGitStore = create<GitState>((set, get) => ({
         try {
             await invoke<string>('undo_last_ambre_change', { vaultPath });
             await get().checkGitStatus(); // Refresh status
+            showToast('Undid last change', 'success');
         } catch (error) {
             console.error('Failed to undo last change:', error);
+            showToast('Failed to undo last change', 'error');
             throw error;
         }
     },
@@ -97,6 +100,7 @@ export const useGitStore = create<GitState>((set, get) => ({
             }, 3000);
 
             logger.success('Snapshot saved:', message);
+            showToast('Snapshot saved', 'success');
         } catch (error) {
             console.error('Failed to snapshot note:', error);
             throw error;
@@ -132,9 +136,11 @@ export const useGitStore = create<GitState>((set, get) => ({
             }, 3000);
 
             logger.success('Vault snapshot saved:', message);
+            showToast('Vault snapshot saved', 'success');
         } catch (error) {
             logger.error('Failed to snapshot vault:', error);
             set({ vaultStatus: 'error', vaultStatusMessage: 'Failed to snapshot vault' });
+            showToast('Failed to snapshot vault', 'error');
 
             // Reset error after delay
             setTimeout(() => {
