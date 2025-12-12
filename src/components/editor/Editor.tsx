@@ -331,9 +331,11 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     // CRITICAL: Sync immediately before saving, bypassing debounce
                     // @ts-ignore
                     const markdown = editor?.getMarkdown();
+                    const currentNoteId = noteIdRef.current;
+
                     if (markdown) {
-                        updateNote(noteId, markdown);
-                        forceSaveNote(noteId);
+                        updateNote(currentNoteId, markdown);
+                        forceSaveNote(currentNoteId);
                     }
                     return true;
                 }

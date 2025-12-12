@@ -695,6 +695,7 @@
    Force text cursor on editor to bypass WebKit's broken hover state detection. */
 .ProseMirror {
   cursor: text !important;
+  white-space: pre-wrap;
 }
 
 .ProseMirror table {
@@ -1065,4 +1066,4 @@ li[data-type="taskItem"]>div>p {
 
 td {
   color: var(--muted-foreground);
-} 
+}

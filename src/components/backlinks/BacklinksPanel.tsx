@@ -14,9 +14,10 @@ interface BacklinksPanelProps {
     noteId: string;
     isOpen: boolean;
     onClose: () => void;
+    isEmbedded?: boolean;
 }
 
-export const BacklinksPanel: React.FC<BacklinksPanelProps> = ({ noteId, isOpen, onClose }) => {
+export const BacklinksPanel: React.FC<BacklinksPanelProps> = ({ noteId, isOpen, onClose, isEmbedded }) => {
     const [backlinks, setBacklinks] = useState<Backlink[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const vaultPath = useSettingsStore(state => state.currentVaultPath);
@@ -53,7 +54,10 @@ export const BacklinksPanel: React.FC<BacklinksPanelProps> = ({ noteId, isOpen, 
     if (!isOpen) return null;
 
     return (
-        <div className={styles.container}>
+        <div
+            className={styles.container}
+            style={isEmbedded ? { width: '100%', borderLeft: 'none' } : undefined}
+        >
             <div className={styles.header}>
                 <div className={styles.title}>
                     <Link2 size={16} />

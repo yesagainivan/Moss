@@ -13,12 +13,14 @@ interface OutlinePanelProps {
     noteContent: string;
     isOpen: boolean;
     onClose: () => void;
+    isEmbedded?: boolean;
 }
 
 export const OutlinePanel: React.FC<OutlinePanelProps> = ({
     noteContent,
     isOpen,
     onClose,
+    isEmbedded
 }) => {
     const headings = useMemo(() => {
         const items: HeadingItem[] = [];
@@ -50,7 +52,10 @@ export const OutlinePanel: React.FC<OutlinePanelProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className={styles.container}>
+        <div
+            className={styles.container}
+            style={isEmbedded ? { width: '100%', borderLeft: 'none' } : undefined}
+        >
             <div className={styles.header}>
                 <div className={styles.title}>
                     <List size={16} />

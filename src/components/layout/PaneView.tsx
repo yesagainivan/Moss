@@ -2,8 +2,8 @@ import React, { useCallback } from 'react';
 import { useAppStore } from '../../store/useStore';
 import { usePaneStore } from '../../store/usePaneStore';
 import { EditorLoader } from '../editor/EditorLoader';
-import { BacklinksPanel } from '../backlinks/BacklinksPanel';
-import { OutlinePanel } from '../outline/OutlinePanel';
+import { RightPanel } from './RightPanel';
+import { ResizableSplit } from './ResizableSplit';
 
 interface PaneViewProps {
     paneId: string;
@@ -57,36 +57,38 @@ export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
                 <div className="absolute top-2 right-2 z-10 w-2 h-2 rounded-full bg-accent animate-pulse" />
             )}
 
-            <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-                {noteId && note ? (
-                    <EditorLoader noteId={noteId} paneId={paneId} />
-                ) : (
-                    <div className="flex items-center justify-center h-full text-muted-foreground">
-                        <div className="text-center">
-                            <h3 className="text-lg font-medium mb-2">No note open</h3>
-                            <p className="text-sm">Select a note from the sidebar or create a new one.</p>
-                        </div>
+            <ResizableSplit
+                side="right"
+                initialSize={280}
+                minSize={200}
+                maxSize={600}
+                isOpen={!!(noteId && note && (isOutlinePanelOpen || isBacklinksPanelOpen))}
+                persistenceKey="right-sidebar-width"
+                className="h-full w-full"
+                mainContent={
+                    <div className="flex-1 flex flex-col h-full overflow-hidden relative w-full">
+                        {noteId && note ? (
+                            <EditorLoader noteId={noteId} paneId={paneId} />
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-muted-foreground">
+                                <div className="text-center">
+                                    <h3 className="text-lg font-medium mb-2">No note open</h3>
+                                    <p className="text-sm">Select a note from the sidebar or create a new one.</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
-
-            {/* Outline Panel */}
-            {noteId && note && (
-                <OutlinePanel
-                    noteContent={note.content}
-                    isOpen={isOutlinePanelOpen}
-                    onClose={() => setOutlinePanelOpen(false)}
-                />
-            )}
-
-            {/* Backlinks Panel */}
-            {noteId && (
-                <BacklinksPanel
-                    noteId={noteId}
-                    isOpen={isBacklinksPanelOpen}
-                    onClose={() => setBacklinksPanelOpen(false)}
-                />
-            )}
+                }
+                sideContent={
+                    <RightPanel
+                        note={note}
+                        isOutlineOpen={isOutlinePanelOpen}
+                        isBacklinksOpen={isBacklinksPanelOpen}
+                        setOutlineOpen={setOutlinePanelOpen}
+                        setBacklinksOpen={setBacklinksPanelOpen}
+                    />
+                }
+            />
         </div>
     );
 });

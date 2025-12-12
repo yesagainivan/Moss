@@ -66,7 +66,7 @@ export const useAppInitialization = () => {
                     debouncedRefresh();
                 });
 
-                console.log('[WATCHER] Setup complete for:', vaultPath);
+                // console.log('[WATCHER] Setup complete for:', vaultPath);
 
                 if (isMounted) {
                     unlistenFn = unlisten;
