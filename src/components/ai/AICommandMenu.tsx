@@ -1,5 +1,6 @@
 import { RefObject, useEffect, useRef } from 'react';
 import { useAIStore } from '../../store/useAIStore';
+import styles from './AICommandMenu.module.css';
 
 interface AICommandMenuProps {
     isOpen: boolean;
@@ -46,26 +47,17 @@ export const AICommandMenu = ({ isOpen, onClose, anchorRef }: AICommandMenuProps
     return (
         <div
             ref={menuRef}
-            className="absolute z-50 min-w-[200px] overflow-hidden rounded-xl border shadow-lg"
+            className={styles.menu}
             style={{
                 top: anchorRef.current ? anchorRef.current.offsetTop + anchorRef.current.offsetHeight + 4 : 0,
                 left: anchorRef.current ? anchorRef.current.offsetLeft : 0,
-                backgroundColor: 'var(--popover)',
-                borderColor: 'var(--border)',
-                color: 'var(--popover-foreground)',
             }}
         >
             {customPrompts.map((prompt) => (
                 <button
                     key={prompt.id}
                     onClick={() => handleCommand(prompt.name, prompt.instruction)}
-                    className="block w-full px-4 py-3 text-left text-sm transition-colors hover:bg-secondary"
-                    style={{
-                        border: 'none',
-                        background: 'transparent',
-                        color: 'inherit',
-                        cursor: 'pointer',
-                    }}
+                    className={styles.item}
                 >
                     {prompt.name}
                 </button>

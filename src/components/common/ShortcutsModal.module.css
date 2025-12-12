@@ -1,0 +1,227 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: color-mix(in srgb, black, transparent 90%);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease-out;
+    border-radius: 0.75rem;
+
+}
+
+.modal {
+    width: 100%;
+    max-width: 48rem;
+    background-color: color-mix(in srgb, var(--background), transparent 10%);
+    border: 1px solid var(--border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+    animation: zoomIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    /* background-color: color-mix(in srgb, var(--card), transparent 50%); */
+}
+
+.headerContent {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.iconWrapper {
+    padding: 0.5rem;
+    background-color: color-mix(in srgb, var(--accent), transparent 90%);
+    border-radius: 0.5rem;
+}
+
+.icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--accent);
+}
+
+.title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+}
+
+.closeButton {
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s, color 0.2s;
+    color: var(--muted-foreground);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeButton:hover {
+    background-color: color-mix(in srgb, var(--accent), transparent 90%);
+    color: var(--foreground);
+}
+
+.closeIcon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 2rem;
+    row-gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .content {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.category {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.categoryHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--border), transparent 50%);
+}
+
+.categoryIcon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.shortcutList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.shortcutItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.shortcutDescription {
+    font-size: 0.875rem;
+    color: var(--foreground);
+    transition: color 0.2s;
+}
+
+.shortcutItem:hover .shortcutDescription {
+    color: var(--accent);
+}
+
+.keys {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.keyWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.key {
+    height: 1.5rem;
+    padding: 0 0.5rem;
+    min-width: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: color-mix(in srgb, var(--secondary), transparent 50%);
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.plus {
+    margin: 0 0.125rem;
+    color: color-mix(in srgb, var(--muted-foreground), transparent 70%);
+    font-size: 0.75rem;
+}
+
+.footer {
+    padding: 1rem;
+    /* background-color: color-mix(in srgb, var(--muted), transparent 80%); */
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+.footerKey {
+    margin: 0 0.25rem;
+    padding: 0.125rem 0.375rem;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}

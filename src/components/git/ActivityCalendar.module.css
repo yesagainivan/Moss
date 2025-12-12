@@ -192,14 +192,15 @@
     height: 12px;
     border-radius: 2px;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    /* important for z-index */
 }
 
 .dayCell:hover {
     transform: scale(1.2);
-    outline: 1px solid var(--foreground);
-    outline-offset: 1px;
-    z-index: 10;
+    box-shadow: 0 0 0 1px var(--background), 0 0 0 2px var(--foreground);
+    z-index: 20;
 }
 
 /* Intensity Levels - Base */

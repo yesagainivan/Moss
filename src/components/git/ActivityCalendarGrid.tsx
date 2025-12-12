@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { CommitInfo } from '../../store/useStore';
 import styles from './ActivityCalendar.module.css';
 
@@ -306,7 +307,7 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
             </div>
 
             {/* Popover */}
-            {selectedDay && (
+            {selectedDay && createPortal(
                 <div
                     className={styles.popover}
                     style={{
@@ -339,7 +340,8 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
                             </div>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

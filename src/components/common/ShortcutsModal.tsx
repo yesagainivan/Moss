@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { X, Command, FileText, RefreshCw, Layout } from 'lucide-react';
+import styles from './ShortcutsModal.module.css';
 
 export const ShortcutsModal = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +26,7 @@ export const ShortcutsModal = () => {
     const categories = [
         {
             title: 'General',
-            icon: <Command className="w-4 h-4" />,
+            icon: <Command className={styles.categoryIcon} />,
             shortcuts: [
                 { keys: ['Cmd', 'Shift', 'F'], description: 'Global Search' },
                 { keys: ['Cmd', 'P'], description: 'Command Palette' },
@@ -35,7 +36,7 @@ export const ShortcutsModal = () => {
         },
         {
             title: 'Editor',
-            icon: <FileText className="w-4 h-4" />,
+            icon: <FileText className={styles.categoryIcon} />,
             shortcuts: [
                 { keys: ['Cmd', 'S'], description: 'Save Note' },
                 { keys: ['Cmd', 'K'], description: 'AI Assistant' },
@@ -45,7 +46,7 @@ export const ShortcutsModal = () => {
         },
         {
             title: 'Navigation',
-            icon: <RefreshCw className="w-4 h-4" />,
+            icon: <RefreshCw className={styles.categoryIcon} />,
             shortcuts: [
                 { keys: ['Cmd', '['], description: 'Go Back' },
                 { keys: ['Cmd', ']'], description: 'Go Forward' },
@@ -55,7 +56,7 @@ export const ShortcutsModal = () => {
         },
         {
             title: 'Layout',
-            icon: <Layout className="w-4 h-4" />,
+            icon: <Layout className={styles.categoryIcon} />,
             shortcuts: [
                 { keys: ['Cmd', 'B'], description: 'Toggle Sidebar' },
                 { keys: ['Cmd', 'Opt', 'B'], description: 'Toggle Backlinks' },
@@ -69,52 +70,52 @@ export const ShortcutsModal = () => {
         <>
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-background/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                    className={styles.overlay}
                     onClick={() => setIsOpen(false)}
                 >
                     <div
                         onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                        className="w-full max-w-3xl bg-card border border-border shadow-2xl rounded-xl overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 slide-in-from-bottom-2 duration-200"
+                        className={styles.modal}
                     >
-                        <div className="flex items-center justify-between p-6 border-b border-border bg-card/50">
-                            <div className="flex items-center gap-2">
-                                <div className="p-2 bg-accent/10 rounded-lg">
-                                    <Command className="w-5 h-5 text-accent" />
+                        <div className={styles.header}>
+                            <div className={styles.headerContent}>
+                                <div className={styles.iconWrapper}>
+                                    <Command className={styles.icon} />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold">Keyboard Shortcuts</h2>
-                                    <p className="text-sm text-muted-foreground">Master the keyboard to work faster</p>
+                                    <h2 className={styles.title}>Keyboard Shortcuts</h2>
+                                    <p className={styles.subtitle}>Master the keyboard to work faster</p>
                                 </div>
                             </div>
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="p-2 hover:bg-accent/10 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                                className={styles.closeButton}
                             >
-                                <X className="w-5 h-5" />
+                                <X className={styles.closeIcon} />
                             </button>
                         </div>
 
-                        <div className="p-6 overflow-y-auto custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+                        <div className={`${styles.content} custom-scrollbar`}>
                             {categories.map((category) => (
-                                <div key={category.title} className="space-y-4">
-                                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground pb-2 border-b border-border/50">
+                                <div key={category.title} className={styles.category}>
+                                    <div className={styles.categoryHeader}>
                                         {category.icon}
                                         {category.title}
                                     </div>
-                                    <div className="space-y-3">
+                                    <div className={styles.shortcutList}>
                                         {category.shortcuts.map((shortcut, idx) => (
-                                            <div key={idx} className="flex items-center justify-between group">
-                                                <span className="text-sm text-foreground group-hover:text-accent transition-colors">
+                                            <div key={idx} className={styles.shortcutItem}>
+                                                <span className={styles.shortcutDescription}>
                                                     {shortcut.description}
                                                 </span>
-                                                <div className="flex items-center gap-1">
+                                                <div className={styles.keys}>
                                                     {shortcut.keys.map((key, keyIdx) => (
-                                                        <div key={keyIdx} className="flex items-center">
-                                                            <kbd className="h-6 px-2 min-w-[1.5rem] flex items-center justify-center bg-secondary/50 border border-border rounded text-[10px] font-sans font-medium text-muted-foreground shadow-sm">
+                                                        <div key={keyIdx} className={styles.keyWrapper}>
+                                                            <kbd className={styles.key}>
                                                                 {key}
                                                             </kbd>
                                                             {keyIdx < shortcut.keys.length - 1 && (
-                                                                <span className="mx-0.5 text-muted-foreground/30 text-xs">+</span>
+                                                                <span className={styles.plus}>+</span>
                                                             )}
                                                         </div>
                                                     ))}
@@ -126,8 +127,8 @@ export const ShortcutsModal = () => {
                             ))}
                         </div>
 
-                        <div className="p-4 bg-muted/20 border-t border-border flex justify-center text-xs text-muted-foreground">
-                            Press <kbd className="mx-1 px-1.5 py-0.5 bg-background border border-border rounded text-[10px]">Esc</kbd> to close
+                        <div className={styles.footer}>
+                            Press <kbd className={styles.footerKey}>Esc</kbd> to close
                         </div>
                     </div>
                 </div>
