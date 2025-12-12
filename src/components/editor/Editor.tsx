@@ -48,17 +48,21 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
     const updateNote = useAppStore(state => state.updateNote);
     const forceSaveNote = useAppStore(state => state.forceSaveNote);
     const setScrollPosition = useAppStore(state => state.setScrollPosition);
+    // Keep a ref of noteId to use in callbacks without triggering re-initialization
+    const noteIdRef = useRef(noteId);
+    useEffect(() => {
+        noteIdRef.current = noteId;
+    }, [noteId]);
+
     const activePaneId = usePaneStore(state => state.activePaneId);
-
     const savedScrollPosition = useAppStore(state => state.scrollPositions[noteId]);
-
     const settings = useSettingsStore(state => state.settings);
 
+    // ... AI Store selectors ...
     const selectedProvider = useAIStore(state => state.selectedProvider);
     const setStreaming = useAIStore(state => state.setStreaming);
     const setStreamedText = useAIStore(state => state.setStreamedText);
     const appendStreamedText = useAIStore(state => state.appendStreamedText);
-
     const streamedText = useAIStore((state) => state.streamedText);
     const isStreaming = useAIStore((state) => state.isStreaming);
     const streamStartPos = useRef<number | null>(null);
@@ -85,8 +89,15 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
     // Parse markdown to HTML asynchronously using worker
     const [initialHtml, setInitialHtml] = useState<string | null>(null);
     const isReady = useRef(false);
+    const [loadedNoteId, setLoadedNoteId] = useState(noteId);
 
-
+    // Derived state: Reset immediately when noteId changes
+    if (noteId !== loadedNoteId) {
+        setLoadedNoteId(noteId);
+        setInitialHtml(null);
+        isReady.current = false;
+        // This will trigger an immediate re-render with null html
+    }
 
     // Helper to calculate prompt position
     const calculatePromptPosition = (view: any, selection: any) => {
@@ -120,47 +131,52 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
 
     useEffect(() => {
         let isMounted = true;
-        const parse = async () => {
-            // Check cache first
-            const cached = markdownCache.get(initialContent);
-            if (cached !== undefined) {
-                if (isMounted) setInitialHtml(cached);
-                return;
-            }
 
-            try {
-                const html = await parseMarkdown(initialContent);
+        // Only parse if initialHtml is null (meaning content needs to be loaded/reloaded)
+        // and the noteId matches the currently loaded noteId (to prevent parsing stale content)
+        if (initialHtml === null && noteId === loadedNoteId) {
+            const parse = async () => {
+                // Check cache first
+                const cached = markdownCache.get(initialContent);
+                if (cached !== undefined) {
+                    if (isMounted) setInitialHtml(cached);
+                    return;
+                }
 
-                // LRU cache automatically handles eviction when capacity is exceeded
-                markdownCache.set(initialContent, html);
+                try {
+                    const html = await parseMarkdown(initialContent);
 
-                if (isMounted) setInitialHtml(html);
-            } catch (e) {
-                console.error('Failed to parse markdown:', e);
-                // Fallback or error state?
-            }
-        };
-        parse();
+                    // LRU cache automatically handles eviction when capacity is exceeded
+                    markdownCache.set(initialContent, html);
+
+                    if (isMounted) setInitialHtml(html);
+                } catch (e) {
+                    console.error('Failed to parse markdown:', e);
+                    // Fallback or error state?
+                }
+            };
+            parse();
+        }
         return () => { isMounted = false; };
-    }, [initialContent, parseMarkdown]);
+    }, [noteId, initialContent, parseMarkdown, initialHtml, loadedNoteId]);
 
     // noteIndex removed in favor of backend resolution
 
 
     // Debounced update to prevent heavy markdown serialization on every keystroke
-    const debouncedUpdate = useMemo(() => debounce((editor: any, noteId: string) => {
+    const debouncedUpdate = useMemo(() => debounce((editor: any) => {
         // @ts-ignore
         const markdown = editor.getMarkdown();
-        updateNote(noteId, markdown);
-        debouncedSaveNote(noteId, markdown);
+        updateNote(noteIdRef.current, markdown);
+        debouncedSaveNote(noteIdRef.current, markdown);
     }, 300), [updateNote, debouncedSaveNote]);
 
     // Handle scroll position saving
     const handleScroll = useMemo(() => debounce((e: React.UIEvent<HTMLDivElement>) => {
         if (e.target instanceof HTMLElement) {
-            setScrollPosition(noteId, e.target.scrollTop);
+            setScrollPosition(noteIdRef.current, e.target.scrollTop);
         }
-    }, 100), [noteId, setScrollPosition]);
+    }, 100), [setScrollPosition]);
 
 
 
@@ -367,9 +383,9 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
 
 
             // Debounce the heavy serialization and store update
-            debouncedUpdate(editor, noteId);
+            debouncedUpdate(editor);
         },
-    }, [settings.fontSize, settings.lineHeight, settings.showDiffPanel, noteId, updateNote, debouncedSaveNote, forceSaveNote]);
+    }, [settings.fontSize, settings.lineHeight, settings.showDiffPanel, updateNote, debouncedSaveNote, forceSaveNote]);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -383,6 +399,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 .run();
 
             isReady.current = true;
+            // ... existing code ...
 
             // Restore scroll position
             if (containerRef.current) {
@@ -398,7 +415,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 window.dispatchEvent(new CustomEvent('force-cursor-update'));
             }, 50);
         }
-    }, [noteId, initialHtml, editor, savedScrollPosition]);
+    }, [initialHtml, editor, savedScrollPosition]);
 
     // Listen for external updates (e.g. from Agent)
     // CRITICAL: Only respond if this editor is in the active pane
@@ -407,22 +424,20 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             const customEvent = e as CustomEvent;
             const { noteId: updatedNoteId, content } = customEvent.detail;
 
-            // Only update if:
-            // 1. This is the right note
-            // We REMOVED the check for active pane to ensure all split views stay in sync
-
-            if (updatedNoteId === noteId && editor) {
-
+            // Only update if this is the right note
+            if (updatedNoteId === noteIdRef.current && editor) {
 
                 // CRITICAL: Cancel any pending debounced save to prevent overwriting
                 debouncedUpdate.cancel();
 
                 // Update the in-memory note content to match the external update
-                // This prevents the editor from thinking it has unsaved changes
-                updateNote(noteId, content);
+                updateNote(updatedNoteId, content);
 
                 // Parse the new markdown content
                 const newHtml = await parseMarkdown(content);
+
+                // Double check if we are still on the same note after async parse
+                if (noteIdRef.current !== updatedNoteId) return;
 
                 // Update editor content
                 editor.chain()
@@ -438,7 +453,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         return () => {
             window.removeEventListener('note-updated-externally', handleExternalUpdate);
         };
-    }, [noteId, editor, parseMarkdown, debouncedUpdate, updateNote, paneId, activePaneId]);
+    }, [editor, parseMarkdown, debouncedUpdate, updateNote, paneId, activePaneId]);
 
 
 
@@ -877,8 +892,8 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         setSourceContent(newContent);
 
         // Update store and save
-        updateNote(noteId, newContent);
-        debouncedSaveNote(noteId, newContent);
+        updateNote(noteIdRef.current, newContent);
+        debouncedSaveNote(noteIdRef.current, newContent);
     };
 
     // Handle Source Mode KeyDown
@@ -896,30 +911,32 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
 
             // Sync current content to store first (fix stale closure)
             const currentContent = sourceContent;
-            updateNote(noteId, currentContent);
+            updateNote(noteIdRef.current, currentContent);
 
             // Cancel any pending debounced saves
             debouncedUpdate.cancel();
 
-            // Force immediate save
-            forceSaveNote(noteId);
+            // Force save
+            forceSaveNote(noteIdRef.current);
             return;
         }
 
-        // Tab: Insert two spaces at cursor position
-        if (e.key === 'Tab' && !e.shiftKey) {
+        // Tab: Insert spaces
+        if (e.key === 'Tab') {
             e.preventDefault();
             const target = e.target as HTMLTextAreaElement;
             const start = target.selectionStart;
             const end = target.selectionEnd;
+
+            // Set textarea value to: text before caret + tab + text after caret
             const value = target.value;
             const newValue = value.substring(0, start) + '  ' + value.substring(end);
             setSourceContent(newValue);
             // Update store and save
-            updateNote(noteId, newValue);
+            updateNote(noteIdRef.current, newValue);
             // Mark tab as dirty
             // Update global dirty state
-            useAppStore.getState().setSaveState(noteId, { status: 'saving' }); // Use 'saving' or 'idle' instead of 'unsaved' if 'unsaved' is not valid
+            useAppStore.getState().setSaveState(noteIdRef.current, { status: 'saving' });
             // Move cursor after inserted spaces
             const newPos = start + 2;
             target.selectionStart = target.selectionEnd = newPos;

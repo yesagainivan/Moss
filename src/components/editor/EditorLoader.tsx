@@ -17,7 +17,6 @@ export const EditorLoader = ({ noteId, paneId }: EditorLoaderProps) => {
 
     return (
         <Editor
-            key={noteId}
             noteId={noteId}
             initialContent={initialContent}
             paneId={paneId}
