@@ -100,23 +100,50 @@ export const ActivityCalendar = ({ isOpen, onClose }: ActivityCalendarProps) => 
         // Calculate streak
         // Sort commits by date descending
         const sortedCommits = [...filteredCommits].sort((a, b) => b.timestamp - a.timestamp);
+        let currentStreak = 0;
 
-        // Iterate through days to find streaks
-        // This is a simplified streak calculation
         if (sortedCommits.length > 0) {
-            const today = new Date().toISOString().split('T')[0];
-            const lastCommitDate = new Date(sortedCommits[0].timestamp * 1000).toISOString().split('T')[0];
+            // Get unique dates (YYYY-MM-DD) from commits
+            const uniqueDates = new Set<string>();
+            sortedCommits.forEach(c => {
+                const date = new Date(c.timestamp * 1000).toISOString().split('T')[0];
+                uniqueDates.add(date);
+            });
 
-            // Check if streak is active (today or yesterday)
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayString = yesterday.toISOString().split('T')[0];
+            // Convert back to array (sorted descending automatically due to string format?) 
+            // Better to be safe and sort
+            const sortedDates = Array.from(uniqueDates).sort().reverse();
 
-            if (lastCommitDate === today || lastCommitDate === yesterdayString) {
-                // currentStreak = 1; // Placeholder
+            if (sortedDates.length > 0) {
+                const today = new Date().toISOString().split('T')[0];
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+                const lastCommitDate = sortedDates[0];
+
+                // Check if streak is active (has commit today or yesterday)
+                if (lastCommitDate === today || lastCommitDate === yesterdayStr) {
+                    currentStreak = 1;
+
+                    // Check previous days
+                    let checkDate = new Date(lastCommitDate);
+
+                    for (let i = 1; i < sortedDates.length; i++) {
+                        // Move checkDate back one day
+                        checkDate.setDate(checkDate.getDate() - 1);
+                        const expectedDateStr = checkDate.toISOString().split('T')[0];
+
+                        // If the next recorded date matches the expected previous day, increment streak
+                        if (sortedDates[i] === expectedDateStr) {
+                            currentStreak++;
+                        } else {
+                            // Streak broken
+                            break;
+                        }
+                    }
+                }
             }
-
-            // TODO: More robust streak calculation requires iterating every day
         }
 
         return {
@@ -124,7 +151,8 @@ export const ActivityCalendar = ({ isOpen, onClose }: ActivityCalendarProps) => 
             userCommits,
             ambreCommits,
             topContributor: userCommits >= ambreCommits ? 'You' : 'Ambre',
-            recentCommits: sortedCommits.slice(0, 10)
+            recentCommits: sortedCommits.slice(0, 10),
+            currentStreak
         };
     }, [commits, timeRange]);
 
@@ -230,8 +258,8 @@ export const ActivityCalendar = ({ isOpen, onClose }: ActivityCalendarProps) => 
                                         <Flame className="w-5 h-5" />
                                     </div>
                                     <div className={styles.statInfo}>
-                                        <span className={styles.statValue}>Active</span>
-                                        <span className={styles.statLabel}>Current Status</span>
+                                        <span className={styles.statValue}>{stats.currentStreak} days</span>
+                                        <span className={styles.statLabel}>Current Streak</span>
                                     </div>
                                 </div>
                             </div>
