@@ -37,6 +37,7 @@ export const TabBar = () => {
                     noteId={tab.noteId}
                     isActive={tab.id === activeTabId}
                     isPreview={tab.isPreview}
+                    isPinned={tab.isPinned}
                     onActivate={handleActivate}
                     onClose={handleClose}
                 />

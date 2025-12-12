@@ -1,22 +1,25 @@
 import { useState, memo } from 'react';
-import { X, Circle } from 'lucide-react';
+import { X, Circle, Pin } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import { useAppStore } from '../../store/useStore';
+import { TabContextMenu } from './TabContextMenu';
 
 interface TabItemProps {
     id: string;
     noteId: string;
     isActive: boolean;
     isPreview: boolean;
+    isPinned?: boolean;
     onActivate: (id: string) => void;
     onClose: (id: string) => void;
 }
 
-export const TabItem = memo(({ id, noteId, isActive, isPreview, onActivate, onClose }: TabItemProps) => {
+export const TabItem = memo(({ id, noteId, isActive, isPreview, isPinned, onActivate, onClose }: TabItemProps) => {
     const title = useAppStore(state => state.notes[noteId]?.title || 'Untitled');
     const isDirty = useAppStore(state => state.dirtyNoteIds.has(noteId));
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+    const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
 
     const handleClick = () => {
         onActivate(id);
@@ -41,15 +44,25 @@ export const TabItem = memo(({ id, noteId, isActive, isPreview, onActivate, onCl
         setShowCloseConfirm(false);
     };
 
+    const handleContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setContextMenu({ x: e.clientX, y: e.clientY });
+    };
+
     return (
         <>
             <div
                 onClick={handleClick}
+                onContextMenu={handleContextMenu}
                 className={cn(
                     "group flex items-center gap-2 px-3 py-2 text-sm border-r border-border cursor-pointer select-none min-w-[120px] max-w-[200px] h-full transition-colors",
-                    isActive ? "bg-background text-foreground font-medium border-t-2 border-t-accent" : "bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground"
+                    isActive ? "bg-background text-foreground font-medium border-t-2 border-t-accent" : "bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground",
+                    isPinned && "bg-accent/5 border-b-2 border-b-accent/50"
                 )}
             >
+                {isPinned && (
+                    <Pin className="w-3 h-3 text-accent" />
+                )}
                 <span className={cn("flex-1 truncate", isPreview && "italic")} title={title}>{title}</span>
 
                 <div className="flex items-center justify-center w-4 h-4">
@@ -78,6 +91,15 @@ export const TabItem = memo(({ id, noteId, isActive, isPreview, onActivate, onCl
                 onConfirm={confirmClose}
                 onCancel={cancelClose}
             />
+
+            {contextMenu && (
+                <TabContextMenu
+                    tabId={id}
+                    isPinned={!!isPinned}
+                    position={contextMenu}
+                    onClose={() => setContextMenu(null)}
+                />
+            )}
         </>
     );
 });

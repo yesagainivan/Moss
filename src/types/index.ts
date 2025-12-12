@@ -11,6 +11,7 @@ export interface Tab {
     id: string;
     noteId: string;
     isPreview: boolean; // Preview tab (will be replaced when opening another note)
+    isPinned?: boolean; // Pinned tab (stays in place, appears first)
     history: string[]; // Navigation history stack
     historyIndex: number; // Current position in history stack
 }

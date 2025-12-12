@@ -39,6 +39,10 @@ interface PaneState {
     closeTab: (tabId: string) => void;
     closeAllTabs: () => void;
     closeOtherTabs: (tabId: string) => void;
+    closeTabsToRight: (tabId: string) => void;
+    pinTab: (tabId: string) => void;
+    duplicateTab: (tabId: string) => void;
+    reorderTabs: (paneId: string, newOrder: string[]) => void;
 
     // Debug & Safety
     validateState: () => boolean;
@@ -470,5 +474,110 @@ export const usePaneStore = create<PaneState>((set, get) => ({
         }
         console.log('[PaneStore] State is valid');
         return true;
-    }
+    },
+
+    // Pin/Unpin tab
+    pinTab: (tabId: string) => {
+        const pane = get().findPaneByTabId(tabId);
+        if (!pane || !pane.tabs) return;
+
+        const { paneRoot } = get();
+        const vaultPath = useSettingsStore.getState().currentVaultPath;
+
+        const updateTree = (node: PaneNode): PaneNode => {
+            if (node.id === pane.id && node.tabs) {
+                // Find and toggle the tab
+                const updatedTabs = node.tabs.map(t =>
+                    t.id === tabId ? { ...t, isPinned: !t.isPinned } : t
+                );
+
+                // Sort: pinned tabs first, then unpinned
+                const sortedTabs = updatedTabs.sort((a, b) => {
+                    if (a.isPinned && !b.isPinned) return -1;
+                    if (!a.isPinned && b.isPinned) return 1;
+                    return 0;
+                });
+
+                return { ...node, tabs: sortedTabs };
+            }
+            if (node.children) {
+                return { ...node, children: node.children.map(updateTree) };
+            }
+            return node;
+        };
+
+        const newRoot = updateTree(clonePaneTree(paneRoot));
+        const newIndex = updatePaneIndex(newRoot);
+        set({ paneRoot: newRoot, paneIndex: newIndex });
+
+        if (vaultPath) {
+            persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId: get().activePaneId });
+        }
+    },
+
+    // Close tabs to the right of specified tab
+    closeTabsToRight: (tabId: string) => {
+        const pane = get().findPaneByTabId(tabId);
+        if (!pane || !pane.tabs) return;
+
+        const index = pane.tabs.findIndex(t => t.id === tabId);
+        if (index === -1 || index === pane.tabs.length - 1) return; // No tabs to close
+
+        const tabsToClose = pane.tabs.slice(index + 1);
+
+        // Don't close pinned tabs
+        tabsToClose.forEach(tab => {
+            if (!tab.isPinned) {
+                get().closeTab(tab.id);
+            }
+        });
+    },
+
+    // Duplicate tab
+    duplicateTab: (tabId: string) => {
+        const pane = get().findPaneByTabId(tabId);
+        const tab = pane?.tabs?.find(t => t.id === tabId);
+        if (!pane || !tab) return;
+
+        // Create new tab with same noteId but not pinned
+        const newTab: Tab = {
+            id: uuidv4(),
+            noteId: tab.noteId,
+            isPreview: false,
+            isPinned: false,
+            history: [tab.noteId],
+            historyIndex: 0,
+        };
+
+        get().addTabToPane(pane.id, newTab);
+    },
+
+    // Reorder tabs (for drag-drop)
+    reorderTabs: (paneId: string, newOrder: string[]) => {
+        const { paneRoot } = get();
+        const vaultPath = useSettingsStore.getState().currentVaultPath;
+        const pane = get().findPaneById(paneId);
+        if (!pane || pane.type !== 'leaf' || !pane.tabs) return;
+
+        // Create new tabs array with new order
+        const newTabs = newOrder.map(id => pane.tabs!.find(t => t.id === id)).filter(Boolean) as Tab[];
+
+        const updateTree = (node: PaneNode): PaneNode => {
+            if (node.id === paneId) {
+                return { ...node, tabs: newTabs };
+            }
+            if (node.children) {
+                return { ...node, children: node.children.map(updateTree) };
+            }
+            return node;
+        };
+
+        const newRoot = updateTree(clonePaneTree(paneRoot));
+        const newIndex = updatePaneIndex(newRoot);
+        set({ paneRoot: newRoot, paneIndex: newIndex });
+
+        if (vaultPath) {
+            persistPaneLayoutDebounced(vaultPath, { paneRoot: newRoot, activePaneId: get().activePaneId });
+        }
+    },
 }));

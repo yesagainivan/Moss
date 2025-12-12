@@ -1,0 +1,45 @@
+.tab-context-menu {
+    position: fixed;
+    z-index: 50;
+    min-width: 200px;
+    background-color: var(--popover);
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.tab-context-menu-item {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.15s;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--foreground);
+}
+
+.tab-context-menu-item:hover {
+    background-color: color-mix(in srgb, var(--accent), transparent 90%);
+}
+
+.tab-context-menu-item.destructive {
+    color: var(--destructive);
+}
+
+.tab-context-menu-item.destructive:hover {
+    background-color: color-mix(in srgb, var(--destructive), transparent 90%);
+}
+
+.tab-context-menu-separator {
+    height: 1px;
+    background-color: var(--border);
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
