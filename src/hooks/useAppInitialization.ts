@@ -6,11 +6,19 @@ import { useAppStore } from '../store/useStore';
 export const useAppInitialization = () => {
     const initialize = useAppStore(state => state.initialize);
     const refreshFileTree = useAppStore(state => state.refreshFileTree);
+    const loadTemplates = useAppStore(state => state.loadTemplates);
     const vaultPath = useAppStore(state => state.vaultPath);
 
     useEffect(() => {
         initialize();
     }, [initialize]);
+
+    // Load templates when vault changes
+    useEffect(() => {
+        if (vaultPath) {
+            loadTemplates();
+        }
+    }, [vaultPath, loadTemplates]);
 
     // Refresh file tree on window focus to catch external changes
     const isInitialMount = useRef(true);

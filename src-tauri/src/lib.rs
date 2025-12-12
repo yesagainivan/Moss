@@ -7,6 +7,7 @@ mod github;
 mod graph;
 mod indexer;
 mod tags;
+mod templates;
 mod tools;
 mod vector_store;
 mod watcher;
@@ -809,6 +810,9 @@ pub fn run() {
             get_backlinks,
             get_all_tags,
             get_notes_by_tag,
+            templates::list_templates,
+            templates::get_template,
+            templates::create_note_from_template,
             tools::agent_get_note,
             tools::agent_batch_read,
             tools::agent_search_notes,

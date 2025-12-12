@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { useShallow } from 'zustand/shallow';
 import { invoke } from '@tauri-apps/api/core';
-import { Note, FileNode, SaveState } from '../types';
+import { Note, FileNode, SaveState, Template } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { useSettingsStore } from './useSettingsStore';
 import { usePaneStore } from './usePaneStore';
@@ -46,6 +46,13 @@ interface AppState {
     dirtyNoteIds: Set<string>; // Track dirty state globally per note
     scrollPositions: Record<string, number>; // Track scroll position per note
     revealTrigger: number; // Trigger for scrolling to note in sidebar
+
+    // Templates
+    templates: Template[];
+    isTemplatePickerOpen: boolean;
+    loadTemplates: () => Promise<void>;
+    createNoteFromTemplate: (templateName: string, noteTitle: string, parentPath?: string) => Promise<string>;
+    setTemplatePickerOpen: (isOpen: boolean) => void;
 
     // Actions
     initialize: () => Promise<void>;
@@ -131,6 +138,8 @@ export const useAppStore = create<AppState>((set, get) => ({
     dirtyNoteIds: new Set(),
     scrollPositions: {},
     revealTrigger: 0,
+    templates: [],
+    isTemplatePickerOpen: false,
 
     initialize: async () => {
         const { vaultPath } = get();
@@ -1084,6 +1093,47 @@ export const useAppStore = create<AppState>((set, get) => ({
         scrollPositions: { ...state.scrollPositions, [noteId]: position }
     })),
 
+    // Templates Actions
+    loadTemplates: async () => {
+        const { vaultPath } = get();
+        if (!vaultPath) return;
+
+        try {
+            const templates = await invoke<Template[]>('list_templates', { vaultPath });
+            set({ templates });
+        } catch (e) {
+            console.error('Failed to load templates:', e);
+            set({ templates: [] });
+        }
+    },
+
+    createNoteFromTemplate: async (templateName, noteTitle, parentPath) => {
+        const { vaultPath, openNote, refreshFileTree } = get();
+        if (!vaultPath) return '';
+
+        try {
+            const notePath = await invoke<string>('create_note_from_template', {
+                vaultPath,
+                templateName,
+                noteTitle,
+                parentPath: parentPath || vaultPath,
+                vars: null, // Frontend doesn't customize vars
+            });
+
+            // Refresh file tree to show new note
+            await refreshFileTree();
+
+            // Open the new note
+            await openNote(notePath);
+
+            return notePath;
+        } catch (e) {
+            console.error('Failed to create note from template:', e);
+            return '';
+        }
+    },
+
+    setTemplatePickerOpen: (isOpen) => set({ isTemplatePickerOpen: isOpen }),
 }));
 
 // ============================================================================

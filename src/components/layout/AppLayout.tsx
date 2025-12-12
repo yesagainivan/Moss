@@ -6,6 +6,7 @@ import { ConfirmDialog } from '../common/ConfirmDialog';
 import { TitleBar } from './TitleBar';
 import { CommandPalette } from '../common/CommandPalette';
 import { SearchModal } from '../common/SearchModal';
+import { TemplatePicker } from '../templates/TemplatePicker';
 import { useAppInitialization } from '../../hooks/useAppInitialization';
 import { useGlobalShortcuts } from '../../hooks/useGlobalShortcuts';
 
@@ -18,6 +19,8 @@ export const AppLayout = () => {
     const isSidebarOpen = useAppStore(state => state.isSidebarOpen);
     const confirmationRequest = useAppStore(state => state.confirmationRequest);
     const resolveConfirmation = useAppStore(state => state.resolveConfirmation);
+    const isTemplatePickerOpen = useAppStore(state => state.isTemplatePickerOpen);
+    const setTemplatePickerOpen = useAppStore(state => state.setTemplatePickerOpen);
 
     return (
         <div className="relative grain-overlay flex h-screen w-screen bg-background text-foreground overflow-hidden pt-8 rounded-xl border border-border/50">
@@ -45,6 +48,10 @@ export const AppLayout = () => {
             />
             <CommandPalette />
             <SearchModal />
+            <TemplatePicker
+                isOpen={isTemplatePickerOpen}
+                onClose={() => setTemplatePickerOpen(false)}
+            />
         </div>
     );
 };

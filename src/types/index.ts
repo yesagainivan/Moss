@@ -61,3 +61,19 @@ export interface CommitInfo {
     is_ambre: boolean;
     stats?: CommitStats;
 }
+
+// Templates system
+export interface Template {
+    name: string;
+    path: string;
+    content: string;
+}
+
+export interface TemplateVars {
+    title?: string;
+    date?: string;
+    time?: string;
+    year?: string;
+    month?: string;
+    day?: string;
+}

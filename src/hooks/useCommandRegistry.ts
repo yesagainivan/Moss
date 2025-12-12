@@ -193,6 +193,18 @@ export const useCommandRegistry = (): Command[] => {
                 },
                 condition: () => !!currentNoteId,
             },
+            {
+                id: 'new-from-template',
+                label: 'New Note from Template',
+                description: 'Create a note using a template',
+                icon: FileType,
+                category: CommandCategory.Files,
+                action: () => {
+                    useAppStore.getState().loadTemplates();
+                    useAppStore.getState().setTemplatePickerOpen(true);
+                },
+                condition: () => !!vaultPath,
+            },
 
             // ========== GIT ==========
             {
