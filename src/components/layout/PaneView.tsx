@@ -4,6 +4,7 @@ import { usePaneStore } from '../../store/usePaneStore';
 import { EditorLoader } from '../editor/EditorLoader';
 import { RightPanel } from './RightPanel';
 import { ResizableSplit } from './ResizableSplit';
+import { EmptyState } from './EmptyState';
 
 interface PaneViewProps {
     paneId: string;
@@ -70,12 +71,7 @@ export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
                         {noteId && note ? (
                             <EditorLoader noteId={noteId} paneId={paneId} />
                         ) : (
-                            <div className="flex items-center justify-center h-full text-muted-foreground">
-                                <div className="text-center">
-                                    <h3 className="text-lg font-medium mb-2">No note open</h3>
-                                    <p className="text-sm">Select a note from the sidebar or create a new one.</p>
-                                </div>
-                            </div>
+                            <EmptyState />
                         )}
                     </div>
                 }

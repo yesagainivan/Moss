@@ -20,6 +20,66 @@ export const useAppInitialization = () => {
         }
     }, [vaultPath, loadTemplates]);
 
+    // Welcome Note Logic
+    useEffect(() => {
+        const checkWelcome = async () => {
+            if (!vaultPath) return;
+
+            const { useSettingsStore } = await import('../store/useSettingsStore');
+            const { checkExists, createFile } = await import('../lib/fs');
+            const settingsStore = useSettingsStore.getState();
+
+            // Check if we've already welcomed the user
+            if (settingsStore.settings.hasSeenWelcome) return;
+
+            const welcomePath = `${vaultPath}/Welcome.md`;
+            const exists = await checkExists(welcomePath);
+
+            if (!exists) {
+                // Create Welcome Note
+                const welcomeContent = `# Welcome to Moss 🌿
+
+Moss is your new second brain. It's designed to be simple, fast, and beautiful.
+
+## Quick Start
+
+- **New Note**: \`Cmd+N\`
+- **Search**: \`Cmd+Shift+F\`
+- **Command Palette**: \`Cmd+P\`
+- **Daily Note**: \`Cmd+Shift+D\`
+
+## Features
+
+- **Markdown First**: Write in pure Markdown.
+- **Git Sync**: Your notes are yours. Sync to GitHub automatically.
+- **Graph View**: See connections between your thoughts.
+- **Linked Editing**: Use \`[[WikiLinks]]\` to connect notes.
+
+## Tips
+
+- Use \`/\` to trigger the AI assistant.
+- Use \`@\` to link to other notes or files.
+- Drag and drop images directly into the editor.
+
+Enjoy writing!
+`;
+                await createFile(welcomePath, welcomeContent);
+
+                // Open it
+                const { useAppStore } = await import('../store/useStore');
+                await useAppStore.getState().openNote(welcomePath);
+
+                // Mark as seen
+                useSettingsStore.getState().updateSettings({ hasSeenWelcome: true });
+            } else {
+                // If it exists but flag is false (maybe pre-existing user), mark as seen so we don't annoy them later if they delete it
+                useSettingsStore.getState().updateSettings({ hasSeenWelcome: true });
+            }
+        };
+
+        checkWelcome();
+    }, [vaultPath]);
+
     // Refresh file tree on window focus to catch external changes
     const isInitialMount = useRef(true);
 

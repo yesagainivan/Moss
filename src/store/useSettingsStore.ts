@@ -14,6 +14,7 @@ export interface EditorSettings {
     maxWidth: number;        // 600-1200px
     grainLevel: number;      // 0-100 (grain texture intensity)
     grainTexture: 'subtle' | 'dense' | 'noise'; // Texture type
+    hasSeenWelcome?: boolean; // Whether the user has seen the welcome note
 }
 
 export interface GitHubSyncSettings {
@@ -55,6 +56,7 @@ const DEFAULT_SETTINGS: EditorSettings = {
     maxWidth: 800,
     grainLevel: 50,
     grainTexture: 'subtle',
+    hasSeenWelcome: false,
 };
 
 const DEFAULT_GITHUB_SYNC: GitHubSyncSettings = {
