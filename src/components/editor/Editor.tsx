@@ -17,7 +17,6 @@ import { WikilinkSuggestion } from './extensions/WikilinkSuggestion';
 import { useAppStore, debouncedSaveNote } from '../../store/useStore';
 import { usePaneStore } from '../../store/usePaneStore';
 import { PropertiesEditor } from './PropertiesEditor';
-import styles from './Editor.module.css';
 import 'tippy.js/dist/tippy.css';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { useAIStore } from '../../store/useAIStore';
@@ -826,6 +825,18 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         }
     }, [editor, isSourceMode, sourceContent, parseMarkdown]);
 
+    // Listen for toggle-editor-mode event from command palette
+    useEffect(() => {
+        const handleToggleMode = () => {
+            toggleSourceMode();
+        };
+
+        window.addEventListener('toggle-editor-mode', handleToggleMode);
+        return () => {
+            window.removeEventListener('toggle-editor-mode', handleToggleMode);
+        };
+    }, [toggleSourceMode]);
+
     // Focus and cursor position management for source mode toggle
     const prevSourceMode = useRef(isSourceMode);
     useEffect(() => {
@@ -882,7 +893,15 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         // Cmd+S: Save
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
             e.preventDefault();
+
+            // Sync current content to store first (fix stale closure)
+            const currentContent = sourceContent;
+            updateNote(noteId, currentContent);
+
+            // Cancel any pending debounced saves
             debouncedUpdate.cancel();
+
+            // Force immediate save
             forceSaveNote(noteId);
             return;
         }
@@ -953,7 +972,8 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                         <textarea
                             ref={textareaRef}
                             value={sourceContent}
-                            onChange={(e) => setSourceContent(e.target.value)}
+                            onChange={handleSourceChange}
+                            onKeyDown={handleSourceKeyDown}
                             className="w-full h-full p-8 bg-transparent border-none outline-none resize-none font-mono"
                             style={{
                                 fontSize: `${settings.fontSize}px`,
