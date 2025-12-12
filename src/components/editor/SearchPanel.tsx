@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Editor } from '@tiptap/react';
 import { X, ChevronUp, ChevronDown, Replace } from 'lucide-react';
 import { ConfirmDialog } from '../common/ConfirmDialog';
+import styles from './SearchPanel.module.css';
 
 interface SearchPanelProps {
     editor: Editor | null;
@@ -95,19 +96,13 @@ export const SearchPanel = ({ editor, isOpen, onClose }: SearchPanelProps) => {
 
     const handleReplaceAll = useCallback(() => {
         if (!editor || !replaceTerm || resultCount === 0) return;
-        console.log('[SearchPanel] Replace All clicked');
         setShowConfirm(true);
     }, [editor, replaceTerm, resultCount]);
 
     const confirmReplaceAll = useCallback(() => {
         if (!editor || showConfirm === false) return; // Guard against double-trigger
-        console.log('[SearchPanel] Confirming Replace All');
 
         setShowConfirm(false); // Close dialog immediately
-
-        // Execute replace all with slight delay to allow state to settle?
-        // For now, synchronous call to see logs
-        console.log('[SearchPanel] dispatching replaceAll command');
         editor.commands.replaceAll();
     }, [editor, showConfirm]);
 
@@ -136,30 +131,24 @@ export const SearchPanel = ({ editor, isOpen, onClose }: SearchPanelProps) => {
 
     return (
         <div
-            className="absolute top-4 right-4 z-50 bg-background border border-border rounded-lg shadow-lg p-3 w-96"
+            className={styles.searchPanel}
             onKeyDown={handleKeyDown}
-            onMouseDown={(e) => {
-                // Prevent editor from stealing focus when clicking in search panel
-                e.stopPropagation();
-            }}
-            onClick={(e) => {
-                // Prevent clicks from bubbling to editor
-                e.stopPropagation();
-            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
         >
             {/* Search Input Row */}
-            <div className="flex items-center gap-2 mb-2">
+            <div className={styles.searchRow}>
                 <input
                     ref={searchInputRef}
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Find in document..."
-                    className="flex-1 px-3 py-1.5 text-sm bg-secondary border border-border rounded focus:outline-none focus:ring-2 focus:ring-accent"
+                    className={styles.searchPanelInput}
                 />
 
                 {/* Result Counter */}
-                <div className="text-xs text-muted-foreground whitespace-nowrap min-w-[60px] text-center">
+                <div className={styles.searchPanelCounter}>
                     {searchTerm && (
                         resultCount > 0
                             ? `${currentPosition}/${resultCount}`
@@ -171,7 +160,7 @@ export const SearchPanel = ({ editor, isOpen, onClose }: SearchPanelProps) => {
                 <button
                     onClick={handlePrevious}
                     disabled={resultCount === 0}
-                    className="p-1.5 hover:bg-secondary rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                    className={styles.searchPanelNavBtn}
                     title="Previous (Shift+Enter)"
                 >
                     <ChevronUp className="w-4 h-4" />
@@ -179,7 +168,7 @@ export const SearchPanel = ({ editor, isOpen, onClose }: SearchPanelProps) => {
                 <button
                     onClick={handleNext}
                     disabled={resultCount === 0}
-                    className="p-1.5 hover:bg-secondary rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                    className={styles.searchPanelNavBtn}
                     title="Next (Enter)"
                 >
                     <ChevronDown className="w-4 h-4" />
@@ -188,7 +177,7 @@ export const SearchPanel = ({ editor, isOpen, onClose }: SearchPanelProps) => {
                 {/* Toggle Replace */}
                 <button
                     onClick={() => setShowReplace(!showReplace)}
-                    className={`p-1.5 rounded ${showReplace ? 'bg-accent text-accent-foreground' : 'hover:bg-secondary'}`}
+                    className={`${styles.searchPanelToggleBtn} ${showReplace ? styles.searchPanelToggleBtnActive : styles.searchPanelToggleBtnInactive}`}
                     title="Toggle Replace"
                 >
                     <Replace className="w-4 h-4" />
@@ -197,7 +186,7 @@ export const SearchPanel = ({ editor, isOpen, onClose }: SearchPanelProps) => {
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="p-1.5 hover:bg-secondary rounded"
+                    className={styles.searchPanelNavBtn}
                     title="Close (Esc)"
                 >
                     <X className="w-4 h-4" />
@@ -206,25 +195,25 @@ export const SearchPanel = ({ editor, isOpen, onClose }: SearchPanelProps) => {
 
             {/* Replace Input Row (conditional) */}
             {showReplace && (
-                <div className="flex items-center gap-2 mb-2">
+                <div className={styles.searchRow}>
                     <input
                         type="text"
                         value={replaceTerm}
                         onChange={(e) => setReplaceTerm(e.target.value)}
                         placeholder="Replace with..."
-                        className="flex-1 px-3 py-1.5 text-sm bg-secondary border border-border rounded focus:outline-none focus:ring-2 focus:ring-accent"
+                        className={styles.searchPanelInput}
                     />
                     <button
                         onClick={handleReplace}
                         disabled={resultCount === 0 || currentIndex < 0}
-                        className="px-3 py-1.5 text-xs font-medium bg-accent text-accent-foreground rounded hover:bg-accent/90 disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
+                        className={styles.searchPanelActionBtn}
                     >
                         Replace
                     </button>
                     <button
                         onClick={handleReplaceAll}
                         disabled={resultCount === 0 || !replaceTerm}
-                        className="px-3 py-1.5 text-xs font-medium bg-accent text-accent-foreground rounded hover:bg-accent/90 disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
+                        className={styles.searchPanelActionBtn}
                     >
                         All
                     </button>
@@ -233,28 +222,29 @@ export const SearchPanel = ({ editor, isOpen, onClose }: SearchPanelProps) => {
 
             {/* Options Row */}
             <div className="flex items-center gap-3 text-xs">
-                <label className="flex items-center gap-1.5 cursor-pointer hover:text-foreground text-muted-foreground">
+                <label className={styles.searchPanelOptionLabel}>
                     <input
                         type="checkbox"
                         checked={caseSensitive}
                         onChange={(e) => setCaseSensitive(e.target.checked)}
-                        className="rounded border-border"
+                        className={styles.searchPanelCheckbox}
                     />
                     <span>Case sensitive</span>
                 </label>
-                <label className="flex items-center gap-1.5 cursor-pointer hover:text-foreground text-muted-foreground">
+                {/* <label className="search-panel-option-label"> */}
+                <label className={styles.searchPanelOptionLabel}>
                     <input
                         type="checkbox"
                         checked={useRegex}
                         onChange={(e) => setUseRegex(e.target.checked)}
-                        className="rounded border-border"
+                        className={styles.searchPanelCheckbox}
                     />
                     <span>Regex</span>
                 </label>
             </div>
 
             {/* Keyboard Hints */}
-            <div className="mt-2 pt-2 border-t border-border text-xs text-muted-foreground">
+            <div className={styles.searchPanelHints}>
                 <div className="flex justify-between">
                     <span>Enter: Next</span>
                     <span>Shift+Enter: Previous</span>

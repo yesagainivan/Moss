@@ -102,21 +102,16 @@ export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, Search
 
                 const result = results[currentIndex];
                 const { from, to } = result;
-
-                // Log version for debug
-                console.log('[Search] Single Replace - Command State Version:', state.doc.content.size);
                 const docSize = state.doc.content.size;
 
                 // Validate position
                 if (from < 0 || to > docSize || from >= to) {
-                    console.warn('[Search] Invalid position:', { from, to, docSize });
                     return false;
                 }
 
                 if (dispatch) {
                     // Create transaction from the PROVIDED state
                     const tr = state.tr.insertText(replaceTerm, from, to);
-                    console.log('[Search] Transaction created from command state');
                     dispatch(tr);
                 }
 
@@ -124,12 +119,7 @@ export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, Search
             },
             replaceAll: () => ({ state, dispatch }: any) => {
                 const { replaceTerm, results } = this.storage;
-                console.log('[Search] ReplaceAll called. Results:', results.length);
-
                 if (results.length === 0) return false;
-
-                // Use PROVIDED state
-                console.log('[Search] ReplaceAll - Command State Version (size):', state.doc.content.size);
 
                 const docSize = state.doc.content.size;
 
@@ -139,7 +129,6 @@ export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, Search
                 });
 
                 if (validResults.length === 0) {
-                    console.warn('[Search] No valid results for replaceAll');
                     this.storage.results = [];
                     this.storage.currentIndex = -1;
                     return false;
@@ -154,7 +143,6 @@ export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, Search
                             tr = tr.insertText(replaceTerm, from, to);
                         });
 
-                        console.log('[Search] Transaction built from command state');
                         dispatch(tr);
                     } catch (error) {
                         console.error('Replace all failed during transaction build:', error);

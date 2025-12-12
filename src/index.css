@@ -803,24 +803,25 @@ li[data-type="taskItem"]>div>p {
    SEARCH AND REPLACE STYLES
    ============================================ */
 .search-result {
-  background-color: color-mix(in srgb, var(--warning), transparent 70%);
+  background-color: color-mix(in srgb, var(--foreground), transparent 20%);
   border-radius: 2px;
   padding: 0 2px;
   transition: all 0.15s ease;
+  color: var(--background);
 }
 
 .search-result-active {
-  background-color: color-mix(in srgb, var(--warning), transparent 40%);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--warning), transparent 60%);
+  background-color: color-mix(in srgb, var(--foreground), transparent 10%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--foreground), transparent 20%);
 }
 
 .dark .search-result {
-  background-color: color-mix(in srgb, var(--warning), transparent 80%);
+  background-color: color-mix(in srgb, var(--foreground), transparent 30%);
 }
 
 .dark .search-result-active {
-  background-color: color-mix(in srgb, var(--warning), transparent 60%);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--warning), transparent 70%);
+  background-color: color-mix(in srgb, var(--foreground), transparent 10%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--foreground), transparent 20%);
 }
 
 /* .ProseMirror img:hover {
