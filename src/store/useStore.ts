@@ -28,6 +28,21 @@ const pendingSaves = new Map<string, string>();
 // Debounced save functions per note (2 second debounce)
 const debouncedSaveByNote = new Map<string, { debouncer: ReturnType<typeof debounce>, delay: number }>();
 
+// Helper function for daily notes date formatting
+function formatDateForFilename(date: Date, format: string): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayName = dayNames[date.getDay()];
+
+    return format
+        .replace('YYYY', String(year))
+        .replace('MM', month)
+        .replace('DD', day)
+        .replace('dddd', dayName);
+}
+
 interface AppState {
     notes: Record<string, Note>;
     fileTree: FileNode[];
@@ -53,6 +68,9 @@ interface AppState {
     loadTemplates: () => Promise<void>;
     createNoteFromTemplate: (templateName: string, noteTitle: string, parentPath?: string) => Promise<string>;
     setTemplatePickerOpen: (isOpen: boolean) => void;
+
+    // Daily Notes
+    openDailyNote: (date?: Date) => Promise<void>;
 
     // Actions
     initialize: () => Promise<void>;
@@ -1134,6 +1152,53 @@ export const useAppStore = create<AppState>((set, get) => ({
     },
 
     setTemplatePickerOpen: (isOpen) => set({ isTemplatePickerOpen: isOpen }),
+
+    // Daily Notes Action
+    openDailyNote: async (date?: Date) => {
+        const { vaultPath, openNote, createNote, createNoteFromTemplate, refreshFileTree } = get();
+        const settings = useSettingsStore.getState().dailyNotes;
+
+        if (!vaultPath || !settings.enabled) return;
+
+        // Use today if no date provided
+        const targetDate = date || new Date();
+
+        // Format the date for filename
+        const filename = formatDateForFilename(targetDate, settings.dateFormat);
+
+        // Construct full path
+        const folder = settings.folder
+            ? `${vaultPath}/${settings.folder}`
+            : vaultPath;
+        const notePath = `${folder}/${filename}.md`;
+
+        try {
+            // Check if note exists
+            const noteExists = await invoke<boolean>('file_exists', { path: notePath });
+
+            if (noteExists) {
+                // Just open it
+                await openNote(notePath);
+            } else {
+                // Create from template or empty
+                if (settings.template) {
+                    await createNoteFromTemplate(settings.template, filename, folder);
+                } else {
+                    // Create folder if it doesn't exist
+                    if (settings.folder) {
+                        const folderExists = await invoke<boolean>('file_exists', { path: folder });
+                        if (!folderExists) {
+                            await createFolderFS(folder);
+                            await refreshFileTree();
+                        }
+                    }
+                    await createNote(filename, folder, true); // useExactName = true
+                }
+            }
+        } catch (e) {
+            console.error('Failed to open daily note:', e);
+        }
+    },
 }));
 
 // ============================================================================

@@ -840,6 +840,7 @@ pub fn run() {
             commit_vault,
             restore_vault,
             fs_extra::rename_note,
+            fs_extra::file_exists,
             watcher::watch_vault,
             github_start_device_flow,
             github_poll_token,

@@ -160,6 +160,13 @@ export const useGlobalShortcuts = () => {
                 state.setSearchModalOpen(true);
             }
 
+            // Cmd+Shift+D (Open Today's Daily Note)
+            if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === 'KeyD') {
+                e.preventDefault();
+                const state = useAppStore.getState();
+                state.openDailyNote();
+            }
+
             // Cmd+, (Settings)
             if ((e.metaKey || e.ctrlKey) && e.key === ',') {
                 e.preventDefault();

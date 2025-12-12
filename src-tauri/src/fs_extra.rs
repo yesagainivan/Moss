@@ -140,3 +140,9 @@ fn process_file(
 
     Ok(())
 }
+
+#[command]
+pub async fn file_exists(path: String) -> Result<bool, String> {
+    let p = Path::new(&path);
+    Ok(p.exists())
+}

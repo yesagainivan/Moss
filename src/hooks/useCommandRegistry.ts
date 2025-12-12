@@ -7,6 +7,7 @@ import { useAppStore, useActiveTabId, useTabs } from '../store/useStore';
 import { usePaneStore } from '../store/usePaneStore';
 import { useGitStore } from '../store/useGitStore';
 import { useThemeStore } from '../store/useThemeStore';
+import { useSettingsStore } from '../store/useSettingsStore';
 import {
     Home,
     Network,
@@ -31,7 +32,9 @@ import {
     ChevronDown,
     ChevronRight,
     Link,
+    Calendar,
 } from 'lucide-react';
+
 
 export const useCommandRegistry = (): Command[] => {
     const {
@@ -204,6 +207,21 @@ export const useCommandRegistry = (): Command[] => {
                     useAppStore.getState().setTemplatePickerOpen(true);
                 },
                 condition: () => !!vaultPath,
+            },
+            {
+                id: 'open-daily-note',
+                label: 'Open Today\'s Note',
+                description: 'Open or create today\'s daily note',
+                icon: Calendar,
+                shortcut: '⌘⇧D',
+                category: CommandCategory.Files,
+                action: async () => {
+                    await useAppStore.getState().openDailyNote();
+                },
+                condition: () => {
+                    const settings = useSettingsStore.getState().dailyNotes;
+                    return !!vaultPath && settings.enabled;
+                },
             },
 
             // ========== GIT ==========

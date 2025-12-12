@@ -23,12 +23,21 @@ export interface GitHubSyncSettings {
     lastSyncTimestamp: number | null;
 }
 
+export interface DailyNotesSettings {
+    enabled: boolean;
+    folder: string;
+    template: string | null;
+    dateFormat: string;
+}
+
 interface SettingsState {
     settings: EditorSettings;
     githubSync: GitHubSyncSettings;
+    dailyNotes: DailyNotesSettings;
     currentVaultPath: string | null;
     updateSettings: (settings: Partial<EditorSettings>) => void;
     updateGitHubSync: (sync: Partial<GitHubSyncSettings>) => void;
+    updateDailyNotesSettings: (settings: Partial<DailyNotesSettings>) => void;
     setVaultPath: (path: string | null) => void;
 }
 
@@ -53,6 +62,13 @@ const DEFAULT_GITHUB_SYNC: GitHubSyncSettings = {
     repoOwner: null,
     repoName: null,
     lastSyncTimestamp: null,
+};
+
+const DEFAULT_DAILY_NOTES: DailyNotesSettings = {
+    enabled: true,
+    folder: 'Daily Notes',
+    template: null,
+    dateFormat: 'YYYY-MM-DD',
 };
 
 const loadSettings = (): EditorSettings => {
@@ -99,9 +115,30 @@ const saveGitHubSync = (sync: GitHubSyncSettings, vaultPath: string | null) => {
     }
 };
 
+const loadDailyNotes = (): DailyNotesSettings => {
+    try {
+        const saved = localStorage.getItem('moss-daily-notes');
+        if (saved) {
+            return { ...DEFAULT_DAILY_NOTES, ...JSON.parse(saved) };
+        }
+    } catch (e) {
+        console.error('Failed to load daily notes settings', e);
+    }
+    return DEFAULT_DAILY_NOTES;
+};
+
+const saveDailyNotes = (settings: DailyNotesSettings) => {
+    try {
+        localStorage.setItem('moss-daily-notes', JSON.stringify(settings));
+    } catch (e) {
+        console.error('Failed to save daily notes settings', e);
+    }
+};
+
 export const useSettingsStore = create<SettingsState>((set) => ({
     settings: loadSettings(),
-    githubSync: DEFAULT_GITHUB_SYNC, // Initial state, will be updated when vault path is set
+    githubSync: DEFAULT_GITHUB_SYNC,
+    dailyNotes: loadDailyNotes(),
     currentVaultPath: null,
 
     updateSettings: (newSettings) =>
@@ -116,6 +153,13 @@ export const useSettingsStore = create<SettingsState>((set) => ({
             const updated = { ...state.githubSync, ...newSync };
             saveGitHubSync(updated, state.currentVaultPath);
             return { githubSync: updated };
+        }),
+
+    updateDailyNotesSettings: (newSettings) =>
+        set((state) => {
+            const updated = { ...state.dailyNotes, ...newSettings };
+            saveDailyNotes(updated);
+            return { dailyNotes: updated };
         }),
 
     setVaultPath: (path) =>
