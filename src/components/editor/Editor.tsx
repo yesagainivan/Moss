@@ -136,6 +136,11 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         return { top, left };
     };
 
+    // Sync sourceContent when noteId or initialContent changes to prevent stale content
+    useEffect(() => {
+        setSourceContent(initialContent);
+    }, [noteId, initialContent]);
+
     useEffect(() => {
         let isMounted = true;
 
@@ -1118,13 +1123,13 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 style={{ cursor: 'text' }}
             >
                 {isSourceMode ? (
-                    <div style={containerStyle} className="h-full min-h-full pb-32">
+                    <div style={containerStyle} className="h-full min-h-full">
                         <textarea
                             ref={textareaRef}
                             value={sourceContent}
                             onChange={handleSourceChange}
                             onKeyDown={handleSourceKeyDown}
-                            className="w-full h-full p-8 bg-transparent border-none outline-none resize-none font-mono"
+                            className="w-full h-full p-8 pb-32 bg-transparent border-none outline-none resize-none font-mono"
                             style={{
                                 fontSize: `${settings.fontSize}px`,
                                 lineHeight: settings.lineHeight,
