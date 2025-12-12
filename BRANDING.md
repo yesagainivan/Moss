@@ -7,13 +7,13 @@ This document lists the branding tasks that need to be completed manually.
 ### Application Icons
 The default Tauri icons in `src-tauri/icons/` need to be replaced with custom Moss branding:
 
-- [ ] **icon.png** (source icon, 512x512 or larger recommended)
-- [ ] **icon.icns** (macOS app icon)
-- [ ] **icon.ico** (Windows app icon)
-- [ ] **32x32.png** (for macOS)
-- [ ] **128x128.png** (for macOS)
-- [ ] **128x128@2x.png** (for macOS Retina)
-- [ ] **Square*.png** files (for Windows Store, if publishing)
+- [x] **icon.png** (source icon, 512x512 or larger recommended)
+- [x] **icon.icns** (macOS app icon)
+- [x] **icon.ico** (Windows app icon)
+- [x] **32x32.png** (for macOS)
+- [x] **128x128.png** (for macOS)
+- [x] **128x128@2x.png** (for macOS Retina)
+- [x] **Square*.png** files (for Windows Store, if publishing)
 
 **Recommended workflow:**
 1. Design a master icon (SVG or high-resolution PNG, 1024x1024 minimum)
@@ -23,9 +23,9 @@ The default Tauri icons in `src-tauri/icons/` need to be replaced with custom Mo
    ```
 
 ### Favicon
-- [ ] Create a custom Moss favicon
-- [ ] Replace `/vite.svg` referenced in [index.html](file:///Users/ivanowono/Documents/Code/Rusty/Apps/brown/Amber_brown/index.html#L6)
-- [ ] Update the `<link rel="icon">` tag to point to your new favicon
+- [x] Create a custom Moss favicon
+- [x] Replace `/vite.svg` referenced in [index.html](file:///Users/ivanowono/Documents/Code/Rusty/Apps/brown/Amber_brown/index.html#L6)
+- [x] Update the `<link rel="icon">` tag to point to your new favicon
 
 **Suggested formats:**
 - `favicon.ico` (traditional, multi-size)
@@ -34,16 +34,16 @@ The default Tauri icons in `src-tauri/icons/` need to be replaced with custom Mo
 
 ## 📝 Optional Documentation Updates
 
-- [ ] Update `README.md` (if it exists) with Moss branding
-- [ ] Add a proper description of what Moss is
-- [ ] Include screenshots of the app
-- [ ] Add installation instructions
+- [x] Update `README.md` (if it exists) with Moss branding
+- [x] Add a proper description of what Moss is
+- [x] Include screenshots of the app
+- [x] Add installation instructions
 
 ## 📄 Legal & Metadata
 
-- [ ] Add or update `LICENSE` file with appropriate license
-- [ ] Update any copyright notices to reflect Moss
-- [ ] Consider adding an "About" section in the app with version info
+- [x] Add or update `LICENSE` file with appropriate license
+- [x] Update any copyright notices to reflect Moss
+- [x] Consider adding an "About" section in the app with version info
 
 ## 🔄 After Icon Updates
 
@@ -67,4 +67,4 @@ Since Moss is a markdown note-taking app, consider icon designs that incorporate
 
 ---
 
-**Current Status**: All configuration files and code have been updated with Moss branding. Only visual assets remain! ✨
+**Current Status**: All branding tasks, including visual assets, configuration files, and code, have been completed! ✨

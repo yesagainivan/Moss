@@ -10,12 +10,15 @@ interface ImageWithMarkdownOptions extends ImageOptions {
  */
 export const ImageWithMarkdown = Image.extend<ImageWithMarkdownOptions>({
     addOptions() {
+        const parentOptions = this.parent?.() as Partial<ImageOptions> || {};
         return {
+            ...parentOptions,
             inline: false,
             allowBase64: false,
             HTMLAttributes: {},
-            ...this.parent?.(),
             vaultPath: '',
+            // Ensure resize is never undefined by providing explicit default
+            resize: parentOptions.resize ?? false,
         };
     },
 

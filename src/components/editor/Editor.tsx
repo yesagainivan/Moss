@@ -14,6 +14,7 @@ import { ImageWithMarkdown } from './extensions/ImageWithMarkdown';
 import { TagHighlight } from './extensions/TagHighlight';
 import { TagSuggestion } from './extensions/TagSuggestion';
 import { WikilinkSuggestion } from './extensions/WikilinkSuggestion';
+import { SearchAndReplace } from './extensions/SearchAndReplace';
 import { useAppStore, debouncedSaveNote } from '../../store/useStore';
 import { usePaneStore } from '../../store/usePaneStore';
 import { PropertiesEditor } from './PropertiesEditor';
@@ -23,6 +24,7 @@ import { useAIStore } from '../../store/useAIStore';
 import { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { AIInlinePrompt } from '../ai/AIInlinePrompt';
 import { DiffContainer } from '../ai/DiffContainer';
+import { SearchPanel } from './SearchPanel';
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from '@tauri-apps/api/core';
 import { debounce } from 'lodash-es';
@@ -87,6 +89,9 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
     // Live streaming mode state
     const liveStreamInsertPos = useRef<number | null>(null);
     const [isLiveModeActive, setIsLiveModeActive] = useState(false);
+
+    // Search panel state
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     // Parse markdown to HTML asynchronously using worker
     const [initialHtml, setInitialHtml] = useState<string | null>(null);
@@ -266,6 +271,11 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 allowBase64: false, // Only allow URL-based images for now
                 vaultPath: vaultPath || '',
             }),
+            SearchAndReplace.configure({
+                searchResultClass: 'search-result',
+                caseSensitive: false,
+                disableRegex: true,
+            }),
             Table.configure({
                 resizable: true,
             }),
@@ -373,6 +383,15 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     setShowInlinePrompt(true);
                     return true;
                 }
+
+                // Cmd+F / Ctrl+F: Open search panel
+                const isCmdF = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f';
+                if (isCmdF) {
+                    event.preventDefault();
+                    setIsSearchOpen(true);
+                    return true;
+                }
+
                 return false;
             },
             handlePaste: (view, event) => {
@@ -1174,6 +1193,13 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     onDiscard={handleDiscard}
                 />
             )}
+
+            {/* Search Panel */}
+            <SearchPanel
+                editor={editor}
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+            />
         </div>
     );
 };

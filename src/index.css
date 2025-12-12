@@ -798,6 +798,31 @@ li[data-type="taskItem"]>div>p {
 }
 
 /* Hover effect disabled per user preference */
+
+/* ============================================
+   SEARCH AND REPLACE STYLES
+   ============================================ */
+.search-result {
+  background-color: color-mix(in srgb, var(--warning), transparent 70%);
+  border-radius: 2px;
+  padding: 0 2px;
+  transition: all 0.15s ease;
+}
+
+.search-result-active {
+  background-color: color-mix(in srgb, var(--warning), transparent 40%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--warning), transparent 60%);
+}
+
+.dark .search-result {
+  background-color: color-mix(in srgb, var(--warning), transparent 80%);
+}
+
+.dark .search-result-active {
+  background-color: color-mix(in srgb, var(--warning), transparent 60%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--warning), transparent 70%);
+}
+
 /* .ProseMirror img:hover {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
