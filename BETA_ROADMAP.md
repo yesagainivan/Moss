@@ -131,7 +131,7 @@ See "Pre-Beta Must-Have Features" below
 
 #### 13. Image Handling Improvements
 **Why**: Ensure paste/upload works smoothly
-**Status**: Check needed
+**Status**: ✅ Implemented (2025-12-11)
 **Effort**: Variable
 **Impact**: Medium
 
@@ -179,7 +179,7 @@ See "Pre-Beta Must-Have Features" below
 - [x] **Daily Notes** ✅ (1 day) - Complete
 - [x] **Backlinks panel** ✅ (1 day) - Complete
 - [x] **Note outline/TOC** ✅ (1 day) - Complete
-- [ ] Image handling polish (1 day)
+- [x] **Image handling polish** ✅ (1 day)
 
 ### Phase 3: Pre-Launch Polish (1 week)
 **Goal**: First impressions matter

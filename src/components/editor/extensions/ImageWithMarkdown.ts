@@ -24,12 +24,9 @@ export const ImageWithMarkdown = Image.extend<ImageWithMarkdownOptions>({
         const vaultPath = this.options.vaultPath;
         const newAttributes = { ...HTMLAttributes };
 
-        // console.log('DEBUG: ImageWithMarkdown renderHTML input', { src, vaultPath });
-
         if (vaultPath && src && !src.startsWith('http') && !src.startsWith('data:') && !src.startsWith('asset:')) {
             const fullPath = src.startsWith('/') ? src : `${vaultPath}/${src}`;
             const converted = convertFileSrc(fullPath);
-            // console.log('DEBUG: Converting path', { from: fullPath, to: converted });
             newAttributes.src = converted;
         }
 
