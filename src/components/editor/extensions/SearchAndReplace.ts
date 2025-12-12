@@ -1,6 +1,6 @@
 import { Extension } from '@tiptap/core';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
 
 export interface SearchAndReplaceOptions {
     searchResultClass: string;
@@ -63,23 +63,38 @@ export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, Search
                 this.storage.replaceTerm = replaceTerm;
                 return true;
             },
-            goToNextSearchResult: () => ({ editor }: any) => {
+            goToNextSearchResult: () => ({ state, dispatch, editor }) => {
                 const { results } = this.storage;
                 if (results.length === 0) return false;
 
                 this.storage.currentIndex = (this.storage.currentIndex + 1) % results.length;
                 const result = results[this.storage.currentIndex];
 
-                // Scroll to and select the result
-                editor.commands.setTextSelection({ from: result.from, to: result.to });
+                if (dispatch) {
+                    const tr = state.tr
+                        .setSelection(TextSelection.create(state.doc, result.from, result.to))
+                        .scrollIntoView()
+                        .setMeta('searchUpdate', true);
+                    dispatch(tr);
 
-                // Trigger a meta transaction to ensure plugin state updates and React re-renders
-                // USE VIEW STATE TR to be safe
-                const tr = editor.view.state.tr.setMeta('searchUpdate', true).scrollIntoView();
-                editor.view.dispatch(tr);
+                    // Manual fallback for scrolling if ProseMirror fails (common in nested scroll containers)
+                    // We need to wait for the DOM to update with the new search-result-active class
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            const activeResult = editor.view.dom.querySelector('.search-result-active');
+                            if (activeResult) {
+                                activeResult.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center',
+                                    inline: 'nearest'
+                                });
+                            }
+                        });
+                    });
+                }
                 return true;
             },
-            goToPreviousSearchResult: () => ({ editor }: any) => {
+            goToPreviousSearchResult: () => ({ state, dispatch, editor }) => {
                 const { results } = this.storage;
                 if (results.length === 0) return false;
 
@@ -87,13 +102,27 @@ export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, Search
                     this.storage.currentIndex <= 0 ? results.length - 1 : this.storage.currentIndex - 1;
                 const result = results[this.storage.currentIndex];
 
-                // Scroll to and select the result
-                editor.commands.setTextSelection({ from: result.from, to: result.to });
+                if (dispatch) {
+                    const tr = state.tr
+                        .setSelection(TextSelection.create(state.doc, result.from, result.to))
+                        .scrollIntoView()
+                        .setMeta('searchUpdate', true);
+                    dispatch(tr);
 
-                // Trigger a meta transaction to ensure plugin state updates and React re-renders
-                // USE VIEW STATE TR to be safe
-                const tr = editor.view.state.tr.setMeta('searchUpdate', true).scrollIntoView();
-                editor.view.dispatch(tr);
+                    // Manual fallback for scrolling
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            const activeResult = editor.view.dom.querySelector('.search-result-active');
+                            if (activeResult) {
+                                activeResult.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center',
+                                    inline: 'nearest'
+                                });
+                            }
+                        });
+                    });
+                }
                 return true;
             },
             replace: () => ({ state, dispatch }: any) => {
