@@ -13,16 +13,16 @@
     --bg-tertiary: #181818;
     --bg-card: rgba(24, 24, 24, 0.6);
 
-    --accent: #5a9a6e;
-    --accent-light: #7ab88a;
-    --accent-dark: #3d7a4f;
-    --accent-glow: rgba(30, 44, 35, 0.13);
+    --accent: #6b7f6c;
+    --accent-light: #8dab8e;
+    --accent-dark: #466047;
+    --accent-glow: rgba(66, 96, 71, 0.13);
     /* --accent-glow: rgba(90, 154, 110, 0.13); */
     /* --accent-glow: color-mix(in srgb, var(--accent) 10%, rgba(90, 154, 110, 0.13) 80%); */
 
-    --text-primary: #fafafa;
-    --text-secondary: #a0a0a0;
-    --text-tertiary: #666666;
+    --text-primary: #f5efe1;
+    --text-secondary: #eee9dced;
+    --text-tertiary: #c6b49fc3;
 
     --border: rgba(255, 255, 255, 0.08);
     --border-hover: rgba(255, 255, 255, 0.15);
@@ -179,13 +179,13 @@ a {
 }
 
 .logo-icon {
-    width: 32px;
-    height: 32px;
-    filter: invert(1);
+    width: 38px;
+    height: 38px;
+    /* filter: invert(1); */
 }
 
 .logo-text {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
     font-weight: 600;
     letter-spacing: -0.02em;
 }
@@ -272,8 +272,9 @@ a {
     align-items: center;
     justify-content: center;
     padding: var(--space-24) var(--space-6);
+    padding-top: 12rem;
     text-align: center;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .hero-bg {
@@ -282,7 +283,7 @@ a {
     left: 0;
     right: 0;
     bottom: 0;
-    overflow: hidden;
+    /* overflow: hidden; */
     z-index: -1;
 }
 
@@ -310,6 +311,7 @@ a {
     bottom: -150px;
     left: -150px;
     animation-delay: -4s;
+    opacity: 0.2;
 }
 
 @keyframes float {
@@ -342,10 +344,14 @@ a {
 }
 
 .text-accent {
-    background: linear-gradient(-125deg, var(--accent-light) 0%, #71c591 50%, #c2d08b 100%);
+    background: linear-gradient(-125deg, var(--accent-light) 0%, var(--accent) 50%, var(--accent) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    /*  */
+    filter: hue-rotate(90deg);
+    /* Use -webkit- prefix for older browser compatibility if needed */
+    -webkit-filter: hue-rotate(-10deg) brightness(1.5);
 }
 
 .hero-subtitle {
@@ -596,12 +602,13 @@ a {
 
 .feature-description kbd {
     display: inline-block;
-    padding: var(--space-1) var(--space-2);
+    /* padding: var(--space-1) var(--space-2); */
+    padding: 0.1rem 0.2rem;
     font-family: var(--font-family);
     font-size: var(--font-size-xs);
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--border);
-    border-radius: var(--radius-moss);
+    border-radius: 0.35rem;
 
 }
 
@@ -783,7 +790,7 @@ a {
 .footer-logo {
     width: 24px;
     height: 24px;
-    filter: invert(1);
+    /* filter: invert(1); */
     opacity: 0.8;
 }
 
