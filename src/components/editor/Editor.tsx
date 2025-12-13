@@ -1,7 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from '@tiptap/markdown';
-import { Wikilink } from './extensions/Wikilink';
+import { WikilinkHighlight } from './extensions/WikilinkHighlight';
 import { Callout } from './extensions/Callout';
 import { HeadingWithId } from './extensions/HeadingWithId';
 import { Table } from '@tiptap/extension-table';
@@ -73,6 +73,64 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
 
     // Worker hook
     const { parseMarkdown } = useMarkdownWorker();
+
+    // Handle wikilink clicks (for decoration-styled wikilinks)
+    const handleWikilinkClick = async (target: string, fragment: string, isCmdClick: boolean) => {
+        const { vaultPath, createNote, openNote } = useAppStore.getState();
+
+        if (!vaultPath) {
+            console.warn('No vault path set');
+            return;
+        }
+
+        // Helper to scroll to heading after note opens
+        const scrollToHeading = (frag: string) => {
+            setTimeout(() => {
+                const headingId = slugify(frag);
+                const element = document.getElementById(headingId);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        };
+
+        // If link is a fragment only (no target), scroll in current note
+        if (!target && fragment) {
+            scrollToHeading(fragment);
+            return;
+        }
+
+        // If no target, ignore
+        if (!target) {
+            return;
+        }
+
+        try {
+            // Use backend to resolve the wikilink
+            const resolvedRelativePath = await invoke<string>('agent_resolve_wikilink', {
+                vaultPath,
+                linkText: target,
+            });
+
+            const absolutePath = `${vaultPath}/${resolvedRelativePath}`;
+            openNote(absolutePath, isCmdClick);
+
+            // Scroll to heading if fragment provided
+            if (fragment) {
+                scrollToHeading(fragment);
+            }
+        } catch (e) {
+            console.warn('Failed to resolve wikilink:', e);
+            // If resolution fails and cmd+click, create the note
+            if (isCmdClick && vaultPath) {
+                const newNotePath = await createNote(target, undefined, true);
+                if (newNotePath) {
+                    openNote(newNotePath, isCmdClick);
+                }
+            }
+        }
+    };
+
 
     // Error dialog state
     const [error, setError] = useState<{ title: string; message: string } | null>(null);
@@ -206,67 +264,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 },
             }),
             Markdown,
-            Wikilink.configure({
-                openNote: async (id, isCmdClick = false, fragment) => {
-                    const { vaultPath, createNote, openNote } = useAppStore.getState();
-
-                    if (!vaultPath) {
-                        console.warn('No vault path set');
-                        return;
-                    }
-
-                    // Helper to scroll to heading after note opens
-                    const scrollToHeading = (frag: string) => {
-                        // Use setTimeout to ensure content is rendered
-                        setTimeout(() => {
-                            // Use the proper GitHub slugify function
-                            const headingId = slugify(frag);
-                            const element = document.getElementById(headingId);
-                            if (element) {
-                                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }
-                        }, 100);
-                    };
-
-                    // Handle same-note fragment links (e.g., [[#Heading]])
-                    if (!id && fragment) {
-                        scrollToHeading(fragment);
-                        return;
-                    }
-
-                    try {
-                        // Use backend to resolve the wikilink
-                        const resolvedRelativePath = await invoke<string>('agent_resolve_wikilink', {
-                            vaultPath,
-                            linkText: id,
-                        });
-
-                        // Construct absolute path for openNote
-                        // resolvedRelativePath is relative to vault, so we prepend vaultPath
-                        // Ensure we handle potential leading slashes correctly
-                        const absolutePath = `${vaultPath}/${resolvedRelativePath}`;
-
-                        // Open the resolved note
-                        openNote(absolutePath, isCmdClick);
-
-                        // Scroll to heading if fragment provided
-                        if (fragment) {
-                            scrollToHeading(fragment);
-                        }
-                    } catch (e) {
-                        console.warn('Failed to resolve wikilink:', e);
-                        // If resolution fails, check if we should create it
-                        if (isCmdClick && vaultPath) {
-                            // Cmd/Ctrl+click and note doesn't exist - create it with exact name
-                            const newNotePath = await createNote(id, undefined, true);
-                            if (newNotePath) {
-                                // Open the newly created note
-                                openNote(newNotePath, isCmdClick);
-                            }
-                        }
-                    }
-                },
-            }),
+            WikilinkHighlight,
             TagHighlight,
             TagSuggestion,
             WikilinkSuggestion,
@@ -291,7 +289,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         content: '', // Initialize with empty, will be updated via useEffect
         editorProps: {
             attributes: {
-                class: 'prose max-w-none focus:outline-none p-8 pb-32 prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-accent prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-a:text-accent prose-blockquote:border-l-accent',
+                class: 'prose max-w-none focus:outline-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-accent prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-a:text-accent prose-blockquote:border-l-accent',
                 style: `font-size: ${settings.editorFontSize}px; line-height: ${settings.lineHeight};`,
             },
             handleClick: (_view, _pos, event) => {
@@ -317,22 +315,16 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     }
                 }
 
-                // Handle wikilinks
+                // Handle wikilinks (now styled with decorations)
                 if (target.closest('.wikilink')) {
                     event.preventDefault();
                     const wikilink = target.closest('.wikilink') as HTMLElement;
-                    const noteTarget = wikilink.getAttribute('data-target');
-                    const fragment = wikilink.getAttribute('data-fragment');
+                    const noteTarget = wikilink.getAttribute('data-target') || '';
+                    const fragment = wikilink.getAttribute('data-fragment') || '';
+                    const isCmdClick = event.metaKey || event.ctrlKey;
 
-                    if (editor) {
-                        // Use the Wikilink extension's openNote handler from storage
-                        const wikilinkStorage = (editor.storage as any).wikilink;
-                        const wikilinkOpenNote = wikilinkStorage?.openNote;
-                        if (wikilinkOpenNote) {
-                            wikilinkOpenNote(noteTarget, event.metaKey || event.ctrlKey, fragment);
-                        }
-                        return true;
-                    }
+                    handleWikilinkClick(noteTarget, fragment, isCmdClick);
+                    return true;
                 }
 
                 return false;
@@ -1149,7 +1141,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                         />
                     </div>
                 ) : (
-                    <div style={containerStyle} className="h-full">
+                    <div style={containerStyle} className="h-full p-8 pb-32">
                         <EditorContent
                             editor={editor}
                             className="h-full"
@@ -1165,9 +1157,9 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     </div>
                 )}
 
-                {/* Clickable area at bottom for easy focus */}
+                {/* Clickable area at bottom for easy focus - reduced to prevent interfering with editor clicks */}
                 <div
-                    className="h-[30vh]"
+                    className="h-[10vh] min-h-[100px]"
                     onClick={(e) => {
                         e.stopPropagation();
                         editor?.commands.focus('end');

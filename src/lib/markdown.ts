@@ -44,8 +44,15 @@ export const wikilinkMarkedExtension = {
         }
     },
     renderer(token: any) {
-        const fragmentAttr = token.fragment ? ` data-fragment="${token.fragment}"` : '';
-        return `<span data-target="${token.target}"${fragmentAttr}>${token.label || token.target || ('#' + token.fragment)}</span>`;
+        // Return the original wikilink syntax as plain text
+        // This allows WikilinkHighlight decorations to style it
+        const target = token.target || '';
+        const fragment = token.fragment || '';
+        const label = token.label;
+
+        // Reconstruct the wikilink syntax
+        const fullTarget = fragment ? (target ? `${target}#${fragment}` : `#${fragment}`) : target;
+        return label ? `[[${fullTarget}|${label}]]` : `[[${fullTarget}]]`;
     }
 };
 
