@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Sunset Desert"
+description: "A warm, earthy theme inspired by desert sunsets with terracotta and golden sand tones."
+
+colors:
+  # Primary: Terracotta
+  primary: "#ea580c"
+  primary_dark: "#c2410c"
+
+  # Secondary: Desert Orange
+  secondary: "#f97316"
+  secondary_dark: "#ea580c"
+
+  # Accent: Sunset Coral
+  accent: "#fb923c"
+  accent_dark: "#f97316"
+
+  # Backgrounds (Light) - warm sands
+  background: "#fffbeb"
+  background_subtle: "#fef3c7"
+  
+  # Surfaces
+  surface: "#fde68a"
+  surface_highlight: "#fcd34d"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#78350f"
+  subtle_foreground: "#92400e"
+  outline: "#fde68a"
+  outline_subtle: "#fef3c7"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#991b1b"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#ea580c"
+    foreground: "#ffffff"
+    border: "#c2410c"
+    subtle_background: "rgba(234, 88, 12, 0.1)"
+  warning:
+    background: "#f97316"
+    foreground: "#ffffff"
+    border: "#ea580c"
+    subtle_background: "rgba(249, 115, 22, 0.1)"
+  info:
+    background: "#fb923c"
+    foreground: "#ffffff"
+    border: "#f97316"
+    subtle_background: "rgba(251, 146, 60, 0.1)"
+
+# Dark mode - desert dusk
+dark:
+  # Backgrounds - desert night
+  background: "#1a0f08"
+  background_subtle: "#24150d"
+  
+  # Surfaces - warm earth
+  surface: "#331f14"
+  surface_highlight: "#442a1c"
+  elevated_surface: "#573624"
+
+  # Text - warm whites
+  foreground: "#fffbeb"
+  subtle_foreground: "#fcd34d"
+  
+  # Borders - warm subtle
+  outline: "rgba(251, 146, 60, 0.15)"
+  outline_subtle: "rgba(251, 146, 60, 0.08)"
+
+  # Colors - sunset oranges
+  primary: "#f97316"
+  secondary: "#fb923c"
+  accent: "#fdba74"

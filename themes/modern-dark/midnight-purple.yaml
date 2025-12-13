@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Midnight Purple"
+description: "A rich, royal purple theme with lavender highlights that feels both modern and luxurious."
+
+colors:
+  # Primary: Royal Purple
+  primary: "#7c3aed"
+  primary_dark: "#6d28d9"
+
+  # Secondary: Vibrant Purple
+  secondary: "#8b5cf6"
+  secondary_dark: "#7c3aed"
+
+  # Accent: Light Purple
+  accent: "#a78bfa"
+  accent_dark: "#8b5cf6"
+
+  # Backgrounds (Light) - soft lavenders
+  background: "#faf5ff"
+  background_subtle: "#f5f3ff"
+  
+  # Surfaces
+  surface: "#ede9fe"
+  surface_highlight: "#ddd6fe"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#1e1b4b"
+  subtle_foreground: "#6b7280"
+  outline: "#c4b5fd"
+  outline_subtle: "#e9d5ff"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#7c3aed"
+    foreground: "#ffffff"
+    border: "#6d28d9"
+    subtle_background: "rgba(124, 58, 237, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#8b5cf6"
+    foreground: "#ffffff"
+    border: "#7c3aed"
+    subtle_background: "rgba(139, 92, 246, 0.1)"
+
+# Dark mode - deep purple night
+dark:
+  # Backgrounds - deep purple
+  background: "#1a0f2e"
+  background_subtle: "#211638"
+  
+  # Surfaces - purple grays
+  surface: "#2e1f47"
+  surface_highlight: "#3d2859"
+  elevated_surface: "#4c3267"
+
+  # Text - bright whites
+  foreground: "#f5f3ff"
+  subtle_foreground: "#c4b5fd"
+  
+  # Borders - subtle purples
+  outline: "rgba(167, 139, 250, 0.15)"
+  outline_subtle: "rgba(167, 139, 250, 0.08)"
+
+  # Colors - vibrant purples
+  primary: "#8b5cf6"
+  secondary: "#a78bfa"
+  accent: "#c4b5fd"

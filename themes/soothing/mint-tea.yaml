@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Mint Tea"
+description: "A refreshing yet calming theme with gentle mint greens inspired by a soothing cup of tea."
+
+colors:
+  # Primary: Gentle Mint
+  primary: "#6ee7b7"
+  primary_dark: "#34d399"
+
+  # Secondary: Fresh Mint
+  secondary: "#a7f3d0"
+  secondary_dark: "#6ee7b7"
+
+  # Accent: Pale Mint
+  accent: "#d1fae5"
+  accent_dark: "#a7f3d0"
+
+  # Backgrounds (Light) - tea green
+  background: "#f0fdf4"
+  background_subtle: "#dcfce7"
+  
+  # Surfaces
+  surface: "#bbf7d0"
+  surface_highlight: "#a7f3d0"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#064e3b"
+  subtle_foreground: "#065f46"
+  outline: "#a7f3d0"
+  outline_subtle: "#bbf7d0"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#991b1b"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#6ee7b7"
+    foreground: "#064e3b"
+    border: "#34d399"
+    subtle_background: "rgba(110, 231, 183, 0.1)"
+  warning:
+    background: "#fbbf24"
+    foreground: "#78350f"
+    border: "#f59e0b"
+    subtle_background: "rgba(251, 191, 36, 0.1)"
+  info:
+    background: "#a7f3d0"
+    foreground: "#064e3b"
+    border: "#6ee7b7"
+    subtle_background: "rgba(167, 243, 208, 0.1)"
+
+# Dark mode - deep mint
+dark:
+  # Backgrounds - tea night
+  background: "#0a1f14"
+  background_subtle: "#0f291c"
+  
+  # Surfaces - gentle mint
+  surface: "#15402e"
+  surface_highlight: "#1c5740"
+  elevated_surface: "#236e53"
+
+  # Text - soft white
+  foreground: "#f0fdf4"
+  subtle_foreground: "#d1fae5"
+  
+  # Borders - soft glow
+  outline: "rgba(209, 250, 229, 0.15)"
+  outline_subtle: "rgba(209, 250, 229, 0.08)"
+
+  # Colors - fresh mints
+  primary: "#a7f3d0"
+  secondary: "#d1fae5"
+  accent: "#dcfce7"

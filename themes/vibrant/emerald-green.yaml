@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Emerald Green"
+description: "A fresh, vibrant theme with rich emerald greens and jade accents that energize and refresh."
+
+colors:
+  # Primary: Emerald
+  primary: "#10b981"
+  primary_dark: "#059669"
+
+  # Secondary: Green
+  secondary: "#34d399"
+  secondary_dark: "#10b981"
+
+  # Accent: Mint
+  accent: "#6ee7b7"
+  accent_dark: "#34d399"
+
+  # Backgrounds (Light) - fresh greens
+  background: "#ecfdf5"
+  background_subtle: "#d1fae5"
+  
+  # Surfaces
+  surface: "#a7f3d0"
+  surface_highlight: "#6ee7b7"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#064e3b"
+  subtle_foreground: "#065f46"
+  outline: "#6ee7b7"
+  outline_subtle: "#a7f3d0"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#10b981"
+    foreground: "#ffffff"
+    border: "#059669"
+    subtle_background: "rgba(16, 185, 129, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#34d399"
+    foreground: "#ffffff"
+    border: "#10b981"
+    subtle_background: "rgba(52, 211, 153, 0.1)"
+
+# Dark mode - deep emerald
+dark:
+  # Backgrounds - deep green-black
+  background: "#05190f"
+  background_subtle: "#0a2417"
+  
+  # Surfaces - emerald night
+  surface: "#0f3b24"
+  surface_highlight: "#155331"
+  elevated_surface: "#1c6b3f"
+
+  # Text - bright white
+  foreground: "#ecfdf5"
+  subtle_foreground: "#6ee7b7"
+  
+  # Borders - mint glow
+  outline: "rgba(110, 231, 183, 0.2)"
+  outline_subtle: "rgba(110, 231, 183, 0.1)"
+
+  # Colors - bright greens
+  primary: "#34d399"
+  secondary: "#6ee7b7"
+  accent: "#a7f3d0"

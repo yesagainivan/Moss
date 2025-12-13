@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Autumn Leaves"
+description: "A warm, cozy theme capturing the rich colors of autumn with golden yellows, rust oranges, and copper tones."
+
+colors:
+  # Primary: Autumn Orange
+  primary: "#f97316"
+  primary_dark: "#ea580c"
+
+  # Secondary: Golden Yellow
+  secondary: "#fbbf24"
+  secondary_dark: "#f59e0b"
+
+  # Accent: Copper
+  accent: "#fb923c"
+  accent_dark: "#f97316"
+
+  # Backgrounds (Light) - golden warmth
+  background: "#fffbeb"
+  background_subtle: "#fef3c7"
+  
+  # Surfaces
+  surface: "#fed7aa"
+  surface_highlight: "#fdba74"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#78350f"
+  subtle_foreground: "#92400e"
+  outline: "#fed7aa"
+  outline_subtle: "#fef3c7"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#991b1b"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#f97316"
+    foreground: "#ffffff"
+    border: "#ea580c"
+    subtle_background: "rgba(249, 115, 22, 0.1)"
+  warning:
+    background: "#fbbf24"
+    foreground: "#78350f"
+    border: "#f59e0b"
+    subtle_background: "rgba(251, 191, 36, 0.1)"
+  info:
+    background: "#fb923c"
+    foreground: "#ffffff"
+    border: "#f97316"
+    subtle_background: "rgba(251, 146, 60, 0.1)"
+
+# Dark mode - deep autumn
+dark:
+  # Backgrounds - autumn night
+  background: "#1a0f05"
+  background_subtle: "#24140a"
+  
+  # Surfaces - burnt earth
+  surface: "#331d10"
+  surface_highlight: "#442716"
+  elevated_surface: "#57321d"
+
+  # Text - warm glow
+  foreground: "#fffbeb"
+  subtle_foreground: "#fdba74"
+  
+  # Borders - warm copper
+  outline: "rgba(251, 146, 60, 0.15)"
+  outline_subtle: "rgba(251, 146, 60, 0.08)"
+
+  # Colors - vibrant autumn
+  primary: "#fb923c"
+  secondary: "#fbbf24"
+  accent: "#fcd34d"

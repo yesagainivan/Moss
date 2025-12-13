@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Misty Blue"
+description: "A tranquil theme with soft, misty blues that evoke calm waters and peaceful skies."
+
+colors:
+  # Primary: Misty Blue
+  primary: "#7dd3fc"
+  primary_dark: "#38bdf8"
+
+  # Secondary: Sky Mist
+  secondary: "#bae6fd"
+  secondary_dark: "#7dd3fc"
+
+  # Accent: Pale Sky
+  accent: "#e0f2fe"
+  accent_dark: "#bae6fd"
+
+  # Backgrounds (Light) - misty sky
+  background: "#f0f9ff"
+  background_subtle: "#e0f2fe"
+  
+  # Surfaces
+  surface: "#bae6fd"
+  surface_highlight: "#7dd3fc"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#0c4a6e"
+  subtle_foreground: "#075985"
+  outline: "#7dd3fc"
+  outline_subtle: "#bae6fd"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#991b1b"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#7dd3fc"
+    foreground: "#0c4a6e"
+    border: "#38bdf8"
+    subtle_background: "rgba(125, 211, 252, 0.1)"
+  warning:
+    background: "#fbbf24"
+    foreground: "#78350f"
+    border: "#f59e0b"
+    subtle_background: "rgba(251, 191, 36, 0.1)"
+  info:
+    background: "#bae6fd"
+    foreground: "#0c4a6e"
+    border: "#7dd3fc"
+    subtle_background: "rgba(186, 230, 253, 0.1)"
+
+# Dark mode - twilight mist
+dark:
+  # Backgrounds - twilight sky
+  background: "#0a1520"
+  background_subtle: "#0f1d2b"
+  
+  # Surfaces - misty night
+  surface: "#1a2937"
+  surface_highlight: "#253748"
+  elevated_surface: "#31455a"
+
+  # Text - soft moonlight
+  foreground: "#f0f9ff"
+  subtle_foreground: "#bae6fd"
+  
+  # Borders - gentle mist
+  outline: "rgba(186, 230, 253, 0.15)"
+  outline_subtle: "rgba(186, 230, 253, 0.08)"
+
+  # Colors - calm blues
+  primary: "#bae6fd"
+  secondary: "#e0f2fe"
+  accent: "#f0f9ff"

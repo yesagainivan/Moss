@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Galaxy"
+description: "A cosmic theme with deep space purples and nebula colors for an otherworldly experience."
+
+colors:
+  # Primary: Deep Space Purple
+  primary: "#8b5cf6"
+  primary_dark: "#7c3aed"
+
+  # Secondary: Nebula Purple
+  secondary: "#a78bfa"
+  secondary_dark: "#8b5cf6"
+
+  # Accent: Cosmic Violet
+  accent: "#c4b5fd"
+  accent_dark: "#a78bfa"
+
+  # Backgrounds (Light) - stardust
+  background: "#faf5ff"
+  background_subtle: "#f5f3ff"
+  
+  # Surfaces
+  surface: "#ede9fe"
+  surface_highlight: "#ddd6fe"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#4c1d95"
+  subtle_foreground: "#5b21b6"
+  outline: "#c4b5fd"
+  outline_subtle: "#ddd6fe"
+
+utility:
+  alert:
+    background: "#ec4899"
+    foreground: "#ffffff"
+    border: "#db2777"
+    subtle_background: "rgba(236, 72, 153, 0.1)"
+  success:
+    background: "#8b5cf6"
+    foreground: "#ffffff"
+    border: "#7c3aed"
+    subtle_background: "rgba(139, 92, 246, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#a78bfa"
+    foreground: "#ffffff"
+    border: "#8b5cf6"
+    subtle_background: "rgba(167, 139, 250, 0.1)"
+
+# Dark mode - deep space
+dark:
+  # Backgrounds - void black
+  background: "#0a0514"
+  background_subtle: "#14091f"
+  
+  # Surfaces - cosmic layers
+  surface: "#1f0f33"
+  surface_highlight: "#2b1548"
+  elevated_surface: "#3a1c5e"
+
+  # Text - starlight
+  foreground: "#faf5ff"
+  subtle_foreground: "#c4b5fd"
+  
+  # Borders - cosmic glow
+  outline: "rgba(196, 181, 253, 0.25)"
+  outline_subtle: "rgba(196, 181, 253, 0.12)"
+
+  # Colors - nebula colors
+  primary: "#a78bfa"
+  secondary: "#c4b5fd"
+  accent: "#ddd6fe"

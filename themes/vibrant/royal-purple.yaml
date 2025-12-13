@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Royal Purple"
+description: "A majestic theme with deep royal purples and violet highlights for a regal workspace."
+
+colors:
+  # Primary: Royal Purple
+  primary: "#9333ea"
+  primary_dark: "#7e22ce"
+
+  # Secondary: Purple
+  secondary: "#a855f7"
+  secondary_dark: "#9333ea"
+
+  # Accent: Violet
+  accent: "#c084fc"
+  accent_dark: "#a855f7"
+
+  # Backgrounds (Light) - soft purples
+  background: "#faf5ff"
+  background_subtle: "#f3e8ff"
+  
+  # Surfaces
+  surface: "#e9d5ff"
+  surface_highlight: "#d8b4fe"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#581c87"
+  subtle_foreground: "#6b21a8"
+  outline: "#d8b4fe"
+  outline_subtle: "#e9d5ff"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#9333ea"
+    foreground: "#ffffff"
+    border: "#7e22ce"
+    subtle_background: "rgba(147, 51, 234, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#a855f7"
+    foreground: "#ffffff"
+    border: "#9333ea"
+    subtle_background: "rgba(168, 85, 247, 0.1)"
+
+# Dark mode - deep royal
+dark:
+  # Backgrounds - deep purple-black
+  background: "#14051f"
+  background_subtle: "#1f0a2e"
+  
+  # Surfaces - royal night
+  surface: "#33114d"
+  surface_highlight: "#481968"
+  elevated_surface: "#5e2184"
+
+  # Text - bright white
+  foreground: "#faf5ff"
+  subtle_foreground: "#d8b4fe"
+  
+  # Borders - violet glow
+  outline: "rgba(216, 180, 254, 0.2)"
+  outline_subtle: "rgba(216, 180, 254, 0.1)"
+
+  # Colors - vibrant purples
+  primary: "#a855f7"
+  secondary: "#c084fc"
+  accent: "#e9d5ff"

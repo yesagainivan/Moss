@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Ocean Breeze"
+description: "A refreshing coastal theme with sky blues and seafoam accents, bringing the tranquility of the ocean to your workspace."
+
+colors:
+  # Primary: Ocean Blue
+  primary: "#0ea5e9"
+  primary_dark: "#0284c7"
+
+  # Secondary: Sky Blue
+  secondary: "#38bdf8"
+  secondary_dark: "#0ea5e9"
+
+  # Accent: Seafoam
+  accent: "#7dd3fc"
+  accent_dark: "#38bdf8"
+
+  # Backgrounds (Light) - sky blues
+  background: "#f0f9ff"
+  background_subtle: "#e0f2fe"
+  
+  # Surfaces
+  surface: "#bae6fd"
+  surface_highlight: "#7dd3fc"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#0c4a6e"
+  subtle_foreground: "#075985"
+  outline: "#bae6fd"
+  outline_subtle: "#e0f2fe"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#0ea5e9"
+    foreground: "#ffffff"
+    border: "#0284c7"
+    subtle_background: "rgba(14, 165, 233, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#38bdf8"
+    foreground: "#ffffff"
+    border: "#0ea5e9"
+    subtle_background: "rgba(56, 189, 248, 0.1)"
+
+# Dark mode - deep ocean
+dark:
+  # Backgrounds - ocean depths
+  background: "#0a1520"
+  background_subtle: "#0f1d2b"
+  
+  # Surfaces - deep water
+  surface: "#172938"
+  surface_highlight: "#1f3a4f"
+  elevated_surface: "#2a4c66"
+
+  # Text - bright blues
+  foreground: "#f0f9ff"
+  subtle_foreground: "#7dd3fc"
+  
+  # Borders - subtle blues
+  outline: "rgba(125, 211, 252, 0.15)"
+  outline_subtle: "rgba(125, 211, 252, 0.08)"
+
+  # Colors - bright ocean blues
+  primary: "#38bdf8"
+  secondary: "#7dd3fc"
+  accent: "#bae6fd"

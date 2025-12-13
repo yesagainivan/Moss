@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Crimson Red"
+description: "A powerful, passionate theme with deep crimson reds and ruby highlights for bold statements."
+
+colors:
+  # Primary: Crimson
+  primary: "#dc2626"
+  primary_dark: "#b91c1c"
+
+  # Secondary: Red
+  secondary: "#ef4444"
+  secondary_dark: "#dc2626"
+
+  # Accent: Rose
+  accent: "#f87171"
+  accent_dark: "#ef4444"
+
+  # Backgrounds (Light) - soft reds
+  background: "#fef2f2"
+  background_subtle: "#fee2e2"
+  
+  # Surfaces
+  surface: "#fecaca"
+  surface_highlight: "#fca5a5"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#7f1d1d"
+  subtle_foreground: "#991b1b"
+  outline: "#fca5a5"
+  outline_subtle: "#fecaca"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#b91c1c"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#16a34a"
+    foreground: "#ffffff"
+    border: "#15803d"
+    subtle_background: "rgba(22, 163, 74, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+
+# Dark mode - deep crimson
+dark:
+  # Backgrounds - deep red-black
+  background: "#1a0505"
+  background_subtle: "#240a0a"
+  
+  # Surfaces - crimson night
+  surface: "#3d0f0f"
+  surface_highlight: "#571515"
+  elevated_surface: "#721c1c"
+
+  # Text - bright white
+  foreground: "#fef2f2"
+  subtle_foreground: "#fca5a5"
+  
+  # Borders - ruby glow
+  outline: "rgba(252, 165, 165, 0.2)"
+  outline_subtle: "rgba(252, 165, 165, 0.1)"
+
+  # Colors - bright reds
+  primary: "#ef4444"
+  secondary: "#f87171"
+  accent: "#fca5a5"

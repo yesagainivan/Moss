@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Ash"
+description: "A muted, contemplative theme with ash grays and smoke tones for calm, focused work."
+
+colors:
+  # Primary: Ash Gray
+  primary: "#9ca3af"
+  primary_dark: "#6b7280"
+
+  # Secondary: Light Ash
+  secondary: "#d1d5db"
+  secondary_dark: "#9ca3af"
+
+  # Accent: Smoke
+  accent: "#e5e7eb"
+  accent_dark: "#d1d5db"
+
+  # Backgrounds (Light) - light ash
+  background: "#f9fafb"
+  background_subtle: "#f3f4f6"
+  
+  # Surfaces
+  surface: "#e5e7eb"
+  surface_highlight: "#d1d5db"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#111827"
+  subtle_foreground: "#4b5563"
+  outline: "#d1d5db"
+  outline_subtle: "#e5e7eb"
+
+utility:
+  alert:
+    background: "#6b7280"
+    foreground: "#ffffff"
+    border: "#4b5563"
+    subtle_background: "rgba(107, 114, 128, 0.1)"
+  success:
+    background: "#9ca3af"
+    foreground: "#111827"
+    border: "#6b7280"
+    subtle_background: "rgba(156, 163, 175, 0.1)"
+  warning:
+    background: "#d1d5db"
+    foreground: "#111827"
+    border: "#9ca3af"
+    subtle_background: "rgba(209, 213, 219, 0.1)"
+  info:
+    background: "#9ca3af"
+    foreground: "#111827"
+    border: "#6b7280"
+    subtle_background: "rgba(156, 163, 175, 0.1)"
+
+# Dark mode - deep ash
+dark:
+  # Backgrounds - deep ash
+  background: "#111827"
+  background_subtle: "#1f2937"
+  
+  # Surfaces - smoke layers
+  surface: "#374151"
+  surface_highlight: "#4b5563"
+  elevated_surface: "#6b7280"
+
+  # Text - smoke white
+  foreground: "#f9fafb"
+  subtle_foreground: "#d1d5db"
+  
+  # Borders - smoke subtle
+  outline: "rgba(209, 213, 219, 0.15)"
+  outline_subtle: "rgba(209, 213, 219, 0.08)"
+
+  # Colors - light ash
+  primary: "#9ca3af"
+  secondary: "#d1d5db"
+  accent: "#e5e7eb"

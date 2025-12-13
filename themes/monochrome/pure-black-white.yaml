@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Pure Black & White"
+description: "A stark, high-contrast theme with pure black and white for maximum clarity and focus."
+
+colors:
+  # Primary: True Black
+  primary: "#000000"
+  primary_dark: "#000000"
+
+  # Secondary: Dark Gray
+  secondary: "#1a1a1a"
+  secondary_dark: "#0a0a0a"
+
+  # Accent: Medium Gray
+  accent: "#4a4a4a"
+  accent_dark: "#2a2a2a"
+
+  # Backgrounds (Light) - pure white
+  background: "#ffffff"
+  background_subtle: "#fafafa"
+  
+  # Surfaces
+  surface: "#f5f5f5"
+  surface_highlight: "#eeeeee"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#000000"
+  subtle_foreground: "#4a4a4a"
+  outline: "#d0d0d0"
+  outline_subtle: "#e8e8e8"
+
+utility:
+  alert:
+    background: "#1a1a1a"
+    foreground: "#ffffff"
+    border: "#000000"
+    subtle_background: "rgba(26, 26, 26, 0.1)"
+  success:
+    background: "#4a4a4a"
+    foreground: "#ffffff"
+    border: "#2a2a2a"
+    subtle_background: "rgba(74, 74, 74, 0.1)"
+  warning:
+    background: "#6a6a6a"
+    foreground: "#ffffff"
+    border: "#4a4a4a"
+    subtle_background: "rgba(106, 106, 106, 0.1)"
+  info:
+    background: "#2a2a2a"
+    foreground: "#ffffff"
+    border: "#1a1a1a"
+    subtle_background: "rgba(42, 42, 42, 0.1)"
+
+# Dark mode - pure black
+dark:
+  # Backgrounds - true black
+  background: "#000000"
+  background_subtle: "#0a0a0a"
+  
+  # Surfaces - near black
+  surface: "#1a1a1a"
+  surface_highlight: "#2a2a2a"
+  elevated_surface: "#363636"
+
+  # Text - pure white
+  foreground: "#ffffff"
+  subtle_foreground: "#b0b0b0"
+  
+  # Borders - subtle grays
+  outline: "rgba(255, 255, 255, 0.15)"
+  outline_subtle: "rgba(255, 255, 255, 0.08)"
+
+  # Colors - light grays
+  primary: "#d0d0d0"
+  secondary: "#e8e8e8"
+  accent: "#f5f5f5"

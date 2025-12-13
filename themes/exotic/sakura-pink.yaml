@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Sakura Pink"
+description: "A delicate yet striking theme inspired by Japanese cherry blossoms with soft pinks and magenta accents."
+
+colors:
+  # Primary: Cherry Blossom
+  primary: "#ec4899"
+  primary_dark: "#db2777"
+
+  # Secondary: Pink
+  secondary: "#f472b6"
+  secondary_dark: "#ec4899"
+
+  # Accent: Rose
+  accent: "#f9a8d4"
+  accent_dark: "#f472b6"
+
+  # Backgrounds (Light) - soft pinks
+  background: "#fdf2f8"
+  background_subtle: "#fce7f3"
+  
+  # Surfaces
+  surface: "#fbcfe8"
+  surface_highlight: "#f9a8d4"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#831843"
+  subtle_foreground: "#9f1239"
+  outline: "#f9a8d4"
+  outline_subtle: "#fbcfe8"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#991b1b"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#ec4899"
+    foreground: "#ffffff"
+    border: "#db2777"
+    subtle_background: "rgba(236, 72, 153, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#f472b6"
+    foreground: "#ffffff"
+    border: "#ec4899"
+    subtle_background: "rgba(244, 114, 182, 0.1)"
+
+# Dark mode - deep rose
+dark:
+  # Backgrounds - deep rose-black
+  background: "#1f0514"
+  background_subtle: "#2e0a1f"
+  
+  # Surfaces - rose night
+  surface: "#4d1133"
+  surface_highlight: "#6b1848"
+  elevated_surface: "#8a205e"
+
+  # Text - bright pink
+  foreground: "#fdf2f8"
+  subtle_foreground: "#f9a8d4"
+  
+  # Borders - pink glow
+  outline: "rgba(249, 168, 212, 0.2)"
+  outline_subtle: "rgba(249, 168, 212, 0.1)"
+
+  # Colors - bright pinks
+  primary: "#f472b6"
+  secondary: "#f9a8d4"
+  accent: "#fbcfe8"

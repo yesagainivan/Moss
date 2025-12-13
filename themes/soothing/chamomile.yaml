@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Chamomile"
+description: "A gentle, soothing theme with warm chamomile yellows perfect for calm, meditative work."
+
+colors:
+  # Primary: Chamomile Yellow
+  primary: "#facc15"
+  primary_dark: "#eab308"
+
+  # Secondary: Golden Tea
+  secondary: "#fde047"
+  secondary_dark: "#facc15"
+
+  # Accent: Pale Chamomile
+  accent: "#fef08a"
+  accent_dark: "#fde047"
+
+  # Backgrounds (Light) - tea warmth
+  background: "#fefce8"
+  background_subtle: "#fef9c3"
+  
+  # Surfaces
+  surface: "#fef08a"
+  surface_highlight: "#fde047"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#713f12"
+  subtle_foreground: "#854d0e"
+  outline: "#fde047"
+  outline_subtle: "#fef08a"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#991b1b"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#facc15"
+    foreground: "#713f12"
+    border: "#eab308"
+    subtle_background: "rgba(250, 204, 21, 0.1)"
+  warning:
+    background: "#fde047"
+    foreground: "#713f12"
+    border: "#facc15"
+    subtle_background: "rgba(253, 224, 71, 0.1)"
+  info:
+    background: "#fef08a"
+    foreground: "#713f12"
+    border: "#fde047"
+    subtle_background: "rgba(254, 240, 138, 0.1)"
+
+# Dark mode - deep golden
+dark:
+  # Backgrounds - warm night
+  background: "#1a1405"
+  background_subtle: "#241c0a"
+  
+  # Surfaces - golden warmth
+  surface: "#332d0f"
+  surface_highlight: "#443e15"
+  elevated_surface: "#57501c"
+
+  # Text - warm glow
+  foreground: "#fefce8"
+  subtle_foreground: "#fef08a"
+  
+  # Borders - soothing glow
+  outline: "rgba(254, 240, 138, 0.15)"
+  outline_subtle: "rgba(254, 240, 138, 0.08)"
+
+  # Colors - warm yellows
+  primary: "#fde047"
+  secondary: "#fef08a"
+  accent: "#fef9c3"

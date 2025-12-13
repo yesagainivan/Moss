@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Mountain Mist"
+description: "A cool, contemplative theme inspired by misty mountain peaks with soft blue-grays and silver highlights."
+
+colors:
+  # Primary: Mountain Gray
+  primary: "#64748b"
+  primary_dark: "#475569"
+
+  # Secondary: Mist Gray
+  secondary: "#94a3b8"
+  secondary_dark: "#64748b"
+
+  # Accent: Silver Mist
+  accent: "#cbd5e1"
+  accent_dark: "#94a3b8"
+
+  # Backgrounds (Light) - light mist
+  background: "#f8fafc"
+  background_subtle: "#f1f5f9"
+  
+  # Surfaces
+  surface: "#e2e8f0"
+  surface_highlight: "#cbd5e1"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#0f172a"
+  subtle_foreground: "#334155"
+  outline: "#cbd5e1"
+  outline_subtle: "#e2e8f0"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#64748b"
+    foreground: "#ffffff"
+    border: "#475569"
+    subtle_background: "rgba(100, 116, 139, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#94a3b8"
+    foreground: "#ffffff"
+    border: "#64748b"
+    subtle_background: "rgba(148, 163, 184, 0.1)"
+
+# Dark mode - stormy mountain
+dark:
+  # Backgrounds - mountain night
+  background: "#0f1419"
+  background_subtle: "#151a21"
+  
+  # Surfaces - storm clouds
+  surface: "#1e2937"
+  surface_highlight: "#2d3e52"
+  elevated_surface: "#3c5168"
+
+  # Text - misty whites
+  foreground: "#f8fafc"
+  subtle_foreground: "#cbd5e1"
+  
+  # Borders - subtle mist
+  outline: "rgba(203, 213, 225, 0.12)"
+  outline_subtle: "rgba(203, 213, 225, 0.06)"
+
+  # Colors - silver grays
+  primary: "#94a3b8"
+  secondary: "#cbd5e1"
+  accent: "#e2e8f0"

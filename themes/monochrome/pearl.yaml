@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Pearl"
+description: "A luminous theme with pearl whites and subtle blue-gray tones for an elegant, refined workspace."
+
+colors:
+  # Primary: Pearl Gray
+  primary: "#cbd5e1"
+  primary_dark: "#94a3b8"
+
+  # Secondary: Light Pearl
+  secondary: "#e2e8f0"
+  secondary_dark: "#cbd5e1"
+
+  # Accent: Bright Pearl
+  accent: "#f1f5f9"
+  accent_dark: "#e2e8f0"
+
+  # Backgrounds (Light) - pearl white
+  background: "#ffffff"
+  background_subtle: "#f8fafc"
+  
+  # Surfaces
+  surface: "#f1f5f9"
+  surface_highlight: "#e2e8f0"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#0f172a"
+  subtle_foreground: "#475569"
+  outline: "#cbd5e1"
+  outline_subtle: "#e2e8f0"
+
+utility:
+  alert:
+    background: "#64748b"
+    foreground: "#ffffff"
+    border: "#475569"
+    subtle_background: "rgba(100, 116, 139, 0.1)"
+  success:
+    background: "#94a3b8"
+    foreground: "#0f172a"
+    border: "#64748b"
+    subtle_background: "rgba(148, 163, 184, 0.1)"
+  warning:
+    background: "#cbd5e1"
+    foreground: "#0f172a"
+    border: "#94a3b8"
+    subtle_background: "rgba(203, 213, 225, 0.1)"
+  info:
+    background: "#94a3b8"
+    foreground: "#0f172a"
+    border: "#64748b"
+    subtle_background: "rgba(148, 163, 184, 0.1)"
+
+# Dark mode - dark pearl
+dark:
+  # Backgrounds - deep pearl
+  background: "#0f172a"
+  background_subtle: "#1e293b"
+  
+  # Surfaces - pearl layers
+  surface: "#334155"
+  surface_highlight: "#475569"
+  elevated_surface: "#64748b"
+
+  # Text - opalescent white
+  foreground: "#f8fafc"
+  subtle_foreground: "#e2e8f0"
+  
+  # Borders - opalescent glow
+  outline: "rgba(226, 232, 240, 0.15)"
+  outline_subtle: "rgba(226, 232, 240, 0.08)"
+
+  # Colors - bright pearls
+  primary: "#cbd5e1"
+  secondary: "#e2e8f0"
+  accent: "#f1f5f9"

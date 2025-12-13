@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Cyber Neon"
+description: "A futuristic cyberpunk theme with electric cyans and purple accents on deep black backgrounds."
+
+colors:
+  # Primary: Neon Cyan
+  primary: "#06b6d4"
+  primary_dark: "#0891b2"
+
+  # Secondary: Electric Cyan
+  secondary: "#22d3ee"
+  secondary_dark: "#06b6d4"
+
+  # Accent: Bright Cyan
+  accent: "#67e8f9"
+  accent_dark: "#22d3ee"
+
+  # Backgrounds (Light) - cyber white
+  background: "#ecfeff"
+  background_subtle: "#cffafe"
+  
+  # Surfaces
+  surface: "#a5f3fc"
+  surface_highlight: "#67e8f9"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#083344"
+  subtle_foreground: "#155e75"
+  outline: "#67e8f9"
+  outline_subtle: "#a5f3fc"
+
+utility:
+  alert:
+    background: "#a855f7"
+    foreground: "#ffffff"
+    border: "#9333ea"
+    subtle_background: "rgba(168, 85, 247, 0.1)"
+  success:
+    background: "#06b6d4"
+    foreground: "#ffffff"
+    border: "#0891b2"
+    subtle_background: "rgba(6, 182, 212, 0.1)"
+  warning:
+    background: "#f472b6"
+    foreground: "#ffffff"
+    border: "#ec4899"
+    subtle_background: "rgba(244, 114, 182, 0.1)"
+  info:
+    background: "#22d3ee"
+    foreground: "#083344"
+    border: "#06b6d4"
+    subtle_background: "rgba(34, 211, 238, 0.1)"
+
+# Dark mode - cyberpunk black
+dark:
+  # Backgrounds - pure cyber black
+  background: "#000000"
+  background_subtle: "#0a0a14"
+  
+  # Surfaces - deep cyber
+  surface: "#0f0f1e"
+  surface_highlight: "#1a1a2e"
+  elevated_surface: "#242442"
+
+  # Text - neon white
+  foreground: "#ecfeff"
+  subtle_foreground: "#67e8f9"
+  
+  # Borders - neon glow
+  outline: "rgba(103, 232, 249, 0.25)"
+  outline_subtle: "rgba(103, 232, 249, 0.12)"
+
+  # Colors - neon cyans
+  primary: "#22d3ee"
+  secondary: "#67e8f9"
+  accent: "#a5f3fc"

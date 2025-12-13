@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Tropical Sunset"
+description: "A vibrant theme combining tropical coral pinks with turquoise accents for an exotic paradise feel."
+
+colors:
+  # Primary: Tropical Coral
+  primary: "#f43f5e"
+  primary_dark: "#e11d48"
+
+  # Secondary: Coral Pink
+  secondary: "#fb7185"
+  secondary_dark: "#f43f5e"
+
+  # Accent: Sunset Rose
+  accent: "#fda4af"
+  accent_dark: "#fb7185"
+
+  # Backgrounds (Light) - tropical warmth
+  background: "#fff1f2"
+  background_subtle: "#ffe4e6"
+  
+  # Surfaces
+  surface: "#fecdd3"
+  surface_highlight: "#fda4af"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#881337"
+  subtle_foreground: "#9f1239"
+  outline: "#fda4af"
+  outline_subtle: "#fecdd3"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#991b1b"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#14b8a6"
+    foreground: "#ffffff"
+    border: "#0d9488"
+    subtle_background: "rgba(20, 184, 166, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#f43f5e"
+    foreground: "#ffffff"
+    border: "#e11d48"
+    subtle_background: "rgba(244, 63, 94, 0.1)"
+
+# Dark mode - deep sunset
+dark:
+  # Backgrounds - sunset night
+  background: "#1a050a"
+  background_subtle: "#290a12"
+  
+  # Surfaces - deep coral
+  surface: "#52111c"
+  surface_highlight: "#7c1928"
+  elevated_surface: "#a72234"
+
+  # Text - tropical white
+  foreground: "#fff1f2"
+  subtle_foreground: "#fda4af"
+  
+  # Borders - coral glow
+  outline: "rgba(253, 164, 175, 0.2)"
+  outline_subtle: "rgba(253, 164, 175, 0.1)"
+
+  # Colors - vibrant coral
+  primary: "#fb7185"
+  secondary: "#fda4af"
+  accent: "#fecdd3"

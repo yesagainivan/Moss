@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Soft Gray"
+description: "A gentle, easy-on-the-eyes theme with soft grays and medium contrast for comfortable all-day use."
+
+colors:
+  # Primary: Medium Gray
+  primary: "#6b7280"
+  primary_dark: "#4b5563"
+
+  # Secondary: Cool Gray
+  secondary: "#9ca3af"
+  secondary_dark: "#6b7280"
+
+  # Accent: Silver Gray
+  accent: "#d1d5db"
+  accent_dark: "#9ca3af"
+
+  # Backgrounds (Light) - soft grays
+  background: "#fafafa"
+  background_subtle: "#f5f5f5"
+  
+  # Surfaces
+  surface: "#eeeeee"
+  surface_highlight: "#e5e5e5"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#1f2937"
+  subtle_foreground: "#6b7280"
+  outline: "#d1d5db"
+  outline_subtle: "#e5e7eb"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#6b7280"
+    foreground: "#ffffff"
+    border: "#4b5563"
+    subtle_background: "rgba(107, 114, 128, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#9ca3af"
+    foreground: "#ffffff"
+    border: "#6b7280"
+    subtle_background: "rgba(156, 163, 175, 0.1)"
+
+# Dark mode - warm dark grays
+dark:
+  # Backgrounds - warm black
+  background: "#151515"
+  background_subtle: "#1a1a1a"
+  
+  # Surfaces - warm grays
+  surface: "#242424"
+  surface_highlight: "#2e2e2e"
+  elevated_surface: "#383838"
+
+  # Text - warm white
+  foreground: "#fafafa"
+  subtle_foreground: "#d1d5db"
+  
+  # Borders - silver subtle
+  outline: "rgba(209, 213, 219, 0.12)"
+  outline_subtle: "rgba(209, 213, 219, 0.06)"
+
+  # Colors - silver grays
+  primary: "#9ca3af"
+  secondary: "#d1d5db"
+  accent: "#e5e7eb"

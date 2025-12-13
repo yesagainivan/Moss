@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Deep Blue Night"
+description: "A sophisticated dark theme with deep navy blues and electric highlights, perfect for late-night coding sessions."
+
+colors:
+  # Primary: Deep Blue
+  primary: "#2563eb"
+  primary_dark: "#1e40af"
+
+  # Secondary: Sky Blue
+  secondary: "#3b82f6"
+  secondary_dark: "#2563eb"
+
+  # Accent: Electric Blue
+  accent: "#60a5fa"
+  accent_dark: "#3b82f6"
+
+  # Backgrounds (Light) - soft blues
+  background: "#f8fafc"
+  background_subtle: "#f1f5f9"
+  
+  # Surfaces
+  surface: "#e0f2fe"
+  surface_highlight: "#bae6fd"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#0f172a"
+  subtle_foreground: "#475569"
+  outline: "#cbd5e1"
+  outline_subtle: "#e2e8f0"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#2563eb"
+    foreground: "#ffffff"
+    border: "#1e40af"
+    subtle_background: "rgba(37, 99, 235, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#3b82f6"
+    foreground: "#ffffff"
+    border: "#2563eb"
+    subtle_background: "rgba(59, 130, 246, 0.1)"
+
+# Dark mode - deep navy night
+dark:
+  # Backgrounds - deep navy
+  background: "#0c1526"
+  background_subtle: "#101b30"
+  
+  # Surfaces - navy grays
+  surface: "#1a2744"
+  surface_highlight: "#243554"
+  elevated_surface: "#2e4568"
+
+  # Text - bright whites
+  foreground: "#f1f5f9"
+  subtle_foreground: "#94a3b8"
+  
+  # Borders - subtle blues
+  outline: "rgba(96, 165, 250, 0.15)"
+  outline_subtle: "rgba(96, 165, 250, 0.08)"
+
+  # Colors - electric blues
+  primary: "#3b82f6"
+  secondary: "#60a5fa"
+  accent: "#93c5fd"

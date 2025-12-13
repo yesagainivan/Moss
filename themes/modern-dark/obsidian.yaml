@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Obsidian"
+description: "A dark slate theme with teal accents, inspired by the sleek surface of volcanic glass."
+
+colors:
+  # Primary: Deep Teal
+  primary: "#0d9488"
+  primary_dark: "#0f766e"
+
+  # Secondary: Teal
+  secondary: "#14b8a6"
+  secondary_dark: "#0d9488"
+
+  # Accent: Light Teal
+  accent: "#2dd4bf"
+  accent_dark: "#14b8a6"
+
+  # Backgrounds (Light) - soft teals
+  background: "#f0fdfa"
+  background_subtle: "#ccfbf1"
+  
+  # Surfaces
+  surface: "#99f6e4"
+  surface_highlight: "#5eead4"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#134e4a"
+  subtle_foreground: "#115e59"
+  outline: "#99f6e4"
+  outline_subtle: "#ccfbf1"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#0d9488"
+    foreground: "#ffffff"
+    border: "#0f766e"
+    subtle_background: "rgba(13, 148, 136, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#14b8a6"
+    foreground: "#ffffff"
+    border: "#0d9488"
+    subtle_background: "rgba(20, 184, 166, 0.1)"
+
+# Dark mode - obsidian slate
+dark:
+  # Backgrounds - deep slate
+  background: "#0f1419"
+  background_subtle: "#131920"
+  
+  # Surfaces - slate grays
+  surface: "#1c2631"
+  surface_highlight: "#253341"
+  elevated_surface: "#2e4052"
+
+  # Text - bright whites
+  foreground: "#f0fdfa"
+  subtle_foreground: "#99f6e4"
+  
+  # Borders - subtle teals
+  outline: "rgba(45, 212, 191, 0.15)"
+  outline_subtle: "rgba(45, 212, 191, 0.08)"
+
+  # Colors - bright teals
+  primary: "#14b8a6"
+  secondary: "#2dd4bf"
+  accent: "#5eead4"

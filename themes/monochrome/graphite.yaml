@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Graphite"
+description: "A sophisticated theme inspired by pencil graphite with rich charcoals and metallic sheen."
+
+colors:
+  # Primary: Graphite
+  primary: "#52525b"
+  primary_dark: "#3f3f46"
+
+  # Secondary: Dark Graphite
+  secondary: "#71717a"
+  secondary_dark: "#52525b"
+
+  # Accent: Light Graphite
+  accent: "#a1a1aa"
+  accent_dark: "#71717a"
+
+  # Backgrounds (Light) - pencil gray
+  background: "#fafafa"
+  background_subtle: "#f4f4f5"
+  
+  # Surfaces
+  surface: "#e4e4e7"
+  surface_highlight: "#d4d4d8"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#18181b"
+  subtle_foreground: "#3f3f46"
+  outline: "#d4d4d8"
+  outline_subtle: "#e4e4e7"
+
+utility:
+  alert:
+    background: "#3f3f46"
+    foreground: "#ffffff"
+    border: "#27272a"
+    subtle_background: "rgba(63, 63, 70, 0.1)"
+  success:
+    background: "#52525b"
+    foreground: "#ffffff"
+    border: "#3f3f46"
+    subtle_background: "rgba(82, 82, 91, 0.1)"
+  warning:
+    background: "#71717a"
+    foreground: "#ffffff"
+    border: "#52525b"
+    subtle_background: "rgba(113, 113, 122, 0.1)"
+  info:
+    background: "#52525b"
+    foreground: "#ffffff"
+    border: "#3f3f46"
+    subtle_background: "rgba(82, 82, 91, 0.1)"
+
+# Dark mode - deep graphite
+dark:
+  # Backgrounds - deep graphite
+  background: "#09090b"
+  background_subtle: "#18181b"
+  
+  # Surfaces - dark graphite
+  surface: "#27272a"
+  surface_highlight: "#3f3f46"
+  elevated_surface: "#52525b"
+
+  # Text - metallic white
+  foreground: "#fafafa"
+  subtle_foreground: "#d4d4d8"
+  
+  # Borders - metallic subtle
+  outline: "rgba(161, 161, 170, 0.15)"
+  outline_subtle: "rgba(161, 161, 170, 0.08)"
+
+  # Colors - light graphite
+  primary: "#a1a1aa"
+  secondary: "#d4d4d8"
+  accent: "#e4e4e7"

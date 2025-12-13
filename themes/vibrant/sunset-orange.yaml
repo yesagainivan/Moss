@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Sunset Orange"
+description: "A warm, energetic theme with vibrant sunset oranges and coral accents that inspire action."
+
+colors:
+  # Primary: Sunset Orange
+  primary: "#f97316"
+  primary_dark: "#ea580c"
+
+  # Secondary: Orange
+  secondary: "#fb923c"
+  secondary_dark: "#f97316"
+
+  # Accent: Coral
+  accent: "#fdba74"
+  accent_dark: "#fb923c"
+
+  # Backgrounds (Light) - warm oranges
+  background: "#fff7ed"
+  background_subtle: "#ffedd5"
+  
+  # Surfaces
+  surface: "#fed7aa"
+  surface_highlight: "#fdba74"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#7c2d12"
+  subtle_foreground: "#9a3412"
+  outline: "#fdba74"
+  outline_subtle: "#fed7aa"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#b91c1c"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#f97316"
+    foreground: "#ffffff"
+    border: "#ea580c"
+    subtle_background: "rgba(249, 115, 22, 0.1)"
+  warning:
+    background: "#fb923c"
+    foreground: "#ffffff"
+    border: "#f97316"
+    subtle_background: "rgba(251, 146, 60, 0.1)"
+  info:
+    background: "#fdba74"
+    foreground: "#7c2d12"
+    border: "#fb923c"
+    subtle_background: "rgba(253, 186, 116, 0.1)"
+
+# Dark mode - deep orange
+dark:
+  # Backgrounds - deep orange-black
+  background: "#1a0a05"
+  background_subtle: "#24100a"
+  
+  # Surfaces - sunset night
+  surface: "#3d1f0f"
+  surface_highlight: "#572d15"
+  elevated_surface: "#723c1c"
+
+  # Text - bright white
+  foreground: "#fff7ed"
+  subtle_foreground: "#fdba74"
+  
+  # Borders - amber glow
+  outline: "rgba(253, 186, 116, 0.2)"
+  outline_subtle: "rgba(253, 186, 116, 0.1)"
+
+  # Colors - vibrant oranges
+  primary: "#fb923c"
+  secondary: "#fdba74"
+  accent: "#fed7aa"

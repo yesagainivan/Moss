@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Paper White"
+description: "A clean, minimalist theme with pure white backgrounds and crisp black text for distraction-free writing."
+
+colors:
+  # Primary: Ink Black
+  primary: "#0f172a"
+  primary_dark: "#020617"
+
+  # Secondary: Charcoal
+  secondary: "#1e293b"
+  secondary_dark: "#0f172a"
+
+  # Accent: Slate
+  accent: "#334155"
+  accent_dark: "#1e293b"
+
+  # Backgrounds (Light) - pure white
+  background: "#ffffff"
+  background_subtle: "#fafafa"
+  
+  # Surfaces
+  surface: "#f5f5f5"
+  surface_highlight: "#eeeeee"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#0f172a"
+  subtle_foreground: "#475569"
+  outline: "#e2e8f0"
+  outline_subtle: "#f1f5f9"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#0f172a"
+    foreground: "#ffffff"
+    border: "#020617"
+    subtle_background: "rgba(15, 23, 42, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#1e293b"
+    foreground: "#ffffff"
+    border: "#0f172a"
+    subtle_background: "rgba(30, 41, 59, 0.1)"
+
+# Dark mode - off-black
+dark:
+  # Backgrounds - off-black
+  background: "#0f0f0f"
+  background_subtle: "#121212"
+  
+  # Surfaces - dark grays
+  surface: "#1a1a1a"
+  surface_highlight: "#242424"
+  elevated_surface: "#2e2e2e"
+
+  # Text - pure white
+  foreground: "#ffffff"
+  subtle_foreground: "#cbd5e1"
+  
+  # Borders - subtle grays
+  outline: "rgba(255, 255, 255, 0.12)"
+  outline_subtle: "rgba(255, 255, 255, 0.06)"
+
+  # Colors - light grays
+  primary: "#cbd5e1"
+  secondary: "#e2e8f0"
+  accent: "#f1f5f9"

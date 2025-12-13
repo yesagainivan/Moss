@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Nordic Light"
+description: "A bright Scandinavian-inspired theme with crisp whites and cool blue accents for maximum clarity."
+
+colors:
+  # Primary: Nordic Blue
+  primary: "#3b82f6"
+  primary_dark: "#2563eb"
+
+  # Secondary: Ocean Blue
+  secondary: "#60a5fa"
+  secondary_dark: "#3b82f6"
+
+  # Accent: Ice Blue
+  accent: "#93c5fd"
+  accent_dark: "#60a5fa"
+
+  # Backgrounds (Light) - pure nordic white
+  background: "#ffffff"
+  background_subtle: "#f9fafb"
+  
+  # Surfaces
+  surface: "#f3f4f6"
+  surface_highlight: "#e5e7eb"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#111827"
+  subtle_foreground: "#4b5563"
+  outline: "#d1d5db"
+  outline_subtle: "#e5e7eb"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#3b82f6"
+    foreground: "#ffffff"
+    border: "#2563eb"
+    subtle_background: "rgba(59, 130, 246, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#60a5fa"
+    foreground: "#ffffff"
+    border: "#3b82f6"
+    subtle_background: "rgba(96, 165, 250, 0.1)"
+
+# Dark mode - nordic night
+dark:
+  # Backgrounds - deep nordic
+  background: "#0f1419"
+  background_subtle: "#151b24"
+  
+  # Surfaces - cool grays
+  surface: "#1e2937"
+  surface_highlight: "#2d3e52"
+  elevated_surface: "#3c5268"
+
+  # Text - nordic white
+  foreground: "#f9fafb"
+  subtle_foreground: "#93c5fd"
+  
+  # Borders - aurora hints
+  outline: "rgba(147, 197, 253, 0.15)"
+  outline_subtle: "rgba(147, 197, 253, 0.08)"
+
+  # Colors - bright blues
+  primary: "#60a5fa"
+  secondary: "#93c5fd"
+  accent: "#bfdbfe"

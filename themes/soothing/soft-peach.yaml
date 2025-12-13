@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Soft Peach"
+description: "A warm, gentle theme with soft peach tones that create a cozy, comfortable workspace."
+
+colors:
+  # Primary: Soft Peach
+  primary: "#fb923c"
+  primary_dark: "#f97316"
+
+  # Secondary: Light Peach
+  secondary: "#fdba74"
+  secondary_dark: "#fb923c"
+
+  # Accent: Pale Peach
+  accent: "#fed7aa"
+  accent_dark: "#fdba74"
+
+  # Backgrounds (Light) - peachy cream
+  background: "#fffbeb"
+  background_subtle: "#fef3c7"
+  
+  # Surfaces
+  surface: "#fde68a"
+  surface_highlight: "#fed7aa"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#78350f"
+  subtle_foreground: "#92400e"
+  outline: "#fed7aa"
+  outline_subtle: "#fde68a"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#991b1b"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#fb923c"
+    foreground: "#ffffff"
+    border: "#f97316"
+    subtle_background: "rgba(251, 146, 60, 0.1)"
+  warning:
+    background: "#fdba74"
+    foreground: "#78350f"
+    border: "#fb923c"
+    subtle_background: "rgba(253, 186, 116, 0.1)"
+  info:
+    background: "#fed7aa"
+    foreground: "#78350f"
+    border: "#fdba74"
+    subtle_background: "rgba(254, 215, 170, 0.1)"
+
+# Dark mode - deep peach
+dark:
+  # Backgrounds - warm night
+  background: "#1a0f05"
+  background_subtle: "#24140a"
+  
+  # Surfaces - soft warmth
+  surface: "#331d0f"
+  surface_highlight: "#442716"
+  elevated_surface: "#57311d"
+
+  # Text - warm glow
+  foreground: "#fffbeb"
+  subtle_foreground: "#fed7aa"
+  
+  # Borders - gentle warmth
+  outline: "rgba(254, 215, 170, 0.15)"
+  outline_subtle: "rgba(254, 215, 170, 0.08)"
+
+  # Colors - warm peaches
+  primary: "#fdba74"
+  secondary: "#fed7aa"
+  accent: "#fde68a"

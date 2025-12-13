@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Lavender Dreams"
+description: "A calm, dreamy theme with soft lavender tones perfect for peaceful, focused writing sessions."
+
+colors:
+  # Primary: Soft Lavender
+  primary: "#a78bfa"
+  primary_dark: "#8b5cf6"
+
+  # Secondary: Light Lavender
+  secondary: "#c4b5fd"
+  secondary_dark: "#a78bfa"
+
+  # Accent: Pale Lavender
+  accent: "#ddd6fe"
+  accent_dark: "#c4b5fd"
+
+  # Backgrounds (Light) - pale lavender
+  background: "#faf5ff"
+  background_subtle: "#f5f3ff"
+  
+  # Surfaces
+  surface: "#ede9fe"
+  surface_highlight: "#ddd6fe"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#4c1d95"
+  subtle_foreground: "#5b21b6"
+  outline: "#ddd6fe"
+  outline_subtle: "#ede9fe"
+
+utility:
+  alert:
+    background: "#a855f7"
+    foreground: "#ffffff"
+    border: "#9333ea"
+    subtle_background: "rgba(168, 85, 247, 0.1)"
+  success:
+    background: "#a78bfa"
+    foreground: "#ffffff"
+    border: "#8b5cf6"
+    subtle_background: "rgba(167, 139, 250, 0.1)"
+  warning:
+    background: "#fbbf24"
+    foreground: "#78350f"
+    border: "#f59e0b"
+    subtle_background: "rgba(251, 191, 36, 0.1)"
+  info:
+    background: "#c4b5fd"
+    foreground: "#4c1d95"
+    border: "#a78bfa"
+    subtle_background: "rgba(196, 181, 253, 0.1)"
+
+# Dark mode - deep lavender
+dark:
+  # Backgrounds - dreamy night
+  background: "#1a0f2e"
+  background_subtle: "#241638"
+  
+  # Surfaces - lavender mist
+  surface: "#33204d"
+  surface_highlight: "#422b63"
+  elevated_surface: "#52367a"
+
+  # Text - dreamy white
+  foreground: "#faf5ff"
+  subtle_foreground: "#ddd6fe"
+  
+  # Borders - soft glow
+  outline: "rgba(221, 214, 254, 0.15)"
+  outline_subtle: "rgba(221, 214, 254, 0.08)"
+
+  # Colors - gentle lavenders
+  primary: "#c4b5fd"
+  secondary: "#ddd6fe"
+  accent: "#ede9fe"

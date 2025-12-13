@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Ivory"
+description: "A soft, warm minimalist theme with cream and ivory tones accented with brown for comfortable reading."
+
+colors:
+  # Primary: Warm Brown
+  primary: "#78350f"
+  primary_dark: "#451a03"
+
+  # Secondary: Coffee Brown
+  secondary: "#92400e"
+  secondary_dark: "#78350f"
+
+  # Accent: Caramel
+  accent: "#a16207"
+  accent_dark: "#92400e"
+
+  # Backgrounds (Light) - cream/ivory
+  background: "#fffef5"
+  background_subtle: "#fffbeb"
+  
+  # Surfaces
+  surface: "#fef3c7"
+  surface_highlight: "#fde68a"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#451a03"
+  subtle_foreground: "#78350f"
+  outline: "#fde68a"
+  outline_subtle: "#fef3c7"
+
+utility:
+  alert:
+    background: "#dc2626"
+    foreground: "#ffffff"
+    border: "#991b1b"
+    subtle_background: "rgba(220, 38, 38, 0.1)"
+  success:
+    background: "#78350f"
+    foreground: "#ffffff"
+    border: "#451a03"
+    subtle_background: "rgba(120, 53, 15, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#92400e"
+    foreground: "#ffffff"
+    border: "#78350f"
+    subtle_background: "rgba(146, 64, 14, 0.1)"
+
+# Dark mode - deep brown
+dark:
+  # Backgrounds - dark brown
+  background: "#1a0f05"
+  background_subtle: "#24150a"
+  
+  # Surfaces - warm earth
+  surface: "#331f10"
+  surface_highlight: "#442a16"
+  elevated_surface: "#57361d"
+
+  # Text - cream white
+  foreground: "#fffef5"
+  subtle_foreground: "#fde68a"
+  
+  # Borders - warm subtle
+  outline: "rgba(253, 230, 138, 0.12)"
+  outline_subtle: "rgba(253, 230, 138, 0.06)"
+
+  # Colors - warm browns
+  primary: "#92400e"
+  secondary: "#a16207"
+  accent: "#fbbf24"

@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Cloud"
+description: "A light, airy theme with soft white clouds and refreshing sky blue accents for a calm workspace."
+
+colors:
+  # Primary: Sky Blue
+  primary: "#0284c7"
+  primary_dark: "#0369a1"
+
+  # Secondary: Bright Sky
+  secondary: "#0ea5e9"
+  secondary_dark: "#0284c7"
+
+  # Accent: Light Sky
+  accent: "#38bdf8"
+  accent_dark: "#0ea5e9"
+
+  # Backgrounds (Light) - soft clouds
+  background: "#ffffff"
+  background_subtle: "#f8fafc"
+  
+  # Surfaces
+  surface: "#f0f9ff"
+  surface_highlight: "#e0f2fe"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#0c4a6e"
+  subtle_foreground: "#0369a1"
+  outline: "#bae6fd"
+  outline_subtle: "#e0f2fe"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#0284c7"
+    foreground: "#ffffff"
+    border: "#0369a1"
+    subtle_background: "rgba(2, 132, 199, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#0ea5e9"
+    foreground: "#ffffff"
+    border: "#0284c7"
+    subtle_background: "rgba(14, 165, 233, 0.1)"
+
+# Dark mode - storm clouds
+dark:
+  # Backgrounds - storm night
+  background: "#0a1520"
+  background_subtle: "#0f1d2b"
+  
+  # Surfaces - dark clouds
+  surface: "#1a2937"
+  surface_highlight: "#253748"
+  elevated_surface: "#31455a"
+
+  # Text - bright white
+  foreground: "#f8fafc"
+  subtle_foreground: "#7dd3fc"
+  
+  # Borders - electric subtle
+  outline: "rgba(56, 189, 248, 0.15)"
+  outline_subtle: "rgba(56, 189, 248, 0.08)"
+
+  # Colors - electric blues
+  primary: "#0ea5e9"
+  secondary: "#38bdf8"
+  accent: "#7dd3fc"

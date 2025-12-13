@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Forest Canopy"
+description: "A refreshing theme inspired by lush forest greens with earthy undertones and vibrant moss accents."
+
+colors:
+  # Primary: Forest Green
+  primary: "#16a34a"
+  primary_dark: "#15803d"
+
+  # Secondary: Leaf Green
+  secondary: "#22c55e"
+  secondary_dark: "#16a34a"
+
+  # Accent: Moss Green
+  accent: "#4ade80"
+  accent_dark: "#22c55e"
+
+  # Backgrounds (Light) - fresh greens
+  background: "#f0fdf4"
+  background_subtle: "#dcfce7"
+  
+  # Surfaces
+  surface: "#bbf7d0"
+  surface_highlight: "#86efac"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#14532d"
+  subtle_foreground: "#166534"
+  outline: "#bbf7d0"
+  outline_subtle: "#dcfce7"
+
+utility:
+  alert:
+    background: "#ef4444"
+    foreground: "#ffffff"
+    border: "#dc2626"
+    subtle_background: "rgba(239, 68, 68, 0.1)"
+  success:
+    background: "#16a34a"
+    foreground: "#ffffff"
+    border: "#15803d"
+    subtle_background: "rgba(22, 163, 74, 0.1)"
+  warning:
+    background: "#f59e0b"
+    foreground: "#ffffff"
+    border: "#d97706"
+    subtle_background: "rgba(245, 158, 11, 0.1)"
+  info:
+    background: "#22c55e"
+    foreground: "#ffffff"
+    border: "#16a34a"
+    subtle_background: "rgba(34, 197, 94, 0.1)"
+
+# Dark mode - deep forest
+dark:
+  # Backgrounds - forest night
+  background: "#0a1f0f"
+  background_subtle: "#0f2814"
+  
+  # Surfaces - deep forest
+  surface: "#163320"
+  surface_highlight: "#1e4229"
+  elevated_surface: "#275233"
+
+  # Text - bright greens
+  foreground: "#f0fdf4"
+  subtle_foreground: "#86efac"
+  
+  # Borders - subtle greens
+  outline: "rgba(74, 222, 128, 0.15)"
+  outline_subtle: "rgba(74, 222, 128, 0.08)"
+
+  # Colors - vibrant greens
+  primary: "#22c55e"
+  secondary: "#4ade80"
+  accent: "#86efac"
