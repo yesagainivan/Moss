@@ -262,7 +262,7 @@ const FileTreeRow = ({
                                 if (e.key === 'Escape') onStopEditing?.();
                             }}
                             onBlur={saveName}
-                            className="flex-1 bg-background border border-input rounded px-1 py-0.5 text-xs outline-none"
+                            className="flex-1 bg-background border border-input rounded px-1 py-0.5 text-xs outline-none placeholder:text-muted-foreground"
                             placeholder="File name"
                         />
                     </div>

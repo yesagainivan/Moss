@@ -116,14 +116,13 @@
 
 .tagCount {
     font-size: 11px;
-    /* color: var(--border); */
     color: var(--muted-foreground);
-    background: color-mix(in srgb, var(--primary), transparent 80%);
+    background: var(--background);
     padding: 2px 6px;
-    /* padding: 2px 6px; */
-    /* border-radius: 10px; */
-    border-radius: 4px;
     flex-shrink: 0;
+
+    border: 1px solid var(--border);
+    border-radius: 4px;
 }
 
 .emptyState {
