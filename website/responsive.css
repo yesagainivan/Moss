@@ -130,6 +130,28 @@
         height: 300px;
     }
 
+    .hero-screenshot {
+        max-width: 100%;
+    }
+
+    .hero-cta {
+        width: 100%;
+    }
+
+    .hero-cta .btn {
+        max-width: 100%;
+    }
+
+    /* CTA Section */
+    .cta-buttons {
+        width: 100%;
+    }
+
+    .cta-buttons .btn {
+        width: 100%;
+        max-width: 400px;
+    }
+
     /* Features */
     .features-grid {
         grid-template-columns: 1fr;
@@ -166,5 +188,32 @@
     .footer-links {
         flex-direction: column;
         gap: var(--space-4);
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    .gradient-orb {
+        width: 200px;
+        height: 200px;
+    }
+
+    .gradient-orb-1 {
+        top: -100px;
+        right: -50px;
+    }
+
+    .gradient-orb-2 {
+        bottom: -100px;
+        left: -50px;
+    }
+
+    .hero-cta .btn {
+        font-size: var(--font-size-sm);
+        padding: var(--space-3) var(--space-6);
+    }
+
+    .cta-buttons .btn {
+        max-width: 100%;
     }
 }
