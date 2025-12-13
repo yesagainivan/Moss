@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { invoke } from '@tauri-apps/api/core';
 import { useAppStore } from './useStore';
 import { usePaneStore } from './usePaneStore';
+import matter from 'gray-matter';
 
 export interface GitHubUser {
     login: string;
@@ -165,11 +166,14 @@ export const useGitHubStore = create<GitHubState>((set, get) => ({
                 const noteId = tab.noteId;
                 if (noteId.includes('/') && notes[noteId]) {
                     try {
-                        const content = await loadNoteContent(noteId);
+                        const rawContent = await loadNoteContent(noteId);
+                        // Parse frontmatter to separate properties from body
+                        const { content: body, data: properties } = matter(rawContent);
                         // Update note content in store
                         store.notes[noteId] = {
                             ...notes[noteId],
-                            content,
+                            content: body,
+                            properties: properties,
                             updatedAt: Date.now()
                         };
                     } catch (err) {
@@ -234,10 +238,13 @@ export const useGitHubStore = create<GitHubState>((set, get) => ({
                 const noteId = tab.noteId;
                 if (noteId.includes('/') && notes[noteId]) {
                     try {
-                        const content = await loadNoteContent(noteId);
+                        const rawContent = await loadNoteContent(noteId);
+                        // Parse frontmatter to separate properties from body
+                        const { content: body, data: properties } = matter(rawContent);
                         store.notes[noteId] = {
                             ...notes[noteId],
-                            content,
+                            content: body,
+                            properties: properties,
                             updatedAt: Date.now()
                         };
                     } catch (err) {

@@ -1,0 +1,185 @@
+/* Collapsed Add Properties Button */
+.addPropertiesContainer {
+    padding: 1rem 1rem;
+    /* padding: 1rem; */
+}
+
+.addPropertiesButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* margin-bottom: 1rem; */
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-muted-foreground);
+    transition: color 0.2s;
+}
+
+.addPropertiesButton:hover {
+    color: var(--color-accent);
+}
+
+.addPropertiesButton svg {
+    transition: color 0.2s;
+}
+
+.addPropertiesButton:hover svg {
+    color: var(--color-primary);
+}
+
+/* Expanded Properties Editor */
+.propertiesContainer {
+    padding: 1rem 2rem 0.5rem;
+    border-bottom: 1px solid hsl(var(--border) / 0.5);
+    margin-bottom: 1rem;
+    background-color: hsl(var(--secondary) / 0.05);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.headerTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: var(--color-muted-foreground);
+}
+
+.toggleButton {
+    color: var(--color-muted-foreground);
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.toggleButton:hover {
+    color: var(--color-accent);
+    background-color: var(--color-hover);
+}
+
+.propertiesList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Property Row */
+.propertyRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.propertyKey {
+    width: 33.333333%;
+    background-color: transparent;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-secondary);
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    outline: none;
+}
+
+.propertyKey:focus {
+    border-color: var(--color-primary);
+}
+
+.propertyValueContainer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.propertyValue {
+    flex: 1;
+    background-color: transparent;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-accent);
+    border: 1px solid var(--color-border);
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    outline: none;
+}
+
+.propertyValue:focus {
+    border-color: var(--color-primary);
+}
+
+.propertyValue::placeholder {
+    color: var(--color-muted-foreground);
+}
+
+.deleteButton {
+    opacity: 0;
+    color: rgb(248 113 113);
+    padding: 0.25rem;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.propertyRow:hover .deleteButton {
+    opacity: 1;
+}
+
+.deleteButton:hover {
+    color: rgb(239 68 68);
+}
+
+/* Add New Property Form */
+.addPropertyForm {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid hsl(var(--border) / 0.3);
+    margin-top: 0.5rem;
+}
+
+.newPropertyInput {
+    width: 33.333333%;
+    background-color: transparent;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: hsl(var(--secondary) / 0.7);
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    outline: none;
+}
+
+.newPropertyInput:focus {
+    border-color: var(--color-primary);
+}
+
+.newPropertyInput::placeholder {
+    color: var(--color-muted-foreground);
+}
+
+.addButton {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--color-primary);
+    padding: 0 0.5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+}
+
+.addButton:hover:not(:disabled) {
+    color: var(--color-primary-hover);
+}
+
+.addButton:disabled {
+    opacity: 0.5;
+}

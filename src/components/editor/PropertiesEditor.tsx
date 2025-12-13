@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, X, List, Trash2 } from 'lucide-react';
 import { useAppStore } from '../../store/useStore';
-
+import styles from './PropertiesEditor.module.css';
 
 interface PropertiesEditorProps {
     noteId: string;
@@ -41,14 +41,14 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
     if (!isExpanded && !hasProperties) {
         return (
             <div
-                className="px-8 pt-4 pb-0"
+                className={styles.addPropertiesContainer}
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
                     onClick={() => setIsExpanded(true)}
-                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors group"
+                    className={styles.addPropertiesButton}
                 >
-                    <List size={14} className="group-hover:text-primary" />
+                    <List size={14} />
                     <span>Add properties</span>
                 </button>
             </div>
@@ -57,44 +57,44 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
 
     return (
         <div
-            className="px-8 pt-4 pb-2 border-b border-border/50 mb-4 bg-secondary/5"
+            className={styles.propertiesContainer}
             onClick={(e) => e.stopPropagation()}
         >
-            <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+            <div className={styles.header}>
+                <div className={styles.headerTitle}>
                     <List size={14} />
                     <span>Properties</span>
                 </div>
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="text-muted-foreground hover:text-accent p-1 rounded hover:bg-hover"
+                    className={styles.toggleButton}
                 >
                     {isExpanded ? <X size={14} /> : <Plus size={14} />}
                 </button>
             </div>
 
             {isExpanded && (
-                <div className="space-y-2">
+                <div className={styles.propertiesList}>
                     {/* Existing Properties */}
                     {Object.entries(properties).map(([key, value]) => (
-                        <div key={key} className="flex items-center gap-2 group">
+                        <div key={key} className={styles.propertyRow}>
                             <input
                                 type="text"
                                 value={key}
                                 readOnly
-                                className="w-1/3 bg-transparent text-xs text-secondary border border-transparent focus:border-primary rounded px-2 py-1 outline-none"
+                                className={styles.propertyKey}
                             />
-                            <div className="flex-1 flex items-center gap-2">
+                            <div className={styles.propertyValueContainer}>
                                 <input
                                     type="text"
                                     value={value as string}
                                     onChange={(e) => handleUpdateProperty(key, e.target.value)}
                                     placeholder="Value"
-                                    className="flex-1 bg-transparent text-xs text-accent border border-border focus:border-primary rounded px-2 py-1 outline-none placeholder:text-muted-foreground"
+                                    className={styles.propertyValue}
                                 />
                                 <button
                                     onClick={() => handleDeleteProperty(key)}
-                                    className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-500 p-1 transition-opacity"
+                                    className={styles.deleteButton}
                                 >
                                     <Trash2 size={12} />
                                 </button>
@@ -103,7 +103,7 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
                     ))}
 
                     {/* Add New Property */}
-                    <div className="flex items-center gap-2 pt-2 border-t border-border/30 mt-2">
+                    <div className={styles.addPropertyForm}>
                         <input
                             type="text"
                             value={newPropKey}
@@ -112,12 +112,12 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
                                 if (e.key === 'Enter') handleAddProperty();
                             }}
                             placeholder="New property name"
-                            className="bg-transparent text-xs text-secondary/70 border border-transparent focus:border-primary rounded px-2 py-1 outline-none w-1/3 placeholder:text-muted-foreground"
+                            className={styles.newPropertyInput}
                         />
                         <button
                             onClick={handleAddProperty}
                             disabled={!newPropKey.trim()}
-                            className="text-xs text-primary hover:text-primary-hover disabled:opacity-50 px-2 uppercase font-bold tracking-wider"
+                            className={styles.addButton}
                         >
                             Add
                         </button>

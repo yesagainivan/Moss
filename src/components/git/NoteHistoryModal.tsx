@@ -4,6 +4,7 @@ import { useAppStore } from '../../store/useStore';
 import { useGitStore } from '../../store/useGitStore';
 import { CommitInfo } from '../../types';
 import * as Diff from 'diff';
+import matter from 'gray-matter';
 import styles from './NoteHistoryModal.module.css';
 
 interface NoteHistoryModalProps {
@@ -128,17 +129,25 @@ export const NoteHistoryModal = ({ isOpen, onClose, notePath }: NoteHistoryModal
 
         if (confirmed) {
             try {
-                // Trigger editor refresh if note is currently open
-                // CRITICAL: Dispatch this BEFORE updating store/saving to ensure
-                // the Editor component cancels its pending debounced save.
+                // Parse the restored content to separate frontmatter and body
+                // This is CRITICAL because Git stores the full file (frontmatter + body)
+                // but our store expects them separated
+                const { content: bodyOnly, data: properties } = matter(commitContent);
+
+                // Update note with body only
+                const { setNoteProperties } = useAppStore.getState();
+                updateNote(notePath, bodyOnly);
+
+                // Update properties separately if any exist
+                if (Object.keys(properties).length > 0) {
+                    setNoteProperties(notePath, properties);
+                }
+
+                // Trigger editor refresh AFTER updating store
                 window.dispatchEvent(new CustomEvent('note-updated-externally', {
-                    detail: { noteId: notePath, content: commitContent }
+                    detail: { noteId: notePath, content: bodyOnly }
                 }));
 
-                // Use the full notePath directly - it's already the absolute path
-                // CRITICAL: Update store state first to cancel any pending debounced saves
-                // This prevents a race condition where a pending save overwrites the restore
-                updateNote(notePath, commitContent);
                 await forceSaveNote(notePath);
 
                 handleClose();

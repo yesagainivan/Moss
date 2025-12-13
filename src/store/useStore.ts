@@ -189,12 +189,19 @@ export const useAppStore = create<AppState>((set, get) => ({
 
                 for (const tab of allTabs) {
                     try {
-                        const content = await loadNoteContent(tab.noteId);
+                        const rawContent = await loadNoteContent(tab.noteId);
                         const name = tab.noteId.split('/').pop() || 'Untitled';
+
+                        // CRITICAL: Parse frontmatter to separate properties from body
+                        // This matches the behavior in openNote() to ensure consistency
+                        // between fresh opens and tab restoration
+                        const { content: body, data: properties } = matter(rawContent);
+
                         restoredNotes[tab.noteId] = {
                             id: tab.noteId,
                             title: name,
-                            content,
+                            content: body,          // Body only, frontmatter stripped
+                            properties: properties, // Parsed frontmatter
                             createdAt: Date.now(),
                             updatedAt: Date.now(),
                         };
@@ -965,13 +972,17 @@ export const useAppStore = create<AppState>((set, get) => ({
                 // Prepare content with frontmatter
                 const note = get().notes[noteId];
                 const properties = note?.properties || {};
-                // If we have properties, use gray-matter to stringify.
-                // Note: content passed to saveNote is usually just the body.
-                // But we must be careful not to double-stringify if content already has frontmatter.
-                // However, Editor passes body content.
+
+                // CRITICAL: Always strip any existing frontmatter from rawContent first
+                // This prevents duplication when content comes from Git restore or other sources
+                // that might include frontmatter. gray-matter.parse safely handles content
+                // with or without frontmatter.
+                const { content: bodyOnly } = matter(rawContent);
+
+                // Now stringify with properties, knowing we're working with clean body content
                 const fileContentToSave = Object.keys(properties).length > 0
-                    ? matter.stringify(rawContent, properties)
-                    : rawContent;
+                    ? matter.stringify(bodyOnly, properties)
+                    : bodyOnly;
 
                 for (let attempt = 0; attempt < maxRetries; attempt++) {
                     try {
