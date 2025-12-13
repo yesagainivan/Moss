@@ -182,6 +182,17 @@ export const useGlobalShortcuts = () => {
                 e.preventDefault();
                 window.dispatchEvent(new CustomEvent('open-shortcuts-modal'));
             }
+
+            // Cmd+G (Graph View)
+            if ((e.metaKey || e.ctrlKey) && e.code === 'KeyG') {
+                e.preventDefault();
+                const state = useAppStore.getState();
+                if (state.currentView === 'graph') {
+                    state.setCurrentView('editor');
+                } else {
+                    state.setCurrentView('graph');
+                }
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);

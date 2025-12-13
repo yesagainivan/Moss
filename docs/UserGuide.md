@@ -55,10 +55,10 @@ Moss has a built-in AI to help you think and write.
 ## 🔗 Graph View
 
 Visualize your knowledge garden.
-- Click the **Graph Icon** in the sidebar (or press `Cmd+G`).
+- Press `Cmd+G` to open the graph view.
 - **Nodes** are notes. **Lines** are links.
 - Larger nodes have more connections.
-- Hover over a node to highlight its connections.
+- Click on a node to open that note.
 
 ## ⌨️ Keyboard Shortcuts
 
