@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useAppStore } from '../../store/useStore';
 import { usePaneStore } from '../../store/usePaneStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { EditorLoader } from '../editor/EditorLoader';
 import { RightPanel } from './RightPanel';
 import { ResizableSplit } from './ResizableSplit';
@@ -48,6 +49,8 @@ export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
     const isOutlinePanelOpen = useAppStore(state => state.isOutlinePanelOpen);
     const setOutlinePanelOpen = useAppStore(state => state.setOutlinePanelOpen);
 
+    const settings = useSettingsStore(state => state.settings);
+
     return (
         <div
             className="flex-1 flex flex-row h-full overflow-hidden relative"
@@ -59,7 +62,7 @@ export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
             )}
 
             <ResizableSplit
-                side="right"
+                side={settings.sidebarPosition === 'left' ? 'left' : 'right'}
                 initialSize={280}
                 minSize={200}
                 maxSize={600}

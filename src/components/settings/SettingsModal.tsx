@@ -320,6 +320,33 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                     </div>
                                                 </div>
 
+                                                {/* Sidebar Position */}
+                                                <div>
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Sidebar Position (Outline/Backlinks)
+                                                    </label>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        <button
+                                                            onClick={() => updateSettings({ sidebarPosition: 'left' })}
+                                                            className={`px-3 py-2 text-sm font-medium rounded-md border transition-all ${settings.sidebarPosition === 'left'
+                                                                ? 'bg-primary text-background border-primary'
+                                                                : 'bg-background text-foreground border-input hover:bg-secondary/50'
+                                                                }`}
+                                                        >
+                                                            Left
+                                                        </button>
+                                                        <button
+                                                            onClick={() => updateSettings({ sidebarPosition: 'right' })}
+                                                            className={`px-3 py-2 text-sm font-medium rounded-md border transition-all ${settings.sidebarPosition === 'right' || !settings.sidebarPosition // partial backward compatibility
+                                                                ? 'bg-primary text-background border-primary'
+                                                                : 'bg-background text-foreground border-input hover:bg-secondary/50'
+                                                                }`}
+                                                        >
+                                                            Right
+                                                        </button>
+                                                    </div>
+                                                </div>
+
                                                 {/* Graph Particles */}
                                                 <div className="flex items-center justify-between">
                                                     <div>

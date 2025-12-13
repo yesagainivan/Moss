@@ -9,6 +9,7 @@ export interface EditorSettings {
     showDiffPanel: boolean;  // Show diff panel for AI changes (false = stream directly)
     theme: 'light' | 'dark' | 'system';
     graphPosition: 'center' | 'sidebar';
+    sidebarPosition: 'left' | 'right'; // Position of outline/backlinks panel
     graphShowParticles: boolean;
     graphShowLabels: boolean;
     enableMaxWidth: boolean; // Limit editor width for readability
@@ -52,6 +53,7 @@ const DEFAULT_SETTINGS: EditorSettings = {
     showDiffPanel: true,
     theme: 'system',
     graphPosition: 'center',
+    sidebarPosition: 'right',
     graphShowParticles: true,
     graphShowLabels: true,
     enableMaxWidth: true,
