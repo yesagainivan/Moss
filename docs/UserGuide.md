@@ -73,13 +73,16 @@ Visualize your knowledge garden.
 | **AI Rewrite** | `Cmd+K` |
 | **Open Graph** | `Cmd+G` |
 | **Toggle Right Panel** | `Cmd+Opt+B` |
+| **Snapshot Vault** | `Cmd+Alt+S` |
 
 ## 🛠️ Advanced: Git Sync
 
 Moss creates a Git repository in your vault automatically.
-- Every time you save (`Cmd+S`), Moss can commit your changes.
+- Changes made by AI operations and templates are auto-committed.
+- You can manually save snapshots with `Cmd+Alt+S`.
 - You can view the history of any note with `Cmd+H`.
 - To sync with GitHub:
     1. Create an empty repo on GitHub.
     2. Go to Settings -> Sync.
-    3. Enter your Repo URL.
+    3. Enter your Repo URL and push your changes.
+
