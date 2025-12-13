@@ -121,7 +121,6 @@ const GraphView: React.FC = () => {
         }
 
         ctx.font = fontCache.current;
-        const fontSize = 12 / globalScale; // Still need this for padding calc
 
         // Draw node circle
         ctx.beginPath();
@@ -129,16 +128,7 @@ const GraphView: React.FC = () => {
         ctx.fillStyle = themeColors.accent;
         ctx.fill();
 
-        if (settings.graphShowLabels) {
-            // Use cached dimensions if available
-            let bckgDimensions = node.__bckgDimensions;
-
-            if (!bckgDimensions) {
-                const textWidth = ctx.measureText(label).width;
-                bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2); // some padding
-                node.__bckgDimensions = bckgDimensions;
-            }
-
+        if (settings.graphShowLabels && globalScale > 1.2) {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
