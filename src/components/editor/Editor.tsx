@@ -57,7 +57,8 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
     }, [noteId]);
 
     const activePaneId = usePaneStore(state => state.activePaneId);
-    const savedScrollPosition = useAppStore(state => state.scrollPositions[noteId]);
+    // REMOVED: savedScrollPosition subscription to prevent re-renders on scroll
+    // We will read it directly from state when restoring
     const settings = useSettingsStore(state => state.settings);
 
     const vaultPath = useAppStore(state => state.vaultPath);
@@ -533,8 +534,9 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
 
             // Restore scroll position
             if (containerRef.current) {
-                if (savedScrollPosition !== undefined) {
-                    containerRef.current.scrollTop = savedScrollPosition;
+                const savedPos = useAppStore.getState().scrollPositions[noteId];
+                if (savedPos !== undefined) {
+                    containerRef.current.scrollTop = savedPos;
                 } else {
                     containerRef.current.scrollTop = 0;
                 }
@@ -545,7 +547,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 window.dispatchEvent(new CustomEvent('force-cursor-update'));
             }, 50);
         }
-    }, [initialHtml, editor, savedScrollPosition]);
+    }, [initialHtml, editor, noteId]);
 
     // Dynamically update editor font size without re-mounting
     // This prevents the "text disappearing" bug
@@ -871,8 +873,18 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         const setupListeners = async () => {
             try {
                 // Use window-specific listeners to avoid global event issues
-                const unlistenChunk = await listen('ai-stream-chunk', (event: any) => {
-                    if (!isMounted) return;
+
+                // Helper to safely register listeners
+                const safeListen = async (event: string, handler: (event: any) => void) => {
+                    const unlisten = await listen(event, handler);
+                    if (!isMounted) {
+                        unlisten();
+                    } else {
+                        unlistenFunctions.push(unlisten);
+                    }
+                };
+
+                await safeListen('ai-stream-chunk', (event: any) => {
                     const chunk = event.payload;
 
                     // CRITICAL: Only process stream if this editor initiated the request
@@ -906,29 +918,18 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                     appendStreamedText(chunk);
                 });
 
-
-                const unlistenDone = await listen('ai-stream-done', async () => {
-                    if (!isMounted) return;
+                await safeListen('ai-stream-done', async () => {
                     setStreaming(false);
                     // Don't parse to HTML here - keep as plain text for consistent positions
                     // Will parse to HTML when user clicks Accept
                 });
 
-                const unlistenError = await listen('ai-stream-error', (event: any) => {
-                    if (!isMounted) return;
+                await safeListen('ai-stream-error', (event: any) => {
                     console.error('AI Stream Error:', event.payload);
                     setStreaming(false);
                     alert('AI Error: ' + event.payload);
                 });
 
-                if (isMounted) {
-                    unlistenFunctions = [unlistenChunk, unlistenDone, unlistenError];
-                } else {
-
-                    unlistenChunk();
-                    unlistenDone();
-                    unlistenError();
-                }
             } catch (error) {
                 console.error('Failed to setup AI listeners:', error);
             }
@@ -948,7 +949,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
                 }
             });
         };
-    }, [editor, appendStreamedText, setStreaming]);
+    }, [editor, appendStreamedText, setStreaming, paneId]);
 
     // Source Mode State
     const [isSourceMode, setIsSourceMode] = useState(false);
@@ -1093,9 +1094,20 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         }
     };
 
-    const handleEditorClick = useCallback(() => {
-        editor?.commands.focus();
-    }, [editor]);
+    const handleEditorClick = useCallback((e: React.MouseEvent) => {
+        const target = e.target as HTMLElement;
+
+        // Prevent stealing focus from interactive elements
+        if (target.closest('input, textarea, button, select, a')) {
+            return;
+        }
+
+        if (isSourceMode) {
+            textareaRef.current?.focus();
+        } else {
+            editor?.commands.focus();
+        }
+    }, [editor, isSourceMode]);
 
     if (!editor || (initialContent && !initialHtml)) {
         return (
