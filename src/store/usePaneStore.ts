@@ -94,28 +94,43 @@ export const usePaneStore = create<PaneState>((set, get) => ({
             return false;
         }
 
-        // 2. Create new structure
-        // We need to replace the target pane with a split node containing two children
-        // Child 1: The original pane (with new ID?) or preserve ID?
-        // Preserving ID is tricky if we want to keep state.
-        // Let's make Child 1 inherit the original pane's content.
-        // Child 2: A new empty pane (or duplicate?) - Let's make it empty or duplicate current tab?
-        // VS Code duplicates the current tab. Let's start with empty or duplicate.
-        // Let's duplicate the current tab for continuity.
+        // 2. Create new structure - both children get tabs with unique IDs
+        // This prevents tab ID collisions across panes which would cause
+        // closing a tab in one pane to incorrectly affect the other pane.
+
+        // Helper to create new tabs with unique IDs
+        const createNewTabs = (originalTabs: Tab[] | undefined): Tab[] => {
+            if (!originalTabs) return [];
+            return originalTabs.map(tab => ({
+                ...tab,
+                id: uuidv4(), // New unique ID for each tab
+            }));
+        };
 
         const newChild1: PaneNode = {
-            ...clonePaneTree(targetPane),
-            id: uuidv4(), // New ID for the child
-            parentId: paneId // The original pane ID will become the split container
+            id: uuidv4(),
+            type: 'leaf',
+            parentId: paneId,
+            tabs: createNewTabs(targetPane.tabs),
+            activeTabId: null // Will be set below
         };
 
         const newChild2: PaneNode = {
             id: uuidv4(),
             type: 'leaf',
             parentId: paneId,
-            tabs: targetPane.tabs ? [...targetPane.tabs] : [], // Duplicate tabs
-            activeTabId: targetPane.activeTabId
+            tabs: createNewTabs(targetPane.tabs),
+            activeTabId: null // Will be set below
         };
+
+        // Update activeTabId to match the new tab IDs
+        if (targetPane.activeTabId && targetPane.tabs && newChild1.tabs && newChild2.tabs) {
+            const activeIndex = targetPane.tabs.findIndex(t => t.id === targetPane.activeTabId);
+            if (activeIndex !== -1) {
+                newChild1.activeTabId = newChild1.tabs[activeIndex]?.id || null;
+                newChild2.activeTabId = newChild2.tabs[activeIndex]?.id || null;
+            }
+        }
 
         // 3. Update the tree
         // We need to find the parent of the target pane and update it, OR if target is root, update root.
