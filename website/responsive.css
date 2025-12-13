@@ -136,6 +136,7 @@
 
     .hero-cta {
         width: 100%;
+        align-items: center;
     }
 
     .hero-cta .btn {
@@ -145,6 +146,7 @@
     /* CTA Section */
     .cta-buttons {
         width: 100%;
+        align-items: center;
     }
 
     .cta-buttons .btn {
