@@ -100,17 +100,21 @@ export const useGlobalShortcuts = () => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'w') {
                 e.preventDefault();
                 const paneState = usePaneStore.getState();
+                const activePane = paneState.getActivePane();
 
-                // If we have multiple panes, close the active pane
-                // Otherwise close the tab
-                if (paneState.paneRoot.type === 'split') {
-                    if (paneState.activePaneId) {
-                        paneState.closePane(paneState.activePaneId);
-                    }
-                } else {
-                    const activePane = paneState.getActivePane();
-                    if (activePane && activePane.activeTabId) {
-                        paneState.closeTab(activePane.activeTabId);
+                if (activePane && activePane.activeTabId) {
+                    // Close the active tab
+                    paneState.closeTab(activePane.activeTabId);
+
+                    // After closing the tab, check if the pane is now empty
+                    // If it is AND we have a split view, close the pane too
+                    const updatedPane = paneState.findPaneById(activePane.id);
+                    if (updatedPane &&
+                        updatedPane.type === 'leaf' &&
+                        (!updatedPane.tabs || updatedPane.tabs.length === 0) &&
+                        paneState.paneRoot.type === 'split') {
+                        // Pane is empty and we have multiple panes - close it
+                        paneState.closePane(activePane.id);
                     }
                 }
             }
