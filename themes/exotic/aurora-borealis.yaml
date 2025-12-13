@@ -1,0 +1,77 @@
+version: "2.0"
+name: "Aurora Borealis"
+description: "A mesmerizing theme capturing the magical northern lights with ethereal greens and purple hints."
+
+colors:
+  # Primary: Aurora Green
+  primary: "#34d399"
+  primary_dark: "#10b981"
+
+  # Secondary: Emerald Aurora
+  secondary: "#6ee7b7"
+  secondary_dark: "#34d399"
+
+  # Accent: Mint Aurora
+  accent: "#a7f3d0"
+  accent_dark: "#6ee7b7"
+
+  # Backgrounds (Light) - ethereal light
+  background: "#ecfdf5"
+  background_subtle: "#d1fae5"
+  
+  # Surfaces
+  surface: "#a7f3d0"
+  surface_highlight: "#6ee7b7"
+  elevated_surface: "#ffffff"
+
+  # Text & Borders
+  foreground: "#064e3b"
+  subtle_foreground: "#065f46"
+  outline: "#6ee7b7"
+  outline_subtle: "#a7f3d0"
+
+utility:
+  alert:
+    background: "#a855f7"
+    foreground: "#ffffff"
+    border: "#9333ea"
+    subtle_background: "rgba(168, 85, 247, 0.1)"
+  success:
+    background: "#34d399"
+    foreground: "#064e3b"
+    border: "#10b981"
+    subtle_background: "rgba(52, 211, 153, 0.1)"
+  warning:
+    background: "#fbbf24"
+    foreground: "#78350f"
+    border: "#f59e0b"
+    subtle_background: "rgba(251, 191, 36, 0.1)"
+  info:
+    background: "#6ee7b7"
+    foreground: "#064e3b"
+    border: "#34d399"
+    subtle_background: "rgba(110, 231, 183, 0.1)"
+
+# Dark mode - arctic night
+dark:
+  # Backgrounds - night sky
+  background: "#0a1014"
+  background_subtle: "#0f1a20"
+  
+  # Surfaces - aurora sky
+  surface: "#15282e"
+  surface_highlight: "#1c3b44"
+  elevated_surface: "#244f5a"
+
+  # Text - aurora glow
+  foreground: "#ecfdf5"
+  subtle_foreground: "#6ee7b7"
+  
+  # Borders - magical glow
+  outline: "rgba(110, 231, 183, 0.25)"
+  outline_subtle: "rgba(110, 231, 183, 0.12)"
+
+  # Colors - northern lights
+  primary: "#6ee7b7"
+  secondary: "#a7f3d0"
+  accent: "#d1fae5"
