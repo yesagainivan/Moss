@@ -33,3 +33,4 @@ src-tauri/target/
 node_modules/
 .moss/
 .gemini/
+side_documents/
