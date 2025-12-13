@@ -62,8 +62,6 @@ Visualize your knowledge garden.
 
 ## ⌨️ Keyboard Shortcuts
 
-| Action | Shortcut |
-| :--- | :--- |
 | **New Note** | `Cmd+N` |
 | **Command Palette** | `Cmd+P` |
 | **Search** | `Cmd+Shift+F` |
@@ -73,7 +71,8 @@ Visualize your knowledge garden.
 | **Split Vertically** | `Cmd+\` |
 | **Split Horizontally** | `Cmd+Shift+\` |
 | **AI Rewrite** | `Cmd+K` |
-| **Snapshot Vault** | `Cmd+Alt+S` |
+| **Open Graph** | `Cmd+G` |
+| **Toggle Right Panel** | `Cmd+Opt+B` |
 
 ## 🛠️ Advanced: Git Sync
 
