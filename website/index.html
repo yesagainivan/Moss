@@ -340,8 +340,8 @@
             document.body.classList.toggle('no-scroll');
         });
 
-        // Close menu when clicking a link
-        document.querySelectorAll('.nav-link').forEach(link => {
+        // Close menu when clicking a link or mobile download button
+        document.querySelectorAll('.nav-link, .mobile-only').forEach(link => {
             link.addEventListener('click', () => {
                 mobileBtn.classList.remove('active');
                 navLinks.classList.remove('active');

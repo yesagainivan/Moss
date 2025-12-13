@@ -976,10 +976,6 @@ a {
 }
 
 @media (max-width: 768px) {
-    .nav-links {
-        display: none;
-    }
-
     .hero-title {
         font-size: var(--font-size-4xl);
     }
