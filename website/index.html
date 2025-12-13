@@ -73,13 +73,7 @@
         </div>
         <div class="hero-screenshot">
             <div class="screenshot-frame">
-                <div class="screenshot-placeholder">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <rect x="3" y="3" width="18" height="18" rx="2" />
-                        <path d="M3 9h18M9 21V9" />
-                    </svg>
-                    <span>hero-editor.png</span>
-                </div>
+                <img src="assets/hero-editor.webp" alt="Moss Editor Interface">
             </div>
         </div>
     </section>
@@ -130,7 +124,20 @@
                         your text. Just press <kbd>⌘K</kbd>.</p>
                 </div>
 
-                <!-- Feature 4: Graph -->
+                <!-- Feature 4: Split Panes -->
+                <div class="feature-card feature-card-tall">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <line x1="12" y1="3" x2="12" y2="21" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Split Panes</h3>
+                    <p class="feature-description">Work on multiple notes side by side. Research and draft
+                        simultaneously.</p>
+                </div>
+
+                <!-- Feature 5: Graph -->
                 <div class="feature-card feature-card-wide">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -147,7 +154,7 @@
                         come alive with interactive linking.</p>
                 </div>
 
-                <!-- Feature 5: Git Sync -->
+                <!-- Feature 6: Git Sync -->
                 <div class="feature-card">
                     <div class="feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -160,19 +167,6 @@
                     <h3 class="feature-title">Git Sync</h3>
                     <p class="feature-description">Version control and backup to GitHub. Your notes, your history.</p>
                 </div>
-
-                <!-- Feature 6: Split Panes -->
-                <div class="feature-card feature-card-tall">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                            <line x1="12" y1="3" x2="12" y2="21" />
-                        </svg>
-                    </div>
-                    <h3 class="feature-title">Split Panes</h3>
-                    <p class="feature-description">Work on multiple notes side by side. Research and draft
-                        simultaneously.</p>
-                </div>
             </div>
         </div>
     </section>
@@ -181,52 +175,66 @@
     <section id="showcase" class="showcase">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">See it in action</h2>
+                <h2 class="section-title">Take a look!</h2>
                 <p class="section-subtitle">A beautiful, focused writing experience</p>
+                <p class="section-space"></p>
             </div>
-            <div class="showcase-grid">
-                <div class="showcase-item showcase-item-main">
-                    <div class="screenshot-frame screenshot-frame-lg">
-                        <div class="screenshot-placeholder">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="5" cy="6" r="3" />
-                                <circle cx="19" cy="6" r="3" />
-                                <circle cx="12" cy="18" r="3" />
-                                <line x1="7.5" y1="7.5" x2="10" y2="16" />
-                                <line x1="16.5" y1="7.5" x2="14" y2="16" />
-                            </svg>
-                            <span>feature-graph.png</span>
+            <div class="showcase-container">
+                <!-- AI Assistant Feature -->
+                <div class="showcase-feature fade-in">
+                    <div class="showcase-text">
+                        <h3>AI that understands your notes</h3>
+                        <p>Get intelligent assistance right where you write. The built-in AI helps you brainstorm,
+                            refine, and transform your thoughts without breaking your flow.</p>
+                        <ul class="feature-highlights">
+                            <li>Generate ideas and overcome writer's block</li>
+                            <li>Summarize long documents instantly</li>
+                            <li>Transform and refine your writing</li>
+                            <!-- <li>Context-aware suggestions</li> this is not implemented yet -->
+                        </ul>
+                    </div>
+                    <div class="showcase-image">
+                        <div class="screenshot-frame">
+                            <img src="assets/feature-ai.webp" alt="AI Assistant in action">
                         </div>
                     </div>
-                    <h3>Knowledge Graph</h3>
-                    <p>See how your ideas connect and discover new relationships between your notes.</p>
                 </div>
-                <div class="showcase-item">
-                    <div class="screenshot-frame">
-                        <div class="screenshot-placeholder">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <rect x="3" y="3" width="18" height="18" rx="2" />
-                                <line x1="12" y1="3" x2="12" y2="21" />
-                            </svg>
-                            <span>feature-split.png</span>
+
+                <!-- Split Panes Feature -->
+                <div class="showcase-feature showcase-feature-centered fade-in">
+                    <!-- <h3>Split Panes</h3> -->
+                    <div class="showcase-image">
+                        <div class="screenshot-frame screenshot-frame-large">
+                            <img src="assets/feature-split.webp" alt="Split panes view">
                         </div>
                     </div>
-                    <h3>Split View</h3>
-                    <p>Research on one side, write on the other.</p>
+                    <div class="showcase-text">
+                        <p>Research and write side-by-side.</p>
+                        <ul class="feature-highlights">
+                            <li>Compare notes instantly</li>
+                            <li>Independent scrolling</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="showcase-item">
-                    <div class="screenshot-frame">
-                        <div class="screenshot-placeholder">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1" />
-                                <circle cx="8" cy="14" r="1" />
-                                <circle cx="16" cy="14" r="1" />
-                            </svg>
-                            <span>feature-ai.png</span>
+
+                <!-- Graph View Feature -->
+                <div class="showcase-feature fade-in">
+                    <div class="showcase-text">
+                        <h3>Your knowledge, visualized</h3>
+                        <p>Discover hidden connections between your notes with an interactive graph view. Watch your
+                            second brain come alive as you build a network of interconnected ideas.</p>
+                        <ul class="feature-highlights">
+                            <li>Interactive force-directed graph</li>
+                            <li>See all note relationships at once</li>
+                            <li>Click to navigate between notes</li>
+                            <li>Understand your knowledge structure</li>
+                        </ul>
+                    </div>
+                    <div class="showcase-image">
+                        <div class="screenshot-frame">
+                            <img src="assets/feature-graph.webp" alt="Knowledge Graph View">
                         </div>
                     </div>
-                    <h3>AI-Powered</h3>
-                    <p>Let AI help you write, edit, and think.</p>
                 </div>
             </div>
         </div>
@@ -307,7 +315,7 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.feature-card, .showcase-item, .cta-content').forEach(el => {
+        document.querySelectorAll('.feature-card, .showcase-feature, .cta-content').forEach(el => {
             el.classList.add('fade-in');
             observer.observe(el);
         });

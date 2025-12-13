@@ -16,7 +16,9 @@
     --accent: #5a9a6e;
     --accent-light: #7ab88a;
     --accent-dark: #3d7a4f;
-    --accent-glow: rgba(90, 154, 110, 0.3);
+    --accent-glow: rgba(30, 44, 35, 0.13);
+    /* --accent-glow: rgba(90, 154, 110, 0.13); */
+    /* --accent-glow: color-mix(in srgb, var(--accent) 10%, rgba(90, 154, 110, 0.13) 80%); */
 
     --text-primary: #fafafa;
     --text-secondary: #a0a0a0;
@@ -53,6 +55,7 @@
     --space-24: 6rem;
 
     /* Borders & Radius */
+    --radius-moss: 0.75rem;
     --radius-sm: 6px;
     --radius-md: 12px;
     --radius-lg: 16px;
@@ -66,9 +69,16 @@
     --shadow-glow: 0 0 40px var(--accent-glow);
 
     /* Transitions */
-    --transition-fast: 150ms ease;
-    --transition-base: 250ms ease;
-    --transition-slow: 400ms ease;
+    --transition-fast: 250ms ease;
+    --transition-base: 350ms ease;
+    --transition-slow: 600ms ease;
+    /* Card Themes */
+    --theme-moss: #5a9a6e;
+    --theme-teal: #4d9f95;
+    --theme-blue: #5b95b8;
+    --theme-indigo: #7689c8;
+    --theme-purple: #9d7ec2;
+    --theme-amber: #dcb36d;
 }
 
 /* --------------------------------------------------------------------------
@@ -325,10 +335,17 @@ a {
     line-height: 1.1;
     letter-spacing: -0.03em;
     margin-bottom: var(--space-6);
+    background: linear-gradient(125deg, var(--text-primary) 0%, var(--accent-light) 95%, var(--accent-dark) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .text-accent {
-    color: var(--accent);
+    background: linear-gradient(-125deg, var(--accent-light) 0%, #71c591 50%, #c2d08b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .hero-subtitle {
@@ -354,7 +371,7 @@ a {
 .screenshot-frame {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-moss);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
     transition: transform var(--transition-base), box-shadow var(--transition-base);
@@ -366,7 +383,7 @@ a {
 }
 
 .screenshot-frame-lg {
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-moss);
 }
 
 .screenshot-placeholder {
@@ -418,6 +435,10 @@ a {
     color: var(--text-secondary);
 }
 
+.section-space {
+    padding-bottom: var(--space-10);
+}
+
 /* --------------------------------------------------------------------------
    Features Section
    -------------------------------------------------------------------------- */
@@ -428,30 +449,115 @@ a {
 .features-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, auto);
     gap: var(--space-6);
 }
 
 .feature-card {
+    --card-accent: var(--accent);
+    position: relative;
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-moss);
     padding: var(--space-8);
     backdrop-filter: blur(8px);
     transition: all var(--transition-base);
+    overflow: hidden;
+}
+
+/* Feature Card Themes */
+/* 1. Local-First */
+.feature-card:nth-child(1) {
+    --card-accent: var(--theme-moss);
+    grid-column: 1;
+    grid-row: 1 / 3;
+}
+
+/* 2. Markdown */
+.feature-card:nth-child(2) {
+    --card-accent: var(--theme-purple);
+    grid-column: 2;
+    grid-row: 1;
+}
+
+/* 3. AI */
+.feature-card:nth-child(3) {
+    --card-accent: var(--theme-indigo);
+    grid-column: 2 / 4;
+    grid-row: 2;
+}
+
+/* 4. Split Panes */
+.feature-card:nth-child(4) {
+    --card-accent: var(--theme-teal);
+    grid-column: 3;
+    grid-row: 1;
+}
+
+/* 5. Graph */
+.feature-card:nth-child(5) {
+    --card-accent: var(--theme-blue);
+    grid-column: 1 / 3;
+    grid-row: 3;
+}
+
+/* 6. Git Sync */
+.feature-card:nth-child(6) {
+    --card-accent: var(--theme-amber);
+    grid-column: 3;
+    grid-row: 3;
+}
+
+/* SVG Background Pattern */
+.feature-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image:
+        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.5;
+    z-index: -1;
+    mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 100%);
+    pointer-events: none;
+}
+
+.feature-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle at top right, var(--card-accent) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    filter: blur(60px);
+    z-index: -2;
+    pointer-events: none;
 }
 
 .feature-card:hover {
-    border-color: var(--accent);
+    border-color: color-mix(in srgb, var(--card-accent) 50%, white 10%);
     transform: translateY(-4px);
-    box-shadow: var(--shadow-glow);
+    box-shadow: 0 8px 32px -8px color-mix(in srgb, var(--card-accent) 20%, transparent);
 }
 
-.feature-card-wide {
-    grid-column: span 2;
+.feature-card:hover::after {
+    opacity: 0.15;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--card-accent) 40%, transparent);
 }
 
 .feature-card-tall {
-    grid-row: span 2;
     display: flex;
     flex-direction: column;
 }
@@ -462,9 +568,10 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--card-accent) 0%, color-mix(in srgb, var(--card-accent) 70%, black) 100%);
+    border-radius: var(--radius-moss);
     margin-bottom: var(--space-6);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .feature-icon svg {
@@ -478,6 +585,7 @@ a {
     font-weight: 600;
     margin-bottom: var(--space-3);
     letter-spacing: -0.01em;
+    color: color-mix(in srgb, var(--text-primary) 90%, var(--card-accent));
 }
 
 .feature-description {
@@ -493,7 +601,8 @@ a {
     font-size: var(--font-size-xs);
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-moss);
+
 }
 
 /* --------------------------------------------------------------------------
@@ -504,38 +613,111 @@ a {
     background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
 }
 
-.showcase-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: var(--space-6);
+.showcase-container {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.showcase-item {
-    text-align: center;
+.showcase-feature {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+    margin-bottom: var(--space-24);
 }
 
-.showcase-item-main {
-    grid-row: span 2;
+.showcase-feature:last-child {
+    margin-bottom: 0;
 }
 
-.showcase-item h3 {
-    font-size: var(--font-size-xl);
+/* First item: text left, image right (default) */
+/* Third item: image left, text right */
+.showcase-feature:nth-child(3) {
+    flex-direction: row-reverse;
+}
+
+/* Special centered layout with overlay for middle item (Split Panes) */
+
+
+.showcase-text {
+    flex: 1;
+    max-width: 500px;
+}
+
+.showcase-text h3 {
+    font-size: clamp(var(--font-size-xl), 3vw, var(--font-size-3xl));
     font-weight: 600;
-    margin-top: var(--space-6);
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-4);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
-.showcase-item p {
+.showcase-text p {
     color: var(--text-secondary);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-lg);
+    line-height: 1.6;
+    margin-bottom: var(--space-6);
 }
 
-.showcase-item .screenshot-frame {
-    min-height: 200px;
+.feature-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.showcase-item-main .screenshot-frame {
-    min-height: 100%;
+.feature-highlights li {
+    position: relative;
+    padding-left: var(--space-8);
+    margin-bottom: var(--space-3);
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+}
+
+.feature-highlights li:last-child {
+    margin-bottom: 0;
+}
+
+/* Custom checkmark bullet */
+.feature-highlights li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: var(--bg-primary);
+    border-radius: 50%;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+}
+
+.showcase-image {
+    flex: 1;
+    max-width: 600px;
+}
+
+.showcase-feature .screenshot-frame {
+    max-width: 600px;
+    margin: 0;
+    transform: translateY(0);
+    transition: all var(--transition-base);
+}
+
+.showcase-feature .screenshot-frame:hover {
+    /* transform: translateY(-4px) scale(1.02); */
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+.showcase-feature .screenshot-frame img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--radius-moss);
 }
 
 /* --------------------------------------------------------------------------
@@ -644,29 +826,95 @@ a {
     transform: translateY(0);
 }
 
-/* Staggered animation for feature cards */
-.features-grid .feature-card:nth-child(1) {
+/* Staggered animation for feature cards - only for fade-in */
+.features-grid .feature-card.fade-in {
+    transition: opacity var(--transition-slow), transform var(--transition-slow);
+}
+
+.features-grid .feature-card.fade-in:nth-child(1) {
     transition-delay: 0ms;
 }
 
-.features-grid .feature-card:nth-child(2) {
+.features-grid .feature-card.fade-in:nth-child(2) {
     transition-delay: 50ms;
 }
 
-.features-grid .feature-card:nth-child(3) {
+.features-grid .feature-card.fade-in:nth-child(3) {
     transition-delay: 100ms;
 }
 
-.features-grid .feature-card:nth-child(4) {
+.features-grid .feature-card.fade-in:nth-child(4) {
     transition-delay: 150ms;
 }
 
-.features-grid .feature-card:nth-child(5) {
+.features-grid .feature-card.fade-in:nth-child(5) {
     transition-delay: 200ms;
 }
 
-.features-grid .feature-card:nth-child(6) {
+.features-grid .feature-card.fade-in:nth-child(6) {
     transition-delay: 250ms;
+}
+
+/* Reset delay once visible so hover works instantly */
+.features-grid .feature-card.fade-in.visible {
+    transition-delay: 0s;
+    transition: all var(--transition-base);
+}
+
+/* Staggered animation for showcase features */
+.showcase-feature:nth-child(1) {
+    transition-delay: 100ms;
+}
+
+.showcase-feature:nth-child(2) {
+    transition-delay: 200ms;
+}
+
+.showcase-feature:nth-child(3) {
+    transition-delay: 300ms;
+}
+
+/* --------------------------------------------------------------------------
+   Special Centered Layout (Split Panes)
+   -------------------------------------------------------------------------- */
+.showcase-feature-centered {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-8);
+}
+
+.showcase-feature-centered .showcase-image {
+    width: 100%;
+    max-width: 900px;
+    /* Ensure the wrapper respects center alignment */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Use high specificity to override .showcase-feature .screenshot-frame (max-width: 600px) */
+.showcase-feature-centered .screenshot-frame {
+    width: 100%;
+    max-width: 100%;
+    /* Force full width of the 900px container */
+    margin: 0 auto;
+    box-shadow: var(--shadow-xl);
+}
+
+/* Ensure text is centered and constrained for readability */
+.showcase-feature-centered .showcase-text {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Make list items centered too */
+.showcase-feature-centered .feature-highlights li {
+    display: inline-block;
+    margin: 0 var(--space-4);
+    text-align: left;
+    /* Keep checkmark aligned */
+    padding-left: var(--space-8);
+    /* Space for checkmark */
 }
 
 /* --------------------------------------------------------------------------
@@ -675,22 +923,48 @@ a {
 @media (max-width: 1024px) {
     .features-grid {
         grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
     }
 
-    .feature-card-wide {
-        grid-column: span 1;
+    /* Reset explicit positioning for tablet */
+    .feature-card:nth-child(1),
+    .feature-card:nth-child(2),
+    .feature-card:nth-child(3),
+    .feature-card:nth-child(4),
+    .feature-card:nth-child(5),
+    .feature-card:nth-child(6) {
+        grid-column: auto;
+        grid-row: auto;
     }
 
-    .feature-card-tall {
-        grid-row: span 1;
+    /* Simple 2-column layout */
+    .feature-card:nth-child(3),
+    .feature-card:nth-child(5) {
+        grid-column: span 2;
     }
 
-    .showcase-grid {
-        grid-template-columns: 1fr;
+    /* Showcase: Stack on tablet */
+    .showcase-feature {
+        flex-direction: column;
+        gap: var(--space-8);
     }
 
-    .showcase-item-main {
-        grid-row: span 1;
+    .showcase-feature:nth-child(3) {
+        flex-direction: column;
+    }
+
+    .showcase-text {
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .showcase-image {
+        max-width: 100%;
+    }
+
+    /* Overlay container maintains its centering on smaller screens */
+    .showcase-overlay-container {
+        max-width: 100%;
     }
 }
 
@@ -717,9 +991,24 @@ a {
         grid-template-columns: 1fr;
     }
 
+    /* Reset all positioning for mobile */
+    .feature-card:nth-child(3),
+    .feature-card:nth-child(5) {
+        grid-column: span 1;
+    }
+
     .screenshot-placeholder {
         min-height: 250px;
         padding: var(--space-10);
+    }
+
+    /* Showcase: Adjust spacing for mobile */
+    .showcase-feature {
+        margin-bottom: var(--space-16);
+    }
+
+    .showcase-text h3 {
+        font-size: var(--font-size-xl);
     }
 }
 
