@@ -89,9 +89,9 @@ export const AIInlinePrompt = ({
                 <div className="ai-inline-prompt-form grain-overlay bg-background border border-border rounded-2xl p-4 shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
                         {isStreaming ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-accent" />
+                            <Loader2 className="w-4 h-4 animate-spin text-primary" />
                         ) : (
-                            <Check className="w-4 h-4 text-accent" />
+                            <Check className="w-4 h-4 text-primary" />
                         )}
                         <span className="text-sm text-foreground">
                             {isStreaming ? 'Generating...' : 'Complete!'}
@@ -100,7 +100,7 @@ export const AIInlinePrompt = ({
                     <div className="flex gap-2">
                         <button
                             onClick={onAccept}
-                            className="flex-1 px-3 py-2 bg-accent text-white hover:bg-accent/90 rounded-md text-sm font-medium transition-colors"
+                            className="flex-1 px-3 py-2 bg-primary text-white hover:bg-primary/90 rounded-md text-sm font-medium transition-colors"
                         >
                             Accept
                         </button>

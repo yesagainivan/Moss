@@ -222,11 +222,11 @@ const FileTreeRow = ({
                 ref={setDragRef}
                 {...attributes}
                 className={cn(
-                    "group flex items-center gap-1 px-1 py-1.5 rounded-0 cursor-pointer hover:bg-accent/10 text-sm transition-colors select-none w-[95%]",
-                    isSelected && "bg-accent/10 text-foreground font-medium",
-                    isActiveNote && "bg-accent/10 border-l-2 border-l-accent",
+                    "group flex items-center gap-1 px-1 py-1.5 rounded-0 cursor-pointer hover:bg-primary/10 text-sm transition-colors select-none w-[95%]",
+                    isSelected && "bg-primary/10 text-foreground font-medium",
+                    isActiveNote && "bg-primary/10 border-l-2 border-l-primary",
                     isDragging && "opacity-50",
-                    isOver && node.type === 'folder' && "bg-accent/20 ring-2 ring-accent"
+                    isOver && node.type === 'folder' && "bg-primary/20 ring-2 ring-primary"
                 )}
                 style={{ paddingLeft: `${depth * 8 + 2}px` }}
                 onClick={handleClick}
@@ -243,7 +243,7 @@ const FileTreeRow = ({
 
                 {node.type === 'folder' ? (
                     isExpanded ? (
-                        <FolderOpen className="w-4 h-4 text-accent" />
+                        <FolderOpen className="w-4 h-4 text-primary" />
                     ) : (
                         <Folder className="w-4 h-4 text-muted-foreground" />
                     )
@@ -649,21 +649,21 @@ export const Sidebar = () => {
                     <div className="flex gap-1">
                         <button
                             onClick={handleRootCreateFolder}
-                            className="p-1 hover:bg-accent/10 rounded-md transition-colors"
+                            className="p-1 hover:bg-primary/10 rounded-md transition-colors"
                             title="New Folder"
                         >
                             <FolderPlus className="w-4 h-4" />
                         </button>
                         <button
                             onClick={handleRootCreateNote}
-                            className="p-1 hover:bg-accent/10 rounded-md transition-colors"
+                            className="p-1 hover:bg-primary/10 rounded-md transition-colors"
                             title="New Note"
                         >
                             <Plus className="w-4 h-4" />
                         </button>
                         <button
                             onClick={() => window.dispatchEvent(new CustomEvent('open-shortcuts-modal'))}
-                            className="p-1 hover:bg-accent/10 rounded-md transition-colors"
+                            className="p-1 hover:bg-primary/10 rounded-md transition-colors"
                             title="Keyboard Shortcuts (Cmd+/)"
                         >
                             <Keyboard className="w-4 h-4" />
@@ -673,7 +673,7 @@ export const Sidebar = () => {
 
                 {vaultPath && (
                     <div
-                        className="h-10 px-4 flex items-center text-xs text-muted-foreground border-b border-border truncate cursor-pointer hover:bg-accent/10 hover:text-foreground transition-colors shrink-0"
+                        className="h-10 px-4 flex items-center text-xs text-muted-foreground border-b border-border truncate cursor-pointer hover:bg-primary/10 hover:text-foreground transition-colors shrink-0"
                         title="Click to search notes (Cmd+P)"
                         onClick={() => setCommandPaletteOpen(true)}
                     >
@@ -684,10 +684,10 @@ export const Sidebar = () => {
                 <div className="flex-1 overflow-hidden flex flex-col " onContextMenu={handleSidebarContextMenu}>
                     {isVaultLoading ? (
                         <div className="space-y-2 p-2">
-                            <div className="h-4 bg-accent/10 rounded animate-pulse w-3/4" />
-                            <div className="h-4 bg-accent/10 rounded animate-pulse w-1/2" />
-                            <div className="h-4 bg-accent/10 rounded animate-pulse w-2/3" />
-                            <div className="h-4 bg-accent/10 rounded animate-pulse w-full" />
+                            <div className="h-4 bg-primary/10 rounded animate-pulse w-3/4" />
+                            <div className="h-4 bg-primary/10 rounded animate-pulse w-1/2" />
+                            <div className="h-4 bg-primary/10 rounded animate-pulse w-2/3" />
+                            <div className="h-4 bg-primary/10 rounded animate-pulse w-full" />
                         </div>
                     ) : (
                         <Virtuoso
@@ -774,8 +774,8 @@ export const Sidebar = () => {
                         className={cn(
                             "w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors",
                             currentView === 'graph'
-                                ? "bg-accent/20 text-foreground font-medium"
-                                : "text-muted-foreground hover:bg-accent/10 hover:text-foreground"
+                                ? "bg-primary/20 text-foreground font-medium"
+                                : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
                         )}
                     >
                         <Network className="w-4 h-4" />
@@ -783,7 +783,7 @@ export const Sidebar = () => {
                     </button>
                     <button
                         onClick={openVault}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-accent/10 hover:text-foreground rounded-md transition-colors"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:bg-primary/10 hover:text-foreground rounded-md transition-colors"
                     >
                         <FolderOpen className="w-4 h-4" />
                         <span>Open Vault</span>
@@ -806,7 +806,7 @@ export const Sidebar = () => {
 
             <DragOverlay>
                 {activeId ? (
-                    <div className="bg-accent/20 px-2 py-1.5 rounded-md border border-accent text-sm opacity-80 pointer-events-none">
+                    <div className="bg-primary/20 px-2 py-1.5 rounded-md border border-primary text-sm opacity-80 pointer-events-none">
                         Dragging...
                     </div>
                 ) : null}

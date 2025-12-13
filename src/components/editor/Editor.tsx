@@ -289,7 +289,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
         content: '', // Initialize with empty, will be updated via useEffect
         editorProps: {
             attributes: {
-                class: 'prose max-w-none focus:outline-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-accent prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-a:text-accent prose-blockquote:border-l-accent',
+                class: 'prose max-w-none focus:outline-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-primary prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-a:text-primary prose-blockquote:border-l-accent',
                 style: `font-size: ${settings.editorFontSize}px; line-height: ${settings.lineHeight};`,
             },
             handleClick: (_view, _pos, event) => {

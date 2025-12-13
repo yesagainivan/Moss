@@ -214,7 +214,7 @@ export const AgentChat: React.FC = () => {
         <div className="w-full h-full bg-background border-l border-border flex flex-col">
             {/* Header */}
             <div className="h-14 border-b border-t border-border flex items-center justify-between px-2 shrink-0 bg-secondary/30">
-                <div className="flex items-center gap-2 text-accent dark:text-accent font-medium">
+                <div className="flex items-center gap-2 text-primary dark:text-primary font-medium">
                     <Sparkles size={18} />
                     <span>Mosaic Agent</span>
                 </div>
@@ -301,11 +301,11 @@ export const AgentChat: React.FC = () => {
                         {currentStatus && (
                             <div className="flex items-center gap-2 text-muted-foreground text-sm ml-8 mb-4">
                                 <div className="flex gap-1">
-                                    <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce"
+                                    <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
                                         style={{ animationDelay: '0ms' }} />
-                                    <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce"
+                                    <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
                                         style={{ animationDelay: '150ms' }} />
-                                    <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce"
+                                    <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
                                         style={{ animationDelay: '300ms' }} />
                                 </div>
                                 <span>{currentStatus}</span>
@@ -342,7 +342,7 @@ export const AgentChat: React.FC = () => {
                             }
                         }}
                         disabled={!input.trim() && !currentThinking}
-                        className="p-2 m-2 h-8 w-10 flex items-center justify-center text-accent hover:bg-secondary/50 dark:hover:bg-secondary/30 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-2 m-2 h-8 w-10 flex items-center justify-center text-primary hover:bg-secondary/50 dark:hover:bg-secondary/30 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         title={currentThinking ? 'Stop generation' : 'Send message'}
                     >
                         {currentThinking ? <Square size={18} /> : <Send size={18} />}

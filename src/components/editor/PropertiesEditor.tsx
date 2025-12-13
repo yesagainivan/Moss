@@ -46,9 +46,9 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
             >
                 <button
                     onClick={() => setIsExpanded(true)}
-                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors group"
+                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors group"
                 >
-                    <List size={14} className="group-hover:text-accent" />
+                    <List size={14} className="group-hover:text-primary" />
                     <span>Add properties</span>
                 </button>
             </div>
@@ -67,7 +67,7 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
                 </div>
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="text-muted-foreground hover:text-primary p-1 rounded hover:bg-hover"
+                    className="text-muted-foreground hover:text-accent p-1 rounded hover:bg-hover"
                 >
                     {isExpanded ? <X size={14} /> : <Plus size={14} />}
                 </button>
@@ -82,7 +82,7 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
                                 type="text"
                                 value={key}
                                 readOnly
-                                className="w-1/3 bg-transparent text-xs text-secondary border border-transparent focus:border-accent rounded px-2 py-1 outline-none"
+                                className="w-1/3 bg-transparent text-xs text-secondary border border-transparent focus:border-primary rounded px-2 py-1 outline-none"
                             />
                             <div className="flex-1 flex items-center gap-2">
                                 <input
@@ -90,7 +90,7 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
                                     value={value as string}
                                     onChange={(e) => handleUpdateProperty(key, e.target.value)}
                                     placeholder="Value"
-                                    className="flex-1 bg-transparent text-xs text-primary border border-border focus:border-accent rounded px-2 py-1 outline-none placeholder:text-muted-foreground"
+                                    className="flex-1 bg-transparent text-xs text-accent border border-border focus:border-primary rounded px-2 py-1 outline-none placeholder:text-muted-foreground"
                                 />
                                 <button
                                     onClick={() => handleDeleteProperty(key)}
@@ -112,12 +112,12 @@ export const PropertiesEditor: React.FC<PropertiesEditorProps> = ({ noteId }) =>
                                 if (e.key === 'Enter') handleAddProperty();
                             }}
                             placeholder="New property name"
-                            className="bg-transparent text-xs text-secondary/70 border border-transparent focus:border-accent rounded px-2 py-1 outline-none w-1/3 placeholder:text-muted-foreground"
+                            className="bg-transparent text-xs text-secondary/70 border border-transparent focus:border-primary rounded px-2 py-1 outline-none w-1/3 placeholder:text-muted-foreground"
                         />
                         <button
                             onClick={handleAddProperty}
                             disabled={!newPropKey.trim()}
-                            className="text-xs text-accent hover:text-accent-hover disabled:opacity-50 px-2 uppercase font-bold tracking-wider"
+                            className="text-xs text-primary hover:text-primary-hover disabled:opacity-50 px-2 uppercase font-bold tracking-wider"
                         >
                             Add
                         </button>

@@ -55,7 +55,7 @@ export const PaneView = React.memo(({ paneId, isActive }: PaneViewProps) => {
         >
             {/* Active pane indicator dot */}
             {isActive && (
-                <div className="absolute top-2 right-2 z-10 w-2 h-2 rounded-full bg-accent animate-pulse" />
+                <div className="absolute top-2 right-2 z-10 w-2 h-2 rounded-full bg-primary animate-pulse" />
             )}
 
             <ResizableSplit

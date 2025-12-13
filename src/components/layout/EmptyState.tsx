@@ -29,9 +29,9 @@ export const EmptyState = () => {
 
                 {/* Logo / Branding */}
                 <div className="flex flex-col items-center space-y-4">
-                    <div className="p-6 bg-primary/10 rounded-full ring-1 ring-border shadow-xl shadow-primary/5">
+                    <div className="p-6 bg-accent/10 rounded-full ring-1 ring-border shadow-xl shadow-primary/5">
                         <div
-                            className="w-14 h-14 bg-primary"
+                            className="w-14 h-14 bg-accent"
                             style={{
                                 maskImage: 'url(/Moss_logo_dark.svg)',
                                 maskSize: 'contain',
@@ -56,27 +56,27 @@ export const EmptyState = () => {
                 <div className="grid grid-cols-2 gap-3 w-full">
                     <button
                         onClick={handleNewNote}
-                        className="flex flex-col items-center justify-center p-4 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-accent transition-all duration-200 group"
+                        className="flex flex-col items-center justify-center p-4 rounded-xl border border-border/50 bg-card hover:bg-primary/50 hover:border-primary transition-all duration-200 group"
                     >
-                        <FilePlus className="w-6 h-6 mb-2 text-primary transition-transform" />
+                        <FilePlus className="w-6 h-6 mb-2 text-accent transition-transform" />
                         <span className="font-medium text-sm">New Note</span>
                         <span className="text-xs text-muted-foreground mt-1 bg-muted/50 px-1.5 py-0.5 rounded text-[10px]">Cmd + N</span>
                     </button>
 
                     <button
                         onClick={() => setCommandPaletteOpen(true)}
-                        className="flex flex-col items-center justify-center p-4 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-accent transition-all duration-200 group"
+                        className="flex flex-col items-center justify-center p-4 rounded-xl border border-border/50 bg-card hover:bg-primary/50 hover:border-primary transition-all duration-200 group"
                     >
-                        <Command className="w-6 h-6 mb-2 text-primary transition-transform" />
+                        <Command className="w-6 h-6 mb-2 text-accent transition-transform" />
                         <span className="font-medium text-sm">Commands</span>
                         <span className="text-xs text-muted-foreground mt-1 bg-muted/50 px-1.5 py-0.5 rounded text-[10px]">Cmd + P</span>
                     </button>
 
                     <button
                         onClick={() => setSearchModalOpen(true)}
-                        className="col-span-2 flex flex-row items-center justify-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-accent/50 hover:border-accent transition-all duration-200 group"
+                        className="col-span-2 flex flex-row items-center justify-center gap-3 p-3 rounded-xl border border-border/50 bg-card hover:bg-primary/50 hover:border-primary transition-all duration-200 group"
                     >
-                        <Search className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <Search className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-colors" />
                         <span className="font-medium text-sm">Search your vault...</span>
                         <span className="text-xs text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded text-[10px] ml-auto">Cmd + Shift + F</span>
                     </button>

@@ -115,7 +115,7 @@ export function GitHubSyncIndicator() {
 
             {/* Tooltip */}
             {isHovered && !syncError && (
-                <div className="absolute top-full right-0 mt-1 px-2 py-1 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded shadow-lg text-xs text-[var(--text-secondary)] whitespace-nowrap z-50">
+                <div className="absolute top-full right-0 mt-1 px-2 py-1 bg-[var(--bg-accent)] border border-[var(--border-color)] rounded shadow-lg text-xs text-[var(--text-secondary)] whitespace-nowrap z-50">
                     {tooltip}
                 </div>
             )}

@@ -185,7 +185,7 @@ export const ActivityCalendar = ({ isOpen, onClose }: ActivityCalendarProps) => 
                 <div className={styles.modalHeader}>
                     <div className="flex items-center gap-3">
                         <div className={styles.headerIcon}>
-                            <Calendar className="w-5 h-5 text-accent" />
+                            <Calendar className="w-5 h-5 text-primary" />
                         </div>
                         <div>
                             <h2 className={styles.headerTitle}>Activity Calendar</h2>

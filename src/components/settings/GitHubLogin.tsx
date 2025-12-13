@@ -129,7 +129,7 @@ export function GitHubLogin({ clientId }: GitHubLoginProps) {
                             className="w-10 h-10 rounded-full"
                         />
                         <div>
-                            <div className="font-medium text-[var(--text-primary)]">
+                            <div className="font-medium text-[var(--text-accent)]">
                                 {user.name || user.login}
                             </div>
                             <div className="text-sm text-[var(--text-secondary)]">
@@ -139,7 +139,7 @@ export function GitHubLogin({ clientId }: GitHubLoginProps) {
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] rounded transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-accent)] hover:bg-[var(--hover-bg)] rounded transition-colors"
                     >
                         <LogOut size={16} />
                         Logout
@@ -162,7 +162,7 @@ export function GitHubLogin({ clientId }: GitHubLoginProps) {
                         />
                         <button
                             onClick={handleChangeRepo}
-                            className="flex items-center justify-center gap-2 w-full px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--hover-bg)] rounded transition-colors"
+                            className="flex items-center justify-center gap-2 w-full px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-accent)] hover:bg-[var(--hover-bg)] rounded transition-colors"
                         >
                             <Settings size={16} />
                             Change Repository
@@ -179,13 +179,13 @@ export function GitHubLogin({ clientId }: GitHubLoginProps) {
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="w-8 h-8 animate-spin text-[var(--accent-color)]" />
                     <div className="text-center">
-                        <div className="text-lg font-medium text-[var(--text-primary)] mb-2">
+                        <div className="text-lg font-medium text-[var(--text-accent)] mb-2">
                             Waiting for authorization...
                         </div>
                         <div className="text-sm text-[var(--text-secondary)] mb-4">
                             Enter this code on GitHub:
                         </div>
-                        <div className="px-4 py-3 bg-[var(--bg-primary)] rounded-lg border border-[var(--border-color)]">
+                        <div className="px-4 py-3 bg-[var(--bg-accent)] rounded-lg border border-[var(--border-color)]">
                             <code className="text-2xl font-mono font-bold text-[var(--accent-color)]">
                                 {deviceCode.user_code}
                             </code>

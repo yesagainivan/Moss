@@ -335,14 +335,14 @@
 
 /* Wikilinks */
 .wikilink {
-  @apply text-accent cursor-pointer hover:underline font-medium px-1 rounded;
+  @apply text-primary cursor-pointer hover:underline font-medium px-1 rounded;
   background-color: color-mix(in srgb, var(--primary), transparent 92%);
   display: inline;
   vertical-align: baseline;
 }
 
 .dark .wikilink {
-  @apply text-accent;
+  @apply text-primary;
   background-color: color-mix(in srgb, var(--primary), transparent 92%);
 }
 
@@ -1092,15 +1092,15 @@ li[data-type="taskItem"]>div>p {
 
 /* Tag Highlighting */
 .tag-highlight {
-  color: var(--accent);
-  background-color: color-mix(in srgb, var(--accent), transparent 95%);
+  color: var(--primary);
+  background-color: color-mix(in srgb, var(--primary), transparent 95%);
   border-radius: 4px;
   padding: 0 2px;
   font-weight: 500;
 }
 
 .dark .tag-highlight {
-  background-color: color-mix(in srgb, var(--accent), transparent 90%);
+  background-color: color-mix(in srgb, var(--primary), transparent 90%);
 }
 
 td {

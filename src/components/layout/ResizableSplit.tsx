@@ -133,13 +133,13 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
                     {isOpen && (
                         <div
                             className={cn(
-                                "z-10 flex items-center justify-center group transition-colors hover:bg-accent/50 active:bg-accent",
+                                "z-10 flex items-center justify-center group transition-colors hover:bg-primary/50 active:bg-primary",
                                 isVertical ? "h-1 w-full cursor-row-resize" : "w-1 h-full cursor-col-resize"
                             )}
                             onMouseDown={startResizing}
                         >
                             <div className={cn(
-                                "bg-border group-hover:bg-accent/50",
+                                "bg-border group-hover:bg-primary/50",
                                 isVertical ? "h-[1px] w-full" : "w-[1px] h-full"
                             )} />
                         </div>
@@ -159,13 +159,13 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
                     {isOpen && (
                         <div
                             className={cn(
-                                "z-10 flex items-center justify-center group transition-colors hover:bg-accent/50 active:bg-accent",
+                                "z-10 flex items-center justify-center group transition-colors hover:bg-primary/50 active:bg-primary",
                                 isVertical ? "h-1 w-full cursor-row-resize" : "w-1 h-full cursor-col-resize"
                             )}
                             onMouseDown={startResizing}
                         >
                             <div className={cn(
-                                "bg-border group-hover:bg-accent/50",
+                                "bg-border group-hover:bg-primary/50",
                                 isVertical ? "h-[1px] w-full" : "w-[1px] h-full"
                             )} />
                         </div>

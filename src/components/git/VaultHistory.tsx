@@ -180,7 +180,7 @@ export const VaultHistory = ({ requestConfirmation, setGitMessage }: VaultHistor
                                                 {commit.message}
                                             </p>
                                             {index === 0 && (
-                                                <span className="text-xs px-2 py-0.5 bg-accent/20 text-accent rounded">
+                                                <span className="text-xs px-2 py-0.5 bg-primary/20 text-primary rounded">
                                                     Current
                                                 </span>
                                             )}
@@ -200,7 +200,7 @@ export const VaultHistory = ({ requestConfirmation, setGitMessage }: VaultHistor
                                     <button
                                         onClick={() => handleRestore(commit)}
                                         disabled={isRestoring}
-                                        className="ml-3 px-3 py-1.5 bg-primary hover:bg-primary/80 text-background rounded-md text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                                        className="ml-3 px-3 py-1.5 bg-accent hover:bg-accent/80 text-background rounded-md text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
                                     >
                                         <RotateCcw className="w-3 h-3" />
                                         {isRestoring ? 'Restoring...' : 'Restore'}

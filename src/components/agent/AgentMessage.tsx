@@ -135,11 +135,11 @@ export const AgentMessageItem: React.FC<AgentMessageProps> = ({ message, isLast 
     if (isUser) {
         return (
             <div className="flex flex-row-reverse gap-2 mb-4 group">
-                <div className="w-4 h-4 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
+                <div className="w-4 h-4 rounded-full flex items-center justify-center shrink-0 bg-accent/10 text-accent">
                     <User size={16} />
                 </div>
                 <div className="flex flex-col items-end max-w-[85%]">
-                    <div className="px-2 py-0 rounded-2xl text-sm bg-primary/10 text-foreground rounded-tr-none">
+                    <div className="px-2 py-0 rounded-2xl text-sm bg-accent/10 text-foreground rounded-tr-none">
                         {message.content}
                     </div>
                     <span className="text-[10px] text-border mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -155,7 +155,7 @@ export const AgentMessageItem: React.FC<AgentMessageProps> = ({ message, isLast 
         <div className="flex flex-col gap-1 mb-6 group">
             {/* Header: Avatar + Name */}
             <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-accent text-accent-foreground shadow-sm">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-primary text-primary-foreground shadow-sm">
                     <Bot size={14} />
                 </div>
                 <span className="text-xs font-medium text-muted-foreground">Mosaic</span>
@@ -167,7 +167,7 @@ export const AgentMessageItem: React.FC<AgentMessageProps> = ({ message, isLast 
             {/* Content */}
             <div className="pl-0 pt-2">
                 <div
-                    className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-accent prose-a:no-underline hover:prose-a:underline prose-pre:bg-secondary prose-pre:p-2 prose-pre:rounded-md prose-code:text-foreground prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none"
+                    className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-pre:bg-secondary prose-pre:p-2 prose-pre:rounded-md prose-code:text-foreground prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none"
                     dangerouslySetInnerHTML={{
                         __html: marked(processContent(message.content || ''), { async: false }) as string,
                     }}
@@ -184,7 +184,7 @@ export const AgentMessageItem: React.FC<AgentMessageProps> = ({ message, isLast 
                     }}
                 />
                 {message.isStreaming && (
-                    <span className="inline-block w-2 h-4 bg-accent animate-pulse ml-1 rounded-sm" />
+                    <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1 rounded-sm" />
                 )}
             </div>
         </div>

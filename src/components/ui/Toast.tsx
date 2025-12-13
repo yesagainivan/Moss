@@ -70,7 +70,7 @@ export const Toast = ({ message, type, onClose, duration = 4000 }: ToastProps) =
             <p className="flex-1 text-sm font-medium text-foreground">{message}</p>
             <button
                 onClick={handleClose}
-                className="p-1 hover:bg-accent/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                className="p-1 hover:bg-primary/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
             >
                 <X className="w-4 h-4" />
             </button>

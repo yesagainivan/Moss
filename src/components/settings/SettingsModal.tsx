@@ -174,7 +174,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                         <h2 className="text-xl font-semibold text-foreground">Settings</h2>
                         <button
                             onClick={handleClose}
-                            className="p-1 hover:bg-accent/10 rounded-md transition-colors"
+                            className="p-1 hover:bg-primary/10 rounded-md transition-colors"
                         >
                             <X className="w-5 h-5" />
                         </button>
@@ -185,7 +185,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                         <button
                             onClick={() => setActiveTab('editor')}
                             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${activeTab === 'editor'
-                                ? 'border-accent text-accent'
+                                ? 'border-primary text-primary'
                                 : 'border-transparent text-muted-foreground hover:text-foreground'
                                 }`}
                         >
@@ -194,7 +194,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                         <button
                             onClick={() => setActiveTab('ai')}
                             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${activeTab === 'ai'
-                                ? 'border-accent text-accent'
+                                ? 'border-primary text-primary'
                                 : 'border-transparent text-muted-foreground hover:text-foreground'
                                 }`}
                         >
@@ -203,7 +203,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                         <button
                             onClick={() => setActiveTab('git')}
                             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${activeTab === 'git'
-                                ? 'border-accent text-accent'
+                                ? 'border-primary text-primary'
                                 : 'border-transparent text-muted-foreground hover:text-foreground'
                                 }`}
                         >
@@ -223,7 +223,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                             <button
                                                 onClick={() => useThemeStore.getState().setActiveTheme(null)}
                                                 className={`p-3 rounded-lg border text-left transition-all ${!useThemeStore.getState().activeThemeId
-                                                    ? 'border-accent bg-accent/10'
+                                                    ? 'border-primary bg-primary/10'
                                                     : 'border-border hover:bg-secondary/50'
                                                     }`}
                                             >
@@ -236,7 +236,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                     key={theme.name}
                                                     onClick={() => useThemeStore.getState().setActiveTheme(theme.name)}
                                                     className={`p-3 rounded-lg border text-left transition-all ${useThemeStore.getState().activeThemeId === theme.name
-                                                        ? 'border-accent bg-accent/10'
+                                                        ? 'border-primary bg-primary/10'
                                                         : 'border-border hover:bg-secondary/50'
                                                         }`}
                                                 >
@@ -277,7 +277,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                         key={theme}
                                                         onClick={() => updateSettings({ theme })}
                                                         className={`px-3 py-2 text-sm font-medium rounded-md border transition-all ${settings.theme === theme
-                                                            ? 'bg-accent text-background border-accent'
+                                                            ? 'bg-primary text-background border-primary'
                                                             : 'bg-background text-foreground border-input hover:bg-secondary/50'
                                                             }`}
                                                     >
@@ -302,7 +302,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                         <button
                                                             onClick={() => updateSettings({ graphPosition: 'center' })}
                                                             className={`px-3 py-2 text-sm font-medium rounded-md border transition-all ${settings.graphPosition === 'center'
-                                                                ? 'bg-accent text-background border-accent'
+                                                                ? 'bg-primary text-background border-primary'
                                                                 : 'bg-background text-foreground border-input hover:bg-secondary/50'
                                                                 }`}
                                                         >
@@ -311,7 +311,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                         <button
                                                             onClick={() => updateSettings({ graphPosition: 'sidebar' })}
                                                             className={`px-3 py-2 text-sm font-medium rounded-md border transition-all ${settings.graphPosition === 'sidebar'
-                                                                ? 'bg-accent text-background border-accent'
+                                                                ? 'bg-primary text-background border-primary'
                                                                 : 'bg-background text-foreground border-input hover:bg-secondary/50'
                                                                 }`}
                                                         >
@@ -332,7 +332,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                     </div>
                                                     <button
                                                         onClick={() => updateSettings({ graphShowParticles: !settings.graphShowParticles })}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${settings.graphShowParticles ? 'bg-accent' : 'bg-input'
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${settings.graphShowParticles ? 'bg-primary' : 'bg-input'
                                                             }`}
                                                     >
                                                         <span
@@ -354,7 +354,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                     </div>
                                                     <button
                                                         onClick={() => updateSettings({ graphShowLabels: !settings.graphShowLabels })}
-                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${settings.graphShowLabels ? 'bg-accent' : 'bg-input'
+                                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${settings.graphShowLabels ? 'bg-primary' : 'bg-input'
                                                             }`}
                                                     >
                                                         <span
@@ -486,7 +486,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                             useThemeStore.getState().updateGrainTexture(texture);
                                                         }}
                                                         className={`px-3 py-2 text-sm font-medium rounded-md border transition-all ${settings.grainTexture === texture
-                                                            ? 'bg-accent text-background border-accent'
+                                                            ? 'bg-primary text-background border-primary'
                                                             : 'bg-background text-foreground border-input hover:bg-secondary/50'
                                                             }`}
                                                     >
@@ -508,7 +508,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                             </div>
                                             <button
                                                 onClick={() => updateSettings({ enableMaxWidth: !settings.enableMaxWidth })}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.enableMaxWidth ? 'bg-accent' : 'bg-secondary'
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.enableMaxWidth ? 'bg-primary' : 'bg-secondary'
                                                     }`}
                                             >
                                                 <span
@@ -572,7 +572,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                             </label>
                                             <button
                                                 onClick={() => updateSettings({ spellCheck: !settings.spellCheck })}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.spellCheck ? 'bg-accent' : 'bg-secondary'
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.spellCheck ? 'bg-primary' : 'bg-secondary'
                                                     }`}
                                             >
                                                 <span
@@ -594,7 +594,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                             </div>
                                             <button
                                                 onClick={() => updateSettings({ showDiffPanel: !settings.showDiffPanel })}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.showDiffPanel ? 'bg-accent' : 'bg-secondary'
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.showDiffPanel ? 'bg-primary' : 'bg-secondary'
                                                     }`}
                                             >
                                                 <span
@@ -709,7 +709,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                         <button
                                                             onClick={handleSaveKey}
                                                             disabled={isSaving}
-                                                            className="px-4 py-2 bg-primary hover:bg-primary/80 text-background rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                            className="px-4 py-2 bg-accent hover:bg-accent/80 text-background rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                                                         >
                                                             {isSaving ? 'Saving...' : 'Save'}
                                                         </button>
@@ -807,7 +807,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                                             <div className="flex gap-2 ml-3">
                                                                                 <button
                                                                                     onClick={() => setEditingPromptId(prompt.id)}
-                                                                                    className="text-xs px-2 py-1 bg-primary hover:bg-primary/80 text-background rounded transition-colors"
+                                                                                    className="text-xs px-2 py-1 bg-accent hover:bg-accent/80 text-background rounded transition-colors"
                                                                                 >
                                                                                     Edit
                                                                                 </button>
@@ -850,7 +850,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                                     }
                                                                 }}
                                                                 disabled={!newPromptName.trim() || !newPromptInstruction.trim()}
-                                                                className="w-full px-4 py-2 bg-accent text-white hover:bg-accent/90 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                className="w-full px-4 py-2 bg-primary text-white hover:bg-primary/90 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                             >
                                                                 Add Prompt
                                                             </button>
@@ -866,7 +866,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                     <button
                                                         onClick={handleTestConnection}
                                                         disabled={isTesting || !apiKey}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-accent text-white hover:bg-accent/90 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                        className="flex items-center gap-2 px-4 py-2 bg-primary text-white hover:bg-primary/90 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                                                     >
                                                         {isTesting ? (
                                                             <>
@@ -940,7 +940,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                             }
                                         }}
                                         disabled={isIndexing}
-                                        className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/80 text-background rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                        className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/80 text-background rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                                     >
                                         {isIndexing ? (
                                             <>
@@ -1030,7 +1030,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                     }
                                                 }}
                                                 disabled={isInitializingGit}
-                                                className="px-4 py-2 bg-accent text-accent-foreground rounded-md hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                             >
                                                 {isInitializingGit ? (
                                                     <>
@@ -1042,7 +1042,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                 )}
                                             </button>
                                             <p className="text-xs text-muted-foreground mt-2">
-                                                This will run <code className="px-1 py-0.5 bg-primary rounded text-xs text-background">git init</code> in your vault folder.
+                                                This will run <code className="px-1 py-0.5 bg-accent rounded text-xs text-background">git init</code> in your vault folder.
                                             </p>
 
                                             {/* Success/Error Messages */}
@@ -1098,7 +1098,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                         setGitMessage({ type: 'error', text: `Failed to snapshot vault: ${e}` });
                                                     }
                                                 }}
-                                                className="px-3 py-1.5 bg-primary hover:bg-primary/80 text-background rounded-md text-xs font-medium transition-colors flex items-center gap-2"
+                                                className="px-3 py-1.5 bg-accent hover:bg-accent/80 text-background rounded-md text-xs font-medium transition-colors flex items-center gap-2"
                                             >
                                                 <Check className="w-3 h-3" />
                                                 Snapshot Entire Vault
@@ -1129,7 +1129,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                     <div className="flex items-center justify-end gap-3 p-6 border-t border-border">
                         <button
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-foreground bg-accent/10 hover:bg-accent/20 rounded-md transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-foreground bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
                         >
                             Close
                         </button>

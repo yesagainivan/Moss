@@ -78,13 +78,13 @@ export const TabItem = memo(({ id, noteId, isActive, isPreview, isPinned, onActi
                 onContextMenu={handleContextMenu}
                 className={cn(
                     "group flex items-center gap-2 px-3 py-2 text-sm border-r border-border cursor-pointer select-none min-w-[120px] max-w-[200px] h-full transition-colors",
-                    isActive ? "bg-background text-foreground font-medium border-t-2 border-t-accent" : "bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground",
-                    isPinned && "bg-accent/5 border-b-2 border-b-accent/50",
+                    isActive ? "bg-background text-foreground font-medium border-t-2 border-t-primary" : "bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground",
+                    isPinned && "bg-accent/5 border-b-2 border-b-primary/50",
                     isDragging && "z-50"
                 )}
             >
                 {isPinned && (
-                    <Pin className="w-3 h-3 text-accent" />
+                    <Pin className="w-3 h-3 text-primary" />
                 )}
                 <span className={cn("flex-1 truncate", isPreview && "italic")} title={title}>{title}</span>
 

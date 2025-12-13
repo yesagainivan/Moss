@@ -52,7 +52,7 @@ export const Toolbar = () => {
                         <button
                             onClick={navigateBack}
                             disabled={!canGoBack}
-                            className={`p-1.5 rounded-md transition-colors ${canGoBack ? 'hover:bg-accent/10 text-foreground' : 'text-muted-foreground/50 cursor-not-allowed'}`}
+                            className={`p-1.5 rounded-md transition-colors ${canGoBack ? 'hover:bg-primary/10 text-foreground' : 'text-muted-foreground/50 cursor-not-allowed'}`}
                             title="Go Back"
                         >
                             <ArrowLeft className="w-4 h-4" />
@@ -60,7 +60,7 @@ export const Toolbar = () => {
                         <button
                             onClick={navigateForward}
                             disabled={!canGoForward}
-                            className={`p-1.5 rounded-md transition-colors ${canGoForward ? 'hover:bg-accent/10 text-foreground' : 'text-muted-foreground/50 cursor-not-allowed'}`}
+                            className={`p-1.5 rounded-md transition-colors ${canGoForward ? 'hover:bg-primary/10 text-foreground' : 'text-muted-foreground/50 cursor-not-allowed'}`}
                             title="Go Forward"
                         >
                             <ArrowRight className="w-4 h-4" />
@@ -70,14 +70,14 @@ export const Toolbar = () => {
                     <div className="flex items-center gap-1 mr-2 border-r border-border pr-2">
                         <button
                             onClick={() => activePaneId && splitPane(activePaneId, 'vertical')}
-                            className="p-1.5 hover:bg-accent/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                            className="p-1.5 hover:bg-primary/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
                             title="Split Vertical (Cmd+\)"
                         >
                             <SplitSquareHorizontal className="w-4 h-4" />
                         </button>
                         <button
                             onClick={() => activePaneId && splitPane(activePaneId, 'horizontal')}
-                            className="p-1.5 hover:bg-accent/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                            className="p-1.5 hover:bg-primary/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
                             title="Split Horizontal (Cmd+Shift+\)"
                         >
                             <SplitSquareVertical className="w-4 h-4" />
@@ -85,7 +85,7 @@ export const Toolbar = () => {
                         <button
                             onClick={() => activePaneId && closePane(activePaneId)}
                             disabled={!canClosePane}
-                            className={`p-1.5 rounded-md transition-colors ${canClosePane ? 'hover:bg-accent/10 text-muted-foreground hover:text-foreground' : 'text-muted-foreground/30 cursor-not-allowed'}`}
+                            className={`p-1.5 rounded-md transition-colors ${canClosePane ? 'hover:bg-primary/10 text-muted-foreground hover:text-foreground' : 'text-muted-foreground/30 cursor-not-allowed'}`}
                             title="Close Pane (Cmd+W)"
                         >
                             <XCircle className="w-4 h-4" />
@@ -97,7 +97,7 @@ export const Toolbar = () => {
                     {gitEnabled && activeTab && (
                         <button
                             onClick={() => window.dispatchEvent(new CustomEvent('open-history-modal'))}
-                            className="p-1.5 hover:bg-accent/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                            className="p-1.5 hover:bg-primary/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
                             title="View History"
                         >
                             <Clock className="w-4 h-4" />
@@ -107,7 +107,7 @@ export const Toolbar = () => {
                     {gitEnabled && (
                         <button
                             onClick={() => setShowActivity(true)}
-                            className="p-1.5 hover:bg-accent/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
+                            className="p-1.5 hover:bg-primary/10 rounded-md transition-colors text-muted-foreground hover:text-foreground"
                             title="Activity Calendar"
                         >
                             <BarChart3 className="w-4 h-4" />
@@ -117,7 +117,7 @@ export const Toolbar = () => {
                     <button
                         ref={aiButtonRef}
                         onClick={() => setShowAIMenu(!showAIMenu)}
-                        className={`p-1.5 rounded-md transition-colors ${showAIMenu ? 'bg-accent/10 text-accent' : 'hover:bg-accent/10 text-muted-foreground'
+                        className={`p-1.5 rounded-md transition-colors ${showAIMenu ? 'bg-primary/10 text-primary' : 'hover:bg-primary/10 text-muted-foreground'
                             }`}
                         title="AI Tools"
                     >
@@ -132,14 +132,14 @@ export const Toolbar = () => {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => setBacklinksPanelOpen(!isBacklinksPanelOpen)}
-                        className={`p-1.5 rounded-md transition-colors ${isBacklinksPanelOpen ? 'bg-accent/10 text-accent' : 'hover:bg-accent/10 text-muted-foreground'}`}
+                        className={`p-1.5 rounded-md transition-colors ${isBacklinksPanelOpen ? 'bg-primary/10 text-primary' : 'hover:bg-primary/10 text-muted-foreground'}`}
                         title="Toggle Backlinks (Cmd+Opt+B)"
                     >
                         <Link2 className="w-4 h-4" />
                     </button>
                     <button
                         onClick={() => setOutlinePanelOpen(!isOutlinePanelOpen)}
-                        className={`p-1.5 rounded-md transition-colors ${isOutlinePanelOpen ? 'bg-accent/10 text-accent' : 'hover:bg-accent/10 text-muted-foreground'}`}
+                        className={`p-1.5 rounded-md transition-colors ${isOutlinePanelOpen ? 'bg-primary/10 text-primary' : 'hover:bg-primary/10 text-muted-foreground'}`}
                         title="Toggle Outline (Cmd+Opt+O)"
                     >
                         <List className="w-4 h-4" />
@@ -147,14 +147,14 @@ export const Toolbar = () => {
                     <GitHubSyncIndicator />
                     <button
                         onClick={toggleAgent}
-                        className={`p-1.5 rounded-md transition-colors ${isAgentOpen ? 'bg-accent/10 text-accent' : 'hover:bg-accent/10 text-muted-foreground'}`}
+                        className={`p-1.5 rounded-md transition-colors ${isAgentOpen ? 'bg-primary/10 text-primary' : 'hover:bg-primary/10 text-muted-foreground'}`}
                         title="Chat with Mosaic"
                     >
                         <Bot className="w-4 h-4" />
                     </button>
                     <button
                         onClick={() => setShowSettings(true)}
-                        className="p-1.5 hover:bg-accent/10 rounded-md transition-colors"
+                        className="p-1.5 hover:bg-primary/10 rounded-md transition-colors"
                         title="Settings"
                     >
                         <SettingsIcon className="w-4 h-4 text-muted-foreground" />

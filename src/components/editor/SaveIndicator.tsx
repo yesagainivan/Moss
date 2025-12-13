@@ -23,7 +23,7 @@ export const SaveIndicator = ({ noteId }: SaveIndicatorProps) => {
                 );
             case 'success':
                 return (
-                    <div className="flex items-center gap-2 text-sm text-accent font-medium animate-in fade-in slide-in-from-bottom-1">
+                    <div className="flex items-center gap-2 text-sm text-primary font-medium animate-in fade-in slide-in-from-bottom-1">
                         <CheckCircle2 className="w-4 h-4" />
                         <span>{vaultStatus.message || 'Snapshot Saved'}</span>
                     </div>
@@ -70,7 +70,7 @@ export const SaveIndicator = ({ noteId }: SaveIndicatorProps) => {
 
         case 'snapshot':
             return (
-                <div className="flex items-center gap-2 text-sm text-accent font-medium animate-in fade-in slide-in-from-bottom-1">
+                <div className="flex items-center gap-2 text-sm text-primary font-medium animate-in fade-in slide-in-from-bottom-1">
                     <CheckCircle2 className="w-4 h-4" />
                     <span>Snapshot Saved</span>
                 </div>

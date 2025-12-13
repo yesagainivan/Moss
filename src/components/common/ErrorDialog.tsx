@@ -29,7 +29,7 @@ export const ErrorDialog = ({ isOpen, title, message, onClose }: ErrorDialogProp
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-1 hover:bg-accent/10 rounded-md transition-colors"
+                            className="p-1 hover:bg-primary/10 rounded-md transition-colors"
                         >
                             <X className="w-5 h-5 text-muted-foreground" />
                         </button>
@@ -44,7 +44,7 @@ export const ErrorDialog = ({ isOpen, title, message, onClose }: ErrorDialogProp
                     <div className="flex justify-end p-4 border-t border-border">
                         <button
                             onClick={onClose}
-                            className="px-4 py-2 bg-accent text-white hover:bg-accent/90 rounded-md text-sm font-medium transition-colors"
+                            className="px-4 py-2 bg-primary text-white hover:bg-primary/90 rounded-md text-sm font-medium transition-colors"
                         >
                             OK
                         </button>

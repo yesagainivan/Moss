@@ -82,7 +82,7 @@ export function GitHubSyncStatus({ repoOwner, repoName }: GitHubSyncStatusProps)
     return (
         <div className="space-y-4">
             <div>
-                <h4 className="text-sm font-medium text-[var(--text-primary)] mb-2">
+                <h4 className="text-sm font-medium text-[var(--text-accent)] mb-2">
                     Sync Status
                 </h4>
                 <p className="text-xs text-[var(--text-secondary)] mb-3">
@@ -139,7 +139,7 @@ export function GitHubSyncStatus({ repoOwner, repoName }: GitHubSyncStatusProps)
                 <button
                     onClick={handleSync}
                     disabled={isSyncing}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--accent-color)] text-[var(--text-primary)] hover:opacity-90 rounded-md text-sm font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--accent-color)] text-[var(--text-accent)] hover:opacity-90 rounded-md text-sm font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isSyncing ? (
                         <>
@@ -174,7 +174,7 @@ export function GitHubSyncStatus({ repoOwner, repoName }: GitHubSyncStatusProps)
             {/* Info */}
             <div className="p-3 bg-[var(--accent-color)]/5 border border-[var(--accent-color)]/20 rounded-lg">
                 <p className="text-xs text-[var(--text-secondary)]">
-                    <strong className="text-[var(--text-primary)]">How sync works:</strong> Pulls latest changes from GitHub, then pushes your local commits. Conflicts will be shown for resolution.
+                    <strong className="text-[var(--text-accent)]">How sync works:</strong> Pulls latest changes from GitHub, then pushes your local commits. Conflicts will be shown for resolution.
                 </p>
             </div>
 
