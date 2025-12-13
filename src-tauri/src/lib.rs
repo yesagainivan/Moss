@@ -399,7 +399,7 @@ async fn init_git_repository(vault_path: String) -> Result<(), String> {
 async fn get_git_history(
     vault_path: String,
     limit: Option<usize>,
-    ambre_only: Option<bool>,
+    mosaic_only: Option<bool>,
     file_path: Option<String>,
     include_stats: Option<bool>,
 ) -> Result<Vec<git_manager::CommitInfo>, String> {
@@ -424,7 +424,7 @@ async fn get_git_history(
         git_manager::get_commit_history(
             &repo,
             limit.unwrap_or(50),
-            ambre_only.unwrap_or(false),
+            mosaic_only.unwrap_or(false),
             relative_file_path.as_deref(),
             include_stats.unwrap_or(false),
         )
@@ -464,11 +464,11 @@ async fn get_file_content_at_commit(
 }
 
 #[tauri::command]
-async fn undo_last_ambre_change(vault_path: String) -> Result<String, String> {
+async fn undo_last_mosaic_change(vault_path: String) -> Result<String, String> {
     let path = std::path::Path::new(&vault_path);
 
     if let Some(repo) = git_manager::open_repository(path) {
-        git_manager::undo_last_ambre_commit(&repo)
+        git_manager::undo_last_mosaic_commit(&repo)
             .map(|oid| format!("Reverted commit: {}", oid))
             .map_err(|e| format!("Failed to undo last change: {}", e))
     } else {
@@ -834,7 +834,7 @@ pub fn run() {
             init_git_repository,
             get_git_history,
             get_file_content_at_commit,
-            undo_last_ambre_change,
+            undo_last_mosaic_change,
             check_uncommitted_changes,
             commit_note,
             commit_vault,

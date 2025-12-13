@@ -347,7 +347,7 @@ export async function executeTool(
                     notePaths: args.note_paths,
                 });
 
-                // Format result for Ambre
+                // Format result for Mosaic
                 const successCount = result.success.length;
                 const failCount = result.failed.length;
 

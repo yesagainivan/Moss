@@ -2,11 +2,11 @@ import { useGitStore } from '../../store/useGitStore';
 import { useAppStore } from '../../store/useStore';
 
 /**
- * Undo button for reverting Ambre's last change
+ * Undo button for reverting the Agent's last change
  * Uses Git revert (safe, non-destructive)
  */
-export const UndoAmbreButton = () => {
-    const { gitEnabled, undoLastAmbreChange } = useGitStore();
+export const UndoAgentButton = () => {
+    const { gitEnabled, undoLastMosaicChange } = useGitStore();
     const { requestConfirmation } = useAppStore();
 
     if (!gitEnabled) {
@@ -15,10 +15,10 @@ export const UndoAmbreButton = () => {
 
     return (
         <button
-            onClick={() => undoLastAmbreChange(requestConfirmation)}
+            onClick={() => undoLastMosaicChange(requestConfirmation)}
             className="p-2 hover:bg-black/10 rounded transition-colors group relative"
-            title="Undo last Ambre change"
-            aria-label="Undo last change made by Ambre"
+            title="Undo last Mosaic change"
+            aria-label="Undo last change made by Mosaic"
         >
             <svg
                 width="18"
@@ -38,7 +38,7 @@ export const UndoAmbreButton = () => {
 
             {/* Tooltip */}
             <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 py-1 bg-background border border-border text-popover-foreground text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                Undo Ambre's last change
+                Undo Mosaic's last change
             </div>
         </button>
     );

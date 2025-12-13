@@ -1,10 +1,10 @@
-# Euler-Style Vault Builder Prompt for Ambre 🏗️
+# Euler-Style Vault Builder Prompt for Mosaic 🏗️
 
-Paste this **exact prompt** to Ambre to auto-generate a structured knowledge vault for **any notable person** (mathematician, actor, musician, scientist, etc.) just like your Leonhard Euler vault!
+Paste this **exact prompt** to Mosaic to auto-generate a structured knowledge vault for **any notable person** (mathematician, actor, musician, scientist, etc.) just like your Leonhard Euler vault!
 
 ---
 
-**Ambre, create a comprehensive knowledge vault for **[[NAME|NAME]]** (e.g., Leonhard Euler, Marie Curie, David Bowie). Mirror the Euler vault structure exactly, but adapt content to **[[NAME|NAME]]**. Use your knowledge to fill notes with accurate, concise markdown—facts, timelines, links, etc.**
+**Mosaic, create a comprehensive knowledge vault for **[[NAME|NAME]]** (e.g., Leonhard Euler, Marie Curie, David Bowie). Mirror the Euler vault structure exactly, but adapt content to **[[NAME|NAME]]**. Use your knowledge to fill notes with accurate, concise markdown—facts, timelines, links, etc.**
 
 ## Exact Structure to Build:
 
@@ -50,6 +50,6 @@ Paste this **exact prompt** to Ambre to auto-generate a structured knowledge vau
 
 ---
 
-**Usage**: Replace [[NAME|NAME]] with "Albert Einstein", "Frida Kahlo", etc. Ambre will handle the rest!
+**Usage**: Replace [[NAME|NAME]] with "Albert Einstein", "Frida Kahlo", etc. Mosaic will handle the rest!
 
 *Inspired by your Euler vault—now scalable to anyone!* ✨

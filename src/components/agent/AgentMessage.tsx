@@ -158,7 +158,7 @@ export const AgentMessageItem: React.FC<AgentMessageProps> = ({ message, isLast 
                 <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-accent text-accent-foreground shadow-sm">
                     <Bot size={14} />
                 </div>
-                <span className="text-xs font-medium text-muted-foreground">Ambre</span>
+                <span className="text-xs font-medium text-muted-foreground">Mosaic</span>
                 <span className="text-[10px] text-border opacity-0 group-hover:opacity-100 transition-opacity">
                     {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>

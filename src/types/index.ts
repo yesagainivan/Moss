@@ -59,7 +59,7 @@ export interface CommitInfo {
     message: string;
     author: string;
     timestamp: number;
-    is_ambre: boolean;
+    is_mosaic: boolean;
     stats?: CommitStats;
 }
 

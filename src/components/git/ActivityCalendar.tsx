@@ -150,7 +150,7 @@ export const ActivityCalendar = ({ isOpen, onClose }: ActivityCalendarProps) => 
             totalCommits,
             userCommits,
             ambreCommits,
-            topContributor: userCommits >= ambreCommits ? 'You' : 'Ambre',
+            topContributor: userCommits >= ambreCommits ? 'You' : 'Mosaic',
             recentCommits: sortedCommits.slice(0, 10),
             currentStreak
         };
@@ -276,14 +276,14 @@ export const ActivityCalendar = ({ isOpen, onClose }: ActivityCalendarProps) => 
                                                 className={`${styles.activityItem} ${isClickable ? styles.clickable : ''}`}
                                                 onClick={() => isClickable && handleActivityClick(commit)}
                                             >
-                                                <div className={`${styles.activityIcon} ${commit.is_ambre ? styles.iconAmbre : styles.iconUser}`}>
+                                                <div className={`${styles.activityIcon} ${commit.is_ambre ? styles.iconMosaic : styles.iconUser}`}>
                                                     <GitCommit className="w-4 h-4" />
                                                 </div>
                                                 <div className={styles.activityContent}>
                                                     <div className={styles.activityMessage}>{commit.message}</div>
                                                     <div className={styles.activityMeta}>
                                                         <span className={styles.activityAuthor}>
-                                                            {commit.is_ambre ? 'Ambre' : 'You'}
+                                                            {commit.is_ambre ? 'Mosaic' : 'You'}
                                                         </span>
                                                         <span className={styles.activityDot}>•</span>
                                                         <span className={styles.activityTime}>

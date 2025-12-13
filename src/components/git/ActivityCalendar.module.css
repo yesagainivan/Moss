@@ -229,8 +229,8 @@
     background-color: var(--accent);
 }
 
-/* Ambre commits - purple */
-.intensityAmbre {
+/* Mosaic commits - purple */
+.intensityMosaic {
     background-color: #a855f7;
 }
 
@@ -435,7 +435,7 @@
     color: var(--accent);
 }
 
-.iconAmbre {
+.iconMosaic {
     background: color-mix(in srgb, #a855f7, transparent 90%);
     color: #a855f7;
 }

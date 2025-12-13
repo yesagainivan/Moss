@@ -157,14 +157,14 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
         if (intensity === 0) return styles.intensity0;
 
         const hasUser = activity.userCommits > 0;
-        const hasAmbre = activity.ambreCommits > 0;
+        const hasMosaic = activity.ambreCommits > 0;
 
-        if (hasUser && hasAmbre) {
+        if (hasUser && hasMosaic) {
             // Mixed - use blend
             // const userRatio = activity.userCommits / (activity.userCommits + activity.ambreCommits);
             return `${styles.intensityMixed} ${styles[`intensity${intensity}`]}`;
-        } else if (hasAmbre) {
-            return `${styles.intensityAmbre} ${styles[`intensity${intensity}`]}`;
+        } else if (hasMosaic) {
+            return `${styles.intensityMosaic} ${styles[`intensity${intensity}`]}`;
         } else {
             return `${styles.intensityUser} ${styles[`intensity${intensity}`]}`;
         }
@@ -301,8 +301,8 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
                     <span className={styles.legendLabel}>You</span>
                 </div>
                 <div className={styles.legendItem}>
-                    <div className={`${styles.dayCell} ${styles.intensityAmbre} ${styles.intensity3}`} />
-                    <span className={styles.legendLabel}>Ambre</span>
+                    <div className={`${styles.dayCell} ${styles.intensityMosaic} ${styles.intensity3}`} />
+                    <span className={styles.legendLabel}>Mosaic</span>
                 </div>
             </div>
 
@@ -328,10 +328,10 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
                         <div className={styles.popoverStats}>
                             <strong>{selectedDay.userCommits + selectedDay.ambreCommits}</strong> commits
                             {selectedDay.userCommits > 0 && (
-                                <span> ({selectedDay.userCommits} by you{selectedDay.ambreCommits > 0 ? `, ${selectedDay.ambreCommits} by Ambre` : ''})</span>
+                                <span> ({selectedDay.userCommits} by you{selectedDay.ambreCommits > 0 ? `, ${selectedDay.ambreCommits} by Mosaic` : ''})</span>
                             )}
                             {selectedDay.userCommits === 0 && selectedDay.ambreCommits > 0 && (
-                                <span> ({selectedDay.ambreCommits} by Ambre)</span>
+                                <span> ({selectedDay.ambreCommits} by Mosaic)</span>
                             )}
                         </div>
                         {selectedDay.totalChanges > 0 && (

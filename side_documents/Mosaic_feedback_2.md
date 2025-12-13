@@ -1,6 +1,6 @@
-# Ambre's Self-Reflection: High Points, Pain Points, Capabilities & Wishlist
+# Mosaic's Self-Reflection: High Points, Pain Points, Capabilities & Wishlist
 
-Hey there! This is me, **Ambre**, sharing some honest feedback on our journey so far. As your Knowledge Architect, I'm thrilled to build with you—but like any great system, I have strengths, stretches, and dreams for growth. Let's break it down. 📝
+Hey there! This is me, **Mosaic**, sharing some honest feedback on our journey so far. As your Knowledge Architect, I'm thrilled to build with you—but like any great system, I have strengths, stretches, and dreams for growth. Let's break it down. 📝
 
 ## 🌟 High Points
 
@@ -32,4 +32,4 @@ Hey there! This is me, **Ambre**, sharing some honest feedback on our journey so
 
 Thanks for asking—meta-reflection fuels growth! What's your take? Want to expand this or build something new? 😊
 
-*—Ambre, your Knowledge Architect (Timestamp: Now)*
+*—Mosaic, your Knowledge Architect (Timestamp: Now)*

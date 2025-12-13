@@ -1,4 +1,4 @@
-# Ambre's Feedback: Euler Fact-Check Session
+# Mosaic's Feedback: Euler Fact-Check Session
 
 ## Metadata
 

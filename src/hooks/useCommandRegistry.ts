@@ -66,7 +66,7 @@ export const useCommandRegistry = (): Command[] => {
     const {
         snapshotNote,
         snapshotVault,
-        undoLastAmbreChange,
+        undoLastMosaicChange,
     } = useGitStore();
 
     const activeTabId = useActiveTabId();
@@ -263,12 +263,12 @@ export const useCommandRegistry = (): Command[] => {
             },
             {
                 id: 'undo-ambre',
-                label: 'Undo Last Ambre Change',
+                label: 'Undo Last Mosaic Change',
                 description: 'Revert the last AI-made change',
                 icon: RotateCcw,
                 category: CommandCategory.Git,
                 action: async () => {
-                    await undoLastAmbreChange(useAppStore.getState().requestConfirmation);
+                    await undoLastMosaicChange(useAppStore.getState().requestConfirmation);
                 },
                 condition: () => !!vaultPath,
             },

@@ -296,7 +296,7 @@ pub async fn agent_create_note(
 
     // Auto-commit if Git repository
     if let Some(repo) = crate::git_manager::open_repository(vault) {
-        let _ = crate::git_manager::auto_commit_ambre_changes(
+        let _ = crate::git_manager::auto_commit_mosaic_changes(
             &repo,
             &format!("Created {}", filename),
             &[&note_path],
@@ -378,7 +378,7 @@ pub async fn agent_batch_create_notes(
                 .collect();
             let file_refs: Vec<&std::path::Path> = file_paths.iter().map(|p| p.as_ref()).collect();
 
-            let _ = crate::git_manager::auto_commit_ambre_changes(
+            let _ = crate::git_manager::auto_commit_mosaic_changes(
                 &repo,
                 &format!(
                     "Created {} note{}",
@@ -461,7 +461,7 @@ pub async fn agent_update_note(
 
     // Auto-commit if Git repository
     if let Some(repo) = crate::git_manager::open_repository(vault) {
-        let _ = crate::git_manager::auto_commit_ambre_changes(
+        let _ = crate::git_manager::auto_commit_mosaic_changes(
             &repo,
             &format!("Updated {}", filename),
             &[&note_path],
@@ -532,7 +532,7 @@ pub async fn agent_batch_update_notes(
                 .collect();
             let file_refs: Vec<&std::path::Path> = file_paths.iter().map(|p| p.as_ref()).collect();
 
-            let _ = crate::git_manager::auto_commit_ambre_changes(
+            let _ = crate::git_manager::auto_commit_mosaic_changes(
                 &repo,
                 &format!(
                     "Updated {} note{}",

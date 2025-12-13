@@ -6,7 +6,7 @@ use std::path::Path;
 /// Git integration module for Moss
 ///
 /// Provides version control features:
-/// - Auto-commit for Ambre changes
+/// - Auto-commit for Mosaic changes
 /// - Manual commit/undo for users
 /// - History viewing
 /// - Repository management
@@ -108,11 +108,11 @@ fn create_commit_internal(
 // Commit Operations
 // ============================================================================
 
-/// Auto-commit changes made by Ambre
+/// Auto-commit changes made by Mosaic
 ///
 /// Creates a commit with all changes in the specified files.
-/// Commit message format: "Ambre: {action}"
-pub fn auto_commit_ambre_changes(
+/// Commit message format: "Mosaic: {action}"
+pub fn auto_commit_mosaic_changes(
     repo: &Repository,
     message: &str,
     files: &[&Path],
@@ -132,11 +132,17 @@ pub fn auto_commit_ambre_changes(
     let tree_id = index.write_tree()?;
     let tree = repo.find_tree(tree_id)?;
 
-    // Commit message with Ambre prefix and timestamp
+    // Commit message with Mosaic prefix and timestamp
     let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M").to_string();
-    let full_message = format!("Ambre: {} ({})", message, timestamp);
+    let full_message = format!("Mosaic: {} ({})", message, timestamp);
 
-    create_commit_internal(repo, &full_message, &tree, "Ambre", "ambre@amber-app.local")
+    create_commit_internal(
+        repo,
+        &full_message,
+        &tree,
+        "Mosaic",
+        "mosaic@amber-app.local",
+    )
 }
 
 /// Create a manual commit for specific files
@@ -237,20 +243,20 @@ pub fn restore_vault_to_commit(repo: &Repository, commit_oid: &str) -> Result<Oi
     Ok(new_commit_oid)
 }
 
-/// Revert the last commit made by Ambre
+/// Revert the last commit made by Mosaic
 ///
 /// Uses `git revert` (safe, creates new commit) instead of `git reset` (destructive).
-/// Only reverts commits with "Ambre:" prefix for safety.
-pub fn undo_last_ambre_commit(repo: &Repository) -> Result<Oid, GitError> {
+/// Only reverts commits with "Mosaic:" prefix for safety.
+pub fn undo_last_mosaic_commit(repo: &Repository) -> Result<Oid, GitError> {
     // Get HEAD commit
     let head = repo.head()?;
     let head_commit = head.peel_to_commit()?;
 
-    // Check if this is an Ambre commit
+    // Check if this is an Mosaic commit
     let message = head_commit.message().unwrap_or("");
-    if !message.starts_with("Ambre:") {
+    if !message.starts_with("Mosaic:") {
         return Err(GitError::from_str(
-            "Last commit was not made by Ambre. Cannot undo.",
+            "Last commit was not made by Mosaic. Cannot undo.",
         ));
     }
 
@@ -268,7 +274,7 @@ pub fn undo_last_ambre_commit(repo: &Repository) -> Result<Oid, GitError> {
     let tree_id = index.write_tree()?;
     let tree = repo.find_tree(tree_id)?;
 
-    let signature = Signature::now("Ambre", "ambre@amber-app.local")?;
+    let signature = Signature::now("Mosaic", "mosaic@amber-app.local")?;
     let revert_message = format!("Revert: {}", message);
 
     let commit_oid = repo.commit(
@@ -293,7 +299,7 @@ pub struct CommitInfo {
     pub message: String,
     pub author: String,
     pub timestamp: i64,
-    pub is_ambre: bool,
+    pub is_mosaic: bool,
     pub stats: Option<CommitStats>,
 }
 
@@ -305,11 +311,11 @@ pub struct CommitStats {
     pub file_paths: Vec<String>,
 }
 
-/// Get commit history, optionally filtered to Ambre commits only and/or specific file
+/// Get commit history, optionally filtered to Mosaic commits only and/or specific file
 pub fn get_commit_history(
     repo: &Repository,
     limit: usize,
-    ambre_only: bool,
+    mosaic_only: bool,
     file_path: Option<&Path>,
     include_stats: bool,
 ) -> Result<Vec<CommitInfo>, GitError> {
@@ -333,9 +339,9 @@ pub fn get_commit_history(
         let oid = oid?;
         let commit = repo.find_commit(oid)?;
         let message = commit.message().unwrap_or("").to_string();
-        let is_ambre = message.starts_with("Ambre:");
+        let is_mosaic = message.starts_with("Mosaic:");
 
-        if ambre_only && !is_ambre {
+        if mosaic_only && !is_mosaic {
             continue;
         }
 
@@ -377,7 +383,7 @@ pub fn get_commit_history(
             message,
             author: commit.author().name().unwrap_or("Unknown").to_string(),
             timestamp: commit.time().seconds(),
-            is_ambre,
+            is_mosaic,
             stats,
         });
 

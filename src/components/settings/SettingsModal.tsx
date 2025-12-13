@@ -757,7 +757,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                     />
                                                     <p className="text-xs text-muted-foreground mt-2">
                                                         {useDefaultSystemPrompt
-                                                            ? "Using the built-in Ambre persona. Switch to 'Custom' to define your own."
+                                                            ? "Using the built-in Mosaic persona. Switch to 'Custom' to define your own."
                                                             : "Define the personality and voice of the AI assistant. Core tool instructions will be automatically appended."}
                                                     </p>
                                                 </div>
@@ -902,7 +902,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                 <div className="py-4">
                                     <h3 className="text-lg font-medium text-foreground mb-2">Vector Search</h3>
                                     <p className="text-sm text-muted-foreground mb-4">
-                                        Enable semantic search by indexing your vault. This allows Ambre to understand concepts and find notes by meaning, not just keywords.
+                                        Enable semantic search by indexing your vault. This allows Mosaic to understand concepts and find notes by meaning, not just keywords.
                                     </p>
 
                                     {selectedProvider === 'openrouter' && (
@@ -931,7 +931,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                             try {
                                                 await invoke('trigger_indexing', { vaultPath });
                                                 setIndexStatus('success');
-                                                setIndexMessage('Vault indexed successfully! Ambre can now use semantic search.');
+                                                setIndexMessage('Vault indexed successfully! Mosaic can now use semantic search.');
                                             } catch (e) {
                                                 setIndexStatus('error');
                                                 setIndexMessage(typeof e === 'string' ? e : 'Indexing failed');
@@ -974,7 +974,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                             <div className="p-6 pt-0">
                                 <h3 className="text-lg font-medium text-foreground mb-2">Version Control</h3>
                                 <p className="text-sm text-muted-foreground mb-6">
-                                    Enable Git version control to automatically track Ambre's changes and undo them if needed.
+                                    Enable Git version control to automatically track Mosaic's changes and undo them if needed.
                                 </p>
 
                                 <div className="space-y-4">
@@ -984,7 +984,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                             <p className="text-sm font-medium text-foreground">Git Status</p>
                                             <p className="text-xs text-muted-foreground mt-1">
                                                 {gitEnabled
-                                                    ? 'Version control is active. Ambre\'s changes are tracked.'
+                                                    ? 'Version control is active. Mosaic\'s changes are tracked.'
                                                     : 'Version control is not enabled for this vault.'}
                                             </p>
                                         </div>
@@ -1069,8 +1069,8 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                 <strong>Features enabled:</strong>
                                             </p>
                                             <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
-                                                <li>Auto-commits after Ambre creates or updates notes</li>
-                                                <li>Undo button (↶) in toolbar to revert Ambre's last change</li>
+                                                <li>Auto-commits after Mosaic creates or updates notes</li>
+                                                <li>Undo button (↶) in toolbar to revert Mosaic's last change</li>
                                                 <li>Full Git history available via command line</li>
                                             </ul>
                                         </div>

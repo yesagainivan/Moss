@@ -190,7 +190,7 @@ pub async fn create_note_from_template(
 
     // Auto-commit if Git repository
     if let Some(repo) = crate::git_manager::open_repository(vault) {
-        let _ = crate::git_manager::auto_commit_ambre_changes(
+        let _ = crate::git_manager::auto_commit_mosaic_changes(
             &repo,
             &format!("Created {} from template {}", note_filename, template_name),
             &[&final_path],

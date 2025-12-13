@@ -15,7 +15,7 @@ interface GitState {
     // Actions
     setGitEnabled: (enabled: boolean) => void;
     checkGitStatus: () => Promise<void>;
-    undoLastAmbreChange: (requestConfirmation: (msg: string) => Promise<boolean>) => Promise<void>;
+    undoLastMosaicChange: (requestConfirmation: (msg: string) => Promise<boolean>) => Promise<void>;
     snapshotNote: (noteId: string, forceSave: (id: string) => Promise<void>, setSaveState: (id: string, state: any) => void) => Promise<void>;
     snapshotVault: () => Promise<void>;
     getNoteHistory: (notePath: string) => Promise<CommitInfo[]>;
@@ -45,17 +45,17 @@ export const useGitStore = create<GitState>((set, get) => ({
         }
     },
 
-    undoLastAmbreChange: async (requestConfirmation) => {
+    undoLastMosaicChange: async (requestConfirmation) => {
         const vaultPath = useSettingsStore.getState().currentVaultPath;
         if (!vaultPath) return;
 
         const confirmed = await requestConfirmation(
-            'Undo the last change made by Ambre? This will create a revert commit.'
+            'Undo the last change made by Mosaic? This will create a revert commit.'
         );
         if (!confirmed) return;
 
         try {
-            await invoke<string>('undo_last_ambre_change', { vaultPath });
+            await invoke<string>('undo_last_mosaic_change', { vaultPath });
             await get().checkGitStatus(); // Refresh status
             showToast('Undid last change', 'success');
         } catch (error) {
@@ -159,7 +159,7 @@ export const useGitStore = create<GitState>((set, get) => ({
             return await invoke<CommitInfo[]>('get_git_history', {
                 vaultPath,
                 limit: 20,
-                ambreOnly: false,
+                mosaicOnly: false,
                 filePath: notePath
             });
         } catch (error) {
@@ -193,7 +193,7 @@ export const useGitStore = create<GitState>((set, get) => ({
             return await invoke<CommitInfo[]>('get_git_history', {
                 vaultPath,
                 limit: 50,
-                ambreOnly: false,
+                mosaicOnly: false,
                 filePath: null // No file filter = full vault history
             });
         } catch (error) {

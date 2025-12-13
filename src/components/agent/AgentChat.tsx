@@ -216,7 +216,7 @@ export const AgentChat: React.FC = () => {
             <div className="h-14 border-b border-t border-border flex items-center justify-between px-2 shrink-0 bg-secondary/30">
                 <div className="flex items-center gap-2 text-accent dark:text-accent font-medium">
                     <Sparkles size={18} />
-                    <span>Ambre Agent</span>
+                    <span>Mosaic Agent</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <button
@@ -245,8 +245,21 @@ export const AgentChat: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar select-text">
                 {messages.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-muted-foreground text-center p-8">
-                        <div className="w-16 h-16 bg-surface dark:bg-surface/20 rounded-full flex items-center justify-center mb-4 text-accent">
-                            <Sparkles size={32} />
+                        <div className="w-16 h-16 bg-surface dark:bg-surface/20 rounded-full flex items-center justify-center mb-4 p-3">
+                            <div
+                                className="w-full h-full"
+                                style={{
+                                    maskImage: 'url(/Moss_logo_dark.svg)',
+                                    WebkitMaskImage: 'url(/Moss_logo_dark.svg)',
+                                    maskSize: 'contain',
+                                    WebkitMaskSize: 'contain',
+                                    maskRepeat: 'no-repeat',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    maskPosition: 'center',
+                                    WebkitMaskPosition: 'center',
+                                    backgroundColor: 'var(--accent)',
+                                }}
+                            />
                         </div>
                         <h3 className="text-foreground font-medium mb-2">
                             How can I help you?
@@ -311,7 +324,7 @@ export const AgentChat: React.FC = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Ask Ambre..."
+                        placeholder="Ask Mosaic..."
                         className="flex-1 bg-transparent border-none focus:ring-0 py-3 pl-4 pr-2 text-sm resize-none outline-none max-h-[120px] min-h-[48px] text-foreground placeholder:text-muted-foreground focus:border-red"
                         rows={1}
                         style={{
@@ -336,7 +349,7 @@ export const AgentChat: React.FC = () => {
                     </button>
                 </div>
                 <div className="text-[10px] text-center text-muted-foreground mt-2">
-                    Ambre can read your notes to answer questions.
+                    Mosaic can read your notes to answer questions.
                 </div>
             </div>
         </div>

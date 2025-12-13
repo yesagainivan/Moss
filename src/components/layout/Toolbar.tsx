@@ -7,7 +7,7 @@ import { useAppStore } from '../../store/useStore';
 import { usePaneStore } from '../../store/usePaneStore';
 import { useGitStore } from '../../store/useGitStore';
 import { SaveIndicator } from '../editor/SaveIndicator';
-import { UndoAmbreButton } from '../git/UndoAmbreButton';
+import { UndoAgentButton } from '../git/UndoAgentButton';
 import { ActivityCalendar } from '../git/ActivityCalendar';
 import { Clock } from 'lucide-react';
 import { GitHubSyncIndicator } from '../toolbar/GitHubSyncIndicator';
@@ -92,7 +92,7 @@ export const Toolbar = () => {
                         </button>
                     </div>
 
-                    <UndoAmbreButton />
+                    <UndoAgentButton />
 
                     {gitEnabled && activeTab && (
                         <button
@@ -148,7 +148,7 @@ export const Toolbar = () => {
                     <button
                         onClick={toggleAgent}
                         className={`p-1.5 rounded-md transition-colors ${isAgentOpen ? 'bg-accent/10 text-accent' : 'hover:bg-accent/10 text-muted-foreground'}`}
-                        title="Chat with Ambre"
+                        title="Chat with Mosaic"
                     >
                         <Bot className="w-4 h-4" />
                     </button>

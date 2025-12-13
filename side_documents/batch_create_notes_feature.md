@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `batch_create_notes` tool enables Ambre (the AI agent) to create multiple notes in a single operation, dramatically improving efficiency when building structured vaults or creating multiple related notes.
+The `batch_create_notes` tool enables Mosaic (the AI agent) to create multiple notes in a single operation, dramatically improving efficiency when building structured vaults or creating multiple related notes.
 
 ## Implementation Details
 
@@ -134,7 +134,7 @@ Created 3 notes successfully. 2 failed:
 
 ## Integration with Vault Builder
 
-This feature directly enables Ambre's "Vault Builder" workflow. When given the Vault Builder prompt, Ambre can now:
+This feature directly enables Mosaic's "Vault Builder" workflow. When given the Vault Builder prompt, Mosaic can now:
 
 1. Create folder structure (using `create_folder`)
 2. **Batch create all notes** (using `batch_create_notes`)
@@ -146,7 +146,7 @@ This reduces a 50-note vault creation from 50+ tool calls to ~5-10 tool calls.
 
 To test the feature:
 
-1. Ask Ambre to create multiple notes at once:
+1. Ask Mosaic to create multiple notes at once:
    ```
    "Create 5 notes about different programming languages in a 'Languages' folder"
    ```
@@ -164,4 +164,4 @@ To test the feature:
 
 ## Next Steps
 
-With `batch_create_notes` implemented, the next high-priority feature is **web_search** to enable Ambre to fetch accurate external data for vault building.
+With `batch_create_notes` implemented, the next high-priority feature is **web_search** to enable Mosaic to fetch accurate external data for vault building.

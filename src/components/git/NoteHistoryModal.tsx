@@ -201,8 +201,8 @@ export const NoteHistoryModal = ({ isOpen, onClose, notePath }: NoteHistoryModal
                                         className={`${styles.commitButton} ${selectedCommit?.oid === commit.oid ? styles.commitButtonSelected : ''}`}
                                     >
                                         <div className="flex items-start justify-between mb-1">
-                                            <span className={`${styles.commitAuthor} ${commit.is_ambre ? styles.commitAuthorAmbre : styles.commitAuthorUser}`}>
-                                                {commit.is_ambre ? 'Ambre' : commit.author}
+                                            <span className={`${styles.commitAuthor} ${commit.is_mosaic ? styles.commitAuthorMosaic : styles.commitAuthorUser}`}>
+                                                {commit.is_mosaic ? 'Mosaic' : commit.author}
                                             </span>
                                             <span className={styles.commitDate}>
                                                 {new Date(commit.timestamp * 1000).toLocaleDateString()}
