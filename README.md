@@ -34,42 +34,42 @@ Moss is built with a modern stack designed for performance and experience:
 ### Installation
 
 1.  Clone the repository:
-    \`\`\`bash
-    git clone https://github.com/yourusername/moss.git
+    ```bash
+    git clone https://github.com/yesagainivan/Moss.git
     cd moss
-    \`\`\`
+    ```
 
 2.  Install dependencies:
-    \`\`\`bash
+    ```bash
     npm install
-    \`\`\`
+    ```
 
 3.  Run the development server:
-    \`\`\`bash
+    ```bash
     npm run tauri dev
-    \`\`\`
+    ```
 
 ### Building for Production
 
 To build the application for your OS:
 
-\`\`\`bash
+```bash
 npm run tauri build
-\`\`\`
+```
 
-The artifacts will be available in \`src-tauri/target/release/bundle\`.
+The artifacts will be available in `src-tauri/target/release/bundle`.
 
 ## 📂 Project Structure
 
-- \`src/\`: React frontend application.
-    - \`components/\`: UI components (Editor, Graph, Layout, etc.).
-    - \`store/\`: Zustand state management stores.
-    - \`hooks/\`: Custom React hooks.
-    - \`lib/\`: Utility functions.
-- \`src-tauri/\`: Rust backend.
-    - \`src/main.rs`: Entry point and command handlers.
-    - \`src/git.rs\`: Git operations.
-- \`docs/\`: User documentation and guides.
+- `src/`: React frontend application.
+    - `components/`: UI components (Editor, Graph, Layout, etc.).
+    - `store/`: Zustand state management stores.
+    - `hooks/`: Custom React hooks.
+    - `lib/`: Utility functions.
+- `src-tauri/`: Rust backend.
+    - `src/main.rs`: Entry point and command handlers.
+    - `src/git.rs`: Git operations.
+- `docs/`: User documentation and guides.
 
 ## 🤝 Contributing
 
@@ -77,4 +77,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-[MIT](LICENSE)
+[AGPL-3.0](LICENSE)
