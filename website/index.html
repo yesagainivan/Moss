@@ -4,261 +4,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moss | Your Second Brain</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="description"
+        content="Moss - A local-first, AI-native markdown note app. Your second brain, elegantly simple.">
+    <meta name="keywords" content="markdown, notes, local-first, AI, knowledge graph, note-taking">
+    <meta property="og:title" content="Moss - Local-First Markdown Notes">
+    <meta property="og:description"
+        content="Your second brain, elegantly simple. Modern markdown. Local-first. AI-powered.">
+    <meta property="og:type" content="website">
+    <title>Moss — Local-First Markdown Notes</title>
+    <link rel="icon" type="image/x-icon" href="../moss.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
-    <meta name="description"
-        content="AI-native, local-first markdown note-taking app with built-in knowledge graphs and version control.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+    <!-- Grain Overlay -->
     <div class="grain-overlay"></div>
 
-    <nav class="navbar">
-        <div class="container nav-container">
-            <div class="logo">
-                <div class="logo-svg"></div>
-            </div>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="#" class="logo">
+                <img src="assets/Moss_logo_dark.svg" alt="Moss" class="logo-icon">
+                <span class="logo-text">Moss</span>
+            </a>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#showcase">Showcase</a>
-                <a href="https://github.com/yourusername/moss" target="_blank" class="btn btn-secondary">GitHub</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#showcase" class="nav-link">Showcase</a>
+                <a href="https://github.com/yourusername/moss" class="nav-link" target="_blank"
+                    rel="noopener">GitHub</a>
+            </div>
+            <a href="#download" class="btn btn-primary btn-sm">Download</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="gradient-orb gradient-orb-1"></div>
+            <div class="gradient-orb gradient-orb-2"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Your second brain,<br>
+                <span class="text-accent">elegantly simple.</span>
+            </h1>
+            <p class="hero-subtitle">
+                Modern markdown. Local-first. AI-native.
+            </p>
+            <div class="hero-cta">
+                <a href="#download" class="btn btn-primary btn-lg">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                    </svg>
+                    Download for macOS
+                </a>
+                <a href="https://github.com/yourusername/moss" class="btn btn-secondary btn-lg" target="_blank"
+                    rel="noopener">
+                    <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                    View on GitHub
+                </a>
             </div>
         </div>
-    </nav>
-
-    <main>
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="container hero-container">
-                <h1 class="hero-title animate-fade-up">Your second brain,<br> <span class="text-accent">elegantly
-                        simple.</span></h1>
-                <p class="hero-subtitle animate-fade-up delay-100">
-                    An AI-native, local-first markdown note-taking app designed for clarity and connection.
-                    Built with Rust and React for blazing performance.
-                </p>
-                <div class="hero-actions animate-fade-up delay-200">
-                    <a href="https://github.com/yourusername/moss/releases" class="btn btn-primary">Download Beta</a>
-                    <a href="#showcase" class="btn btn-secondary">View Gallery</a>
-                </div>
-
-                <div class="hero-image-wrapper animate-fade-up delay-300">
-                    <img src="./assets/hero-editor-.webp" alt="Moss Editor Interface" class="hero-image">
+        <div class="hero-screenshot">
+            <div class="screenshot-frame">
+                <div class="screenshot-placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <path d="M3 9h18M9 21V9" />
+                    </svg>
+                    <span>hero-editor.png</span>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Features Grid -->
-        <section id="features" class="features">
-            <div class="container">
-                <h2 class="section-title animate-fade-up">Cultivate your knowledge.</h2>
-                <div class="features-grid">
-                    <div class="feature-card animate-fade-up delay-100">
-                        <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                                <polyline points="14 2 14 8 20 8" />
-                                <line x1="16" y1="13" x2="8" y2="13" />
-                                <line x1="16" y1="17" x2="8" y2="17" />
-                                <polyline points="10 9 9 9 8 9" />
-                            </svg>
-                        </div>
-                        <h3>Markdown First</h3>
-                        <p>Write in pure Markdown with a distraction-free editor. What you see is what you get, but
-                            better.</p>
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Everything you need to think clearly</h2>
+                <p class="section-subtitle">Powerful features, beautifully simple</p>
+            </div>
+            <div class="features-grid">
+                <!-- Feature 1: Local-First -->
+                <div class="feature-card feature-card-tall">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
                     </div>
-                    <div class="feature-card animate-fade-up delay-200">
-                        <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path
-                                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-                                <path d="M5 3v4" />
-                                <path d="M9 3v4" />
-                                <path d="M7 5h4" />
-                                <path d="M15 3v4" />
-                                <path d="M19 3v4" />
-                                <path d="M17 5h4" />
-                            </svg>
-                        </div>
-                        <h3>AI Native</h3>
-                        <p>Built-in AI tools to rewrite, summarize, and brainstorm. Bring your own API key for total
-                            privacy.</p>
+                    <h3 class="feature-title">Local-First</h3>
+                    <p class="feature-description">Your notes live on your device in plain markdown files. Private by
+                        default, always accessible.</p>
+                </div>
+
+                <!-- Feature 2: Markdown -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M4 7V4h16v3M9 20h6M12 4v16" />
+                        </svg>
                     </div>
-                    <div class="feature-card animate-fade-up delay-300">
-                        <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <rect x="16" y="16" width="6" height="6" rx="1" />
-                                <rect x="2" y="16" width="6" height="6" rx="1" />
-                                <rect x="9" y="2" width="6" height="6" rx="1" />
-                                <path d="M5 16v-3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3" />
-                                <path d="M12 8v4" />
-                            </svg>
-                        </div>
-                        <h3>Knowledge Graph</h3>
-                        <p>Visualize connections between your thoughts. Watch your garden grow as you link notes.</p>
+                    <h3 class="feature-title">Pure Markdown</h3>
+                    <p class="feature-description">Write in markdown with a beautiful, distraction-free editor.</p>
+                </div>
+
+                <!-- Feature 3: AI -->
+                <div class="feature-card feature-card-wide">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path
+                                d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z" />
+                            <circle cx="8" cy="14" r="1" />
+                            <circle cx="16" cy="14" r="1" />
+                        </svg>
                     </div>
-                    <div class="feature-card animate-fade-up delay-100">
-                        <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                            </svg>
-                        </div>
-                        <h3>Local & Private</h3>
-                        <p>Your data lives on your device in plain text files. No cloud lock-in, ever.</p>
+                    <h3 class="feature-title">AI Assistant</h3>
+                    <p class="feature-description">Built-in AI to help you write, brainstorm, summarize, and transform
+                        your text. Just press <kbd>⌘K</kbd>.</p>
+                </div>
+
+                <!-- Feature 4: Graph -->
+                <div class="feature-card feature-card-wide">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="5" cy="6" r="3" />
+                            <circle cx="19" cy="6" r="3" />
+                            <circle cx="12" cy="18" r="3" />
+                            <line x1="7.5" y1="7.5" x2="10" y2="16" />
+                            <line x1="16.5" y1="7.5" x2="14" y2="16" />
+                            <line x1="8" y1="6" x2="16" y2="6" />
+                        </svg>
                     </div>
-                    <div class="feature-card animate-fade-up delay-200">
-                        <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <line x1="6" y1="3" x2="6" y2="15" />
-                                <circle cx="18" cy="6" r="3" />
-                                <circle cx="6" cy="18" r="3" />
-                                <path d="M18 9a9 9 0 0 1-9 9" />
-                            </svg>
-                        </div>
-                        <h3>Git Sync</h3>
-                        <p>Automatic version control built-in. Sync to GitHub seamlessly for backup and history.</p>
+                    <h3 class="feature-title">Graph View</h3>
+                    <p class="feature-description">Visualize connections between your thoughts. See your knowledge graph
+                        come alive with interactive linking.</p>
+                </div>
+
+                <!-- Feature 5: Git Sync -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="3" />
+                            <circle cx="19" cy="5" r="2" />
+                            <circle cx="5" cy="19" r="2" />
+                            <path d="M10.5 9.5L7 6M13.5 14.5L17 18" />
+                        </svg>
                     </div>
-                    <div class="feature-card animate-fade-up delay-300">
-                        <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <circle cx="13.5" cy="6.5" r=".5" />
-                                <circle cx="17.5" cy="10.5" r=".5" />
-                                <circle cx="8.5" cy="7.5" r=".5" />
-                                <circle cx="6.5" cy="12.5" r=".5" />
-                                <path
-                                    d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-                            </svg>
-                        </div>
-                        <h3>Beautiful UI</h3>
-                        <p>Designed with care. Dark mode, glassmorphism, and fluid animations feel right at home on Mac.
-                        </p>
+                    <h3 class="feature-title">Git Sync</h3>
+                    <p class="feature-description">Version control and backup to GitHub. Your notes, your history.</p>
+                </div>
+
+                <!-- Feature 6: Split Panes -->
+                <div class="feature-card feature-card-tall">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2" />
+                            <line x1="12" y1="3" x2="12" y2="21" />
+                        </svg>
                     </div>
+                    <h3 class="feature-title">Split Panes</h3>
+                    <p class="feature-description">Work on multiple notes side by side. Research and draft
+                        simultaneously.</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Showcase Section -->
-        <section id="showcase" class="showcase">
-            <div class="container">
-                <h2 class="section-title animate-fade-up">See it in action.</h2>
-
-                <div class="showcase-item animate-fade-up delay-100">
-                    <div class="showcase-content">
-                        <h3>Split Panes for Multitasking</h3>
-                        <p>Keep your research on one side and your draft on the other. Moss allows infinite vertical and
-                            horizontal splits.</p>
+    <!-- Showcase Section -->
+    <section id="showcase" class="showcase">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">See it in action</h2>
+                <p class="section-subtitle">A beautiful, focused writing experience</p>
+            </div>
+            <div class="showcase-grid">
+                <div class="showcase-item showcase-item-main">
+                    <div class="screenshot-frame screenshot-frame-lg">
+                        <div class="screenshot-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="5" cy="6" r="3" />
+                                <circle cx="19" cy="6" r="3" />
+                                <circle cx="12" cy="18" r="3" />
+                                <line x1="7.5" y1="7.5" x2="10" y2="16" />
+                                <line x1="16.5" y1="7.5" x2="14" y2="16" />
+                            </svg>
+                            <span>feature-graph.png</span>
+                        </div>
                     </div>
-                    <div class="showcase-image">
-                        <img src="./assets/feature-split-.webp" alt="Split Panes" class="showcase-img">
-                    </div>
+                    <h3>Knowledge Graph</h3>
+                    <p>See how your ideas connect and discover new relationships between your notes.</p>
                 </div>
-
-                <div class="showcase-item reverse animate-fade-up delay-200">
-                    <div class="showcase-content">
-                        <h3>Connect Your Thoughts</h3>
-                        <p>The interactive graph view helps you find hidden connections in your knowledge base.</p>
+                <div class="showcase-item">
+                    <div class="screenshot-frame">
+                        <div class="screenshot-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <line x1="12" y1="3" x2="12" y2="21" />
+                            </svg>
+                            <span>feature-split.png</span>
+                        </div>
                     </div>
-                    <div class="showcase-image">
-                        <img src="./assets/feature-graph-.webp" alt="Graph View" class="showcase-img">
-                    </div>
+                    <h3>Split View</h3>
+                    <p>Research on one side, write on the other.</p>
                 </div>
-
-                <div class="showcase-item animate-fade-up delay-300">
-                    <div class="showcase-content">
-                        <h3>AI That Understands You</h3>
-                        <p>Use the intelligent command palette to rewrite, summarize, or brainstorm ideas without
-                            leaving your flow.</p>
+                <div class="showcase-item">
+                    <div class="screenshot-frame">
+                        <div class="screenshot-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1" />
+                                <circle cx="8" cy="14" r="1" />
+                                <circle cx="16" cy="14" r="1" />
+                            </svg>
+                            <span>feature-ai.png</span>
+                        </div>
                     </div>
-                    <div class="showcase-image">
-                        <img src="./assets/feature-ai-.webp" alt="AI Command Palette" class="showcase-img">
-                    </div>
-                </div>
-
-                <div class="showcase-item reverse animate-fade-up delay-200">
-                    <div class="showcase-content">
-                        <h3>Elegantly Simple</h3>
-                        <p>Start with a clean slate. The zero-inbox state is designed to give you clarity before you
-                            begin.</p>
-                    </div>
-                    <div class="showcase-image">
-                        <img src="./assets/feature-empty-.webp" alt="Empty State" class="showcase-img">
-                    </div>
+                    <h3>AI-Powered</h3>
+                    <p>Let AI help you write, edit, and think.</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- CTA Section -->
-        <section class="cta">
-            <div class="container cta-container">
-                <h2 class="animate-fade-up">Ready to plant your garden?</h2>
-                <p class="animate-fade-up delay-100">Moss is open source and currently in public beta.</p>
-                <div class="cta-actions animate-fade-up delay-200">
-                    <a href="https://github.com/yesagainivan/moss" class="btn btn-primary btn-large">Get Started Now</a>
+    <!-- Download CTA Section -->
+    <section id="download" class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to think clearly?</h2>
+                <p class="cta-subtitle">Download Moss and start building your second brain today.</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary btn-lg">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                        </svg>
+                        Download for macOS
+                    </a>
+                    <p class="cta-note">Free and open source. MIT License.</p>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <footer>
-        <div class="container footer-container">
-            <div class="footer-logo">
-                <div class="logo" style="font-size: 1.25rem;">
-                    <div class="logo-svg"></div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="assets/Moss_logo_dark.svg" alt="Moss" class="footer-logo">
+                    <span class="footer-tagline">Your second brain, elegantly simple.</span>
                 </div>
-            </div>
-            <div class="footer-links">
-                <a href="https://github.com/yesagainivan/moss">GitHub</a>
-                <a href="https://twitter.com/yourusername">Twitter</a>
-                <a href="mailto:hello@example.com">Contact</a>
-            </div>
-            <div class="footer-copyright">
-                &copy; 2025 Moss Team. Open Source (MIT).
+                <div class="footer-links">
+                    <a href="https://github.com/yourusername/moss" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://github.com/yourusername/moss/releases" target="_blank" rel="noopener">Releases</a>
+                    <a href="https://github.com/yourusername/moss/blob/main/LICENSE" target="_blank" rel="noopener">MIT
+                        License</a>
+                </div>
+                <p class="footer-copyright">© 2024 Moss. Built with ❤️</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Intersection Observer for scroll-triggered animations
-        document.addEventListener('DOMContentLoaded', () => {
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.animationPlayState = 'running';
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-
-            // Observe all animated elements except hero (hero should animate immediately)
-            const animatedElements = document.querySelectorAll('.features .animate-fade-up, .showcase .animate-fade-up, .cta .animate-fade-up');
-            animatedElements.forEach(el => {
-                el.style.animationPlayState = 'paused';
-                observer.observe(el);
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             });
+        });
+
+        // Header background on scroll
+        const header = document.querySelector('.header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
+
+        // Fade-in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .showcase-item, .cta-content').forEach(el => {
+            el.classList.add('fade-in');
+            observer.observe(el);
         });
     </script>
 </body>
-
 
 </html>
