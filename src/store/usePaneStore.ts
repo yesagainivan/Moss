@@ -144,6 +144,7 @@ export const usePaneStore = create<PaneState>((set, get) => ({
                     id: node.id,
                     type: 'split',
                     direction,
+                    splitRatio: 0.5, // 50/50 split by default
                     children: [newChild1, newChild2],
                     parentId: node.parentId
                 };

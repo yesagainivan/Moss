@@ -6,6 +6,7 @@ interface ResizableSplitProps {
     sideContent: React.ReactNode;
     side: 'left' | 'right' | 'top' | 'bottom';
     initialSize?: number;
+    defaultRatio?: number; // 0-1, e.g. 0.5 for 50%
     minSize?: number;
     maxSize?: number;
     isOpen?: boolean;
@@ -18,6 +19,7 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
     sideContent,
     side,
     initialSize = 250,
+    defaultRatio,
     minSize = 200,
     maxSize = 600,
     isOpen = true,
@@ -28,14 +30,28 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
     const loadedSize = persistenceKey
         ? localStorage.getItem(persistenceKey)
         : null;
+
     const [size, setSize] = useState(
         loadedSize ? parseInt(loadedSize, 10) : initialSize
     );
     const [isResizing, setIsResizing] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(!!loadedSize); // Track if we need to calc ratio
     const sidebarRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     const isVertical = side === 'top' || side === 'bottom';
+
+    // Calculate initial size from ratio if active
+    useEffect(() => {
+        if (!isInitialized && defaultRatio && containerRef.current && !loadedSize) {
+            const rect = containerRef.current.getBoundingClientRect();
+            const containerSize = isVertical ? rect.height : rect.width;
+            if (containerSize > 0) {
+                setSize(containerSize * defaultRatio);
+                setIsInitialized(true);
+            }
+        }
+    }, [defaultRatio, isVertical, isInitialized, loadedSize]);
 
     const startResizing = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -44,6 +60,9 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
 
     useEffect(() => {
         if (!isResizing) return;
+
+        // Disable text selection globally while resizing
+        document.body.style.userSelect = 'none';
 
         const handleMouseMove = (e: MouseEvent) => {
             if (!containerRef.current) return;
@@ -61,13 +80,19 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
                 newSize = rect.bottom - e.clientY;
             }
 
-            if (newSize >= minSize && newSize <= maxSize) {
+            // Respect min/max sizes
+            // Also ensure we don't overflow container
+            const containerSize = isVertical ? rect.height : rect.width;
+            const safeMaxSize = Math.min(maxSize, containerSize - 50); // Keep at least 50px for main
+
+            if (newSize >= minSize && newSize <= safeMaxSize) {
                 setSize(newSize);
             }
         };
 
         const handleMouseUp = () => {
             setIsResizing(false);
+            document.body.style.userSelect = '';
         };
 
         window.addEventListener('mousemove', handleMouseMove);
@@ -78,8 +103,9 @@ export const ResizableSplit: React.FC<ResizableSplitProps> = React.memo(({
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
             window.removeEventListener('blur', handleMouseUp);
+            document.body.style.userSelect = '';
         };
-    }, [isResizing, side, minSize, maxSize, initialSize]);
+    }, [isResizing, side, minSize, maxSize, initialSize, isVertical]);
 
     // Persistence
     useEffect(() => {

@@ -27,7 +27,7 @@ export const PaneContainer = () => {
             return (
                 <ResizableSplit
                     side={isHorizontal ? 'top' : 'left'}
-                    initialSize={node.splitRatio ? node.splitRatio * 100 : 50}
+                    defaultRatio={node.splitRatio || 0.5}
                     minSize={isHorizontal ? 100 : 200}
                     maxSize={isHorizontal ? 600 : 800}
                     sideContent={renderPane(leftChild)}
