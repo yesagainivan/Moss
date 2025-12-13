@@ -87,65 +87,42 @@ const FileTreeRow = ({
     toggleExpansion,
     onStartCreating,
     style,
-    onContextMenuOpen
+    onContextMenuOpen,
+    activeNoteId,
+    isEditing,
+    onStopEditing
 }: {
     flatNode: FlatNode;
     toggleExpansion: (path: string) => void;
     onStartCreating: (parentId: string, type: 'note' | 'folder') => void;
     style: React.CSSProperties;
     onContextMenuOpen: (e: React.MouseEvent, node: FileNode) => void;
+    activeNoteId?: string | null;
+    isEditing?: boolean;
+    onStopEditing?: () => void;
 }) => {
     const { node, depth, isExpanded, isCreationInput, creationType } = flatNode;
-    const { openNote, renameNote, createNote, createFolder, deleteNote, deleteFolder, renameFolder } = useFileActions();
+    const { openNote, renameNote, createNote, createFolder, renameFolder } = useFileActions();
     const setSelectedFolder = useAppStore(state => state.setSelectedFolder);
 
-    // Selective subscriptions
-    const isActiveNote = usePaneStore(state => {
-        if (!node.noteId) return false;
-        const activePaneId = state.activePaneId;
-        const activePane = state.paneIndex.get(activePaneId || '');
-        const activeTab = activePane?.tabs?.find(t => t.id === activePane.activeTabId);
-        return activeTab?.noteId === node.noteId;
-    });
+    const isActiveNote = node.noteId === activeNoteId;
     const isSelected = useAppStore(state => state.selectedFolderPath === node.path);
     const isDirty = useAppStore(state => node.noteId ? state.dirtyNoteIds.has(node.noteId) : false);
 
-    const [editing, setEditing] = useState(false);
     const [editName, setEditName] = useState(node.name);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     // Sync editName when node changes (e.g. after rename)
     React.useEffect(() => {
         setEditName(node.name);
     }, [node.name]);
 
-    // Listen for rename trigger from context menu
+    // Initialize edit name when entering edit mode
     React.useEffect(() => {
-        const handleEditTrigger = () => {
-            setEditing(true);
-        };
+        if (isEditing) {
+            setEditName(node.name);
+        }
+    }, [isEditing, node.name]);
 
-        const eventName = `edit-trigger-${node.id}`;
-        window.addEventListener(eventName, handleEditTrigger);
-
-        return () => {
-            window.removeEventListener(eventName, handleEditTrigger);
-        };
-    }, [node.id]);
-
-    // Listen for delete trigger from context menu
-    React.useEffect(() => {
-        const handleDeleteTrigger = () => {
-            setShowDeleteConfirm(true);
-        };
-
-        const eventName = `delete-trigger-${node.id}`;
-        window.addEventListener(eventName, handleDeleteTrigger);
-
-        return () => {
-            window.removeEventListener(eventName, handleDeleteTrigger);
-        };
-    }, [node.id]);
     // Creation state (only used if isCreationInput is true)
     const [newName, setNewName] = useState('');
 
@@ -154,7 +131,7 @@ const FileTreeRow = ({
     const { attributes, listeners, setNodeRef: setDragRef, isDragging } = useDraggable({
         id: draggableId,
         data: { node },
-        disabled: editing || isCreationInput,
+        disabled: isEditing || isCreationInput,
     });
 
     const { setNodeRef: setDropRef, isOver } = useDroppable({
@@ -171,9 +148,6 @@ const FileTreeRow = ({
             return;
         }
 
-        // We need the parent path. The 'node' here is actually the PARENT node if this is an input row?
-        // No, for input rows, 'node' is a dummy or the parent?
-        // Let's define: for input rows, 'node' is the PARENT node.
         if (isCreationInput && creationType) {
             if (creationType === 'note') {
                 const id = await createNote(newName, node.path, true);
@@ -207,32 +181,13 @@ const FileTreeRow = ({
         onContextMenuOpen(e, node);
     };
 
-    const startEditing = (e?: React.MouseEvent) => {
-        e?.stopPropagation();
-        setEditing(true);
-    };
-
     const saveName = () => {
         if (node.type === 'file' && node.noteId && editName.trim()) {
             renameNote(node.noteId, editName);
         } else if (node.type === 'folder' && node.path && editName.trim()) {
             renameFolder(node.path, editName);
         }
-        setEditing(false);
-    };
-
-    const handleDelete = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setShowDeleteConfirm(true);
-    };
-
-    const confirmDelete = async () => {
-        if (node.type === 'file' && node.noteId) {
-            await deleteNote(node.noteId);
-        } else if (node.type === 'folder' && node.path) {
-            await deleteFolder(node.path);
-        }
-        setShowDeleteConfirm(false);
+        if (onStopEditing) onStopEditing();
     };
 
     if (isCreationInput) {
@@ -253,7 +208,7 @@ const FileTreeRow = ({
                         if (e.key === 'Escape') onStartCreating('', 'note'); // Cancel
                     }}
                     onBlur={submitCreation}
-                    className="flex-1 bg-background border border-input rounded px-1 py-0.5 text-xs outline-none"
+                    className="flex-1 bg-background border border-input rounded px-1 py-0.5 text-xs outline-none placeholder:text-muted-foreground"
                     placeholder={creationType === 'note' ? "Note name" : "Folder name"}
                     onClick={(e) => e.stopPropagation()}
                 />
@@ -296,7 +251,7 @@ const FileTreeRow = ({
                     <File className="w-4 h-4 text-muted-foreground" />
                 )}
 
-                {editing ? (
+                {isEditing ? (
                     <div className="flex items-center gap-1 flex-1" onClick={e => e.stopPropagation()}>
                         <input
                             autoFocus
@@ -304,7 +259,7 @@ const FileTreeRow = ({
                             onChange={(e) => setEditName(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') saveName();
-                                if (e.key === 'Escape') setEditing(false);
+                                if (e.key === 'Escape') onStopEditing?.();
                             }}
                             onBlur={saveName}
                             className="flex-1 bg-background border border-input rounded px-1 py-0.5 text-xs outline-none"
@@ -320,40 +275,25 @@ const FileTreeRow = ({
                         {node.type === 'file' && (
                             <div className="flex gap-1">
                                 <button
-                                    onClick={startEditing}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onContextMenuOpen(e, node);
+                                    }}
                                     className="opacity-0 group-hover:opacity-100 p-0 hover:bg-background rounded transition-opacity"
                                 >
                                     <Edit2 className="w-3 h-3 text-muted-foreground" />
-                                </button>
-                                <button
-                                    onClick={handleDelete}
-                                    className="opacity-0 group-hover:opacity-100 p-0 hover:bg-background rounded transition-opacity"
-                                >
-                                    <Trash2 className="w-3 h-3 text-destructive" />
                                 </button>
                             </div>
                         )}
                     </>
                 )}
             </div>
-
-            {/* Context menu moved to parent Sidebar component */}
-            <ConfirmDialog
-                isOpen={showDeleteConfirm}
-                title={node.type === 'folder' ? "Delete Folder" : "Delete Note"}
-                message={`Are you sure you want to delete "${node.name}"? ${node.type === 'folder' ? 'All contents will be permanently deleted.' : 'This action cannot be undone.'}`}
-                confirmLabel="Delete"
-                cancelLabel="Cancel"
-                variant="danger"
-                onConfirm={confirmDelete}
-                onCancel={() => setShowDeleteConfirm(false)}
-            />
         </div>
     );
 };
 
 export const Sidebar = () => {
-    const { moveNote } = useFileActions();
+    const { moveNote, deleteNote, deleteFolder } = useFileActions();
     const fileTree = useAppStore(state => state.fileTree);
     const vaultPath = useAppStore(state => state.vaultPath);
     const openVault = useAppStore(state => state.openVault);
@@ -380,6 +320,10 @@ export const Sidebar = () => {
     const [sidebarContextMenu, setSidebarContextMenu] = useState<{ x: number; y: number } | null>(null);
     const [rowContextMenu, setRowContextMenu] = useState<{ x: number; y: number; node: FileNode } | null>(null);
     const [isTagsPanelCollapsed, setIsTagsPanelCollapsed] = useState(true);
+    const [nodeToDelete, setNodeToDelete] = useState<FileNode | null>(null);
+    const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
+
+    const activeNoteId = tabs.find(t => t.id === activeTabId)?.noteId;
 
     // Drag & Drop sensors
     const sensors = useSensors(
@@ -670,31 +614,26 @@ export const Sidebar = () => {
     // Handle rename from context menu
     const handleRowRename = () => {
         if (!rowContextMenu) return;
-        const node = rowContextMenu.node;
-
-        // Close menu first
+        setEditingNodeId(rowContextMenu.node.id);
         setRowContextMenu(null);
-
-        // Trigger rename by dispatching a custom event
-        setTimeout(() => {
-            const event = new CustomEvent(`edit-trigger-${node.id}`);
-            window.dispatchEvent(event);
-        }, 50);
     };
 
     // Handle delete from context menu
     const handleRowDelete = () => {
         if (!rowContextMenu) return;
-        const node = rowContextMenu.node;
-
-        // Close menu first
+        setNodeToDelete(rowContextMenu.node);
         setRowContextMenu(null);
+    };
 
-        // Trigger delete confirmation by dispatching a custom event
-        setTimeout(() => {
-            const event = new CustomEvent(`delete-trigger-${node.id}`);
-            window.dispatchEvent(event);
-        }, 50);
+    const confirmDelete = async () => {
+        if (!nodeToDelete) return;
+
+        if (nodeToDelete.type === 'file' && nodeToDelete.noteId) {
+            await deleteNote(nodeToDelete.noteId);
+        } else if (nodeToDelete.type === 'folder' && nodeToDelete.path) {
+            await deleteFolder(nodeToDelete.path);
+        }
+        setNodeToDelete(null);
     };
 
     return (
@@ -742,7 +681,7 @@ export const Sidebar = () => {
                     </div>
                 )}
 
-                <div className="flex-1 overflow-hidden flex flex-col" onContextMenu={handleSidebarContextMenu}>
+                <div className="flex-1 overflow-hidden flex flex-col " onContextMenu={handleSidebarContextMenu}>
                     {isVaultLoading ? (
                         <div className="space-y-2 p-2">
                             <div className="h-4 bg-accent/10 rounded animate-pulse w-3/4" />
@@ -765,10 +704,13 @@ export const Sidebar = () => {
                                     }}
                                     onContextMenuOpen={handleRowContextMenuOpen}
                                     style={{}}
+                                    activeNoteId={activeNoteId}
+                                    isEditing={editingNodeId === item.node.id}
+                                    onStopEditing={() => setEditingNodeId(null)}
                                 />
                             )}
                             style={{ height: '100%', overflowX: 'hidden' }}
-                            className="p-2"
+                            className="p-1 mt-2"
                         />
                     )}
                 </div>
@@ -848,6 +790,19 @@ export const Sidebar = () => {
                     </button>
                 </div>
             </div>
+
+            {nodeToDelete && (
+                <ConfirmDialog
+                    isOpen={!!nodeToDelete}
+                    title={nodeToDelete.type === 'folder' ? "Delete Folder" : "Delete Note"}
+                    message={`Are you sure you want to delete "${nodeToDelete.name}"? ${nodeToDelete.type === 'folder' ? 'All contents will be permanently deleted.' : 'This action cannot be undone.'}`}
+                    confirmLabel="Delete"
+                    cancelLabel="Cancel"
+                    variant="danger"
+                    onConfirm={confirmDelete}
+                    onCancel={() => setNodeToDelete(null)}
+                />
+            )}
 
             <DragOverlay>
                 {activeId ? (
