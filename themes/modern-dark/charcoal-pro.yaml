@@ -4,21 +4,21 @@ description: "A professional dark theme with warm charcoal tones and amber accen
 
 colors:
   # Primary: Warm Amber
-  primary: "#f59e0b"
-  primary_dark: "#d97706"
+  primary: "#e09f30"
+  primary_dark: "#c0811e"
 
   # Secondary: Golden Amber
-  secondary: "#fbbf24"
-  secondary_dark: "#f59e0b"
+  secondary: "#e9c445"
+  secondary_dark: "#e09f30"
 
   # Accent: Light Amber
-  accent: "#fcd34d"
-  accent_dark: "#fbbf24"
+  accent: "#f3d671"
+  accent_dark: "#e9c445"
 
   # Backgrounds (Light) - warm grays
   background: "#fafaf9"
   background_subtle: "#f5f5f4"
-  
+
   # Surfaces
   surface: "#e7e5e4"
   surface_highlight: "#d6d3d1"
@@ -32,20 +32,20 @@ colors:
 
 utility:
   alert:
-    background: "#ef4444"
+    background: "#da6161"
     foreground: "#ffffff"
-    border: "#dc2626"
-    subtle_background: "rgba(239, 68, 68, 0.1)"
+    border: "#c54444"
+    subtle_background: "rgba(218, 97, 97, 0.1)"
   success:
-    background: "#f59e0b"
+    background: "#e09f30"
     foreground: "#ffffff"
-    border: "#d97706"
-    subtle_background: "rgba(245, 158, 11, 0.1)"
+    border: "#c0811e"
+    subtle_background: "rgba(224, 159, 48, 0.1)"
   warning:
-    background: "#fbbf24"
+    background: "#e9c445"
     foreground: "#1c1917"
-    border: "#f59e0b"
-    subtle_background: "rgba(251, 191, 36, 0.1)"
+    border: "#e09f30"
+    subtle_background: "rgba(233, 196, 69, 0.1)"
   info:
     background: "#78716c"
     foreground: "#ffffff"
@@ -57,7 +57,7 @@ dark:
   # Backgrounds - deep charcoal
   background: "#0f0e0d"
   background_subtle: "#141312"
-  
+
   # Surfaces - warm dark grays
   surface: "#1c1b1a"
   surface_highlight: "#282624"
@@ -66,12 +66,12 @@ dark:
   # Text - warm whites
   foreground: "#fafaf9"
   subtle_foreground: "#a8a29e"
-  
+
   # Borders - warm subtle
-  outline: "rgba(252, 211, 77, 0.12)"
-  outline_subtle: "rgba(252, 211, 77, 0.06)"
+  outline: "rgba(243, 214, 113, 0.12)"
+  outline_subtle: "rgba(243, 214, 113, 0.06)"
 
   # Colors - warm ambers
-  primary: "#fbbf24"
-  secondary: "#fcd34d"
-  accent: "#fde68a"
+  primary: "#e9c445"
+  secondary: "#f3d671"
+  accent: "#f7e8a3"

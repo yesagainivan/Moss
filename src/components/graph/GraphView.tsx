@@ -146,7 +146,7 @@ const GraphView: React.FC = () => {
             ctx.fillStyle = themeColors.foreground;
             ctx.fillText(label, node.x, node.y + 8);
         }
-    }, [settings.graphShowLabels]);
+    }, [settings.graphShowLabels, themeColors]);
 
     return (
         <div className="w-full h-full flex flex-col overflow-hidden bg-background rounded-lg">

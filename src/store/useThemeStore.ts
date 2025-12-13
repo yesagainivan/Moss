@@ -66,18 +66,18 @@ const MUTED_COFFEE_THEME: Theme = {
     name: 'Muted Coffee',
     description: 'Warm, cozy coffee tones for a relaxed focus',
     colors: {
-        // Coffee theme is inherently dark, so these are the base colors
-        primary: '#d4a373', // Caramel (main brand color)
-        secondary: '#b27651ff',
-        accent: '#c18e6fff', // Coffee brown (supplementary)
-        background: '#201b18',
-        background_subtle: '#181412',
-        surface: '#2a2420',
-        surface_highlight: '#453a33',
-        foreground: '#e6dccf',
-        subtle_foreground: '#a89f91',
-        outline: '#453a33',
-        outline_subtle: '#2a2420',
+        // Light mode colors
+        primary: '#d4a373', // Caramel
+        secondary: '#e8e2d2', // Light linen
+        accent: '#4a3b30', // Dark coffee
+        background: '#f5efe1', // Light cream
+        background_subtle: '#f0e9dd',
+        surface: '#e8e2d2',
+        surface_highlight: '#dcd6c8',
+        foreground: '#4a3b30', // Dark coffee
+        subtle_foreground: '#8c7b70', // Muted coffee
+        outline: '#dcd6c8',
+        outline_subtle: '#e8e2d2',
     },
     utility: {
         alert: { background: '#ef4444', foreground: '#fee2e2', border: '#ef4444', subtle_background: 'rgba(239, 68, 68, 0.1)' },
@@ -86,18 +86,18 @@ const MUTED_COFFEE_THEME: Theme = {
         info: { background: '#3b82f6', foreground: '#dbeafe', border: '#3b82f6', subtle_background: 'rgba(59, 130, 246, 0.1)' },
     },
     dark: {
-        // Even darker variation for dark mode
-        background: '#181412',
-        background_subtle: '#0c0a09',
-        surface: '#201b18',
-        surface_highlight: '#2a2420',
+        // Dark mode colors (previously defined in 'colors' and 'dark' properties)
+        primary: '#d4a373', // Caramel
+        secondary: '#b27651ff',
+        accent: '#c18e6fff', // Coffee brown
+        background: '#201b18',
+        background_subtle: '#181412',
+        surface: '#2a2420',
+        surface_highlight: '#453a33',
         foreground: '#e6dccf',
         subtle_foreground: '#a89f91',
-        outline: '#352b25',
+        outline: '#453a33',
         outline_subtle: '#2a2420',
-        accent: '#e6dccf',
-        secondary: '#352b25',
-        primary: '#d4a373', // Caramel remains primary in dark mode
     }
 };
 

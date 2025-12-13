@@ -226,14 +226,14 @@ export const AgentChat: React.FC = () => {
                             }
                             clearHistory();
                         }}
-                        className="p-2 hover:bg-secondary rounded-md text-muted-foreground transition-colors"
+                        className="p-2 hover:bg-black/10 rounded-md text-muted-foreground transition-colors"
                         title="Clear History"
                     >
                         <Trash2 size={16} />
                     </button>
                     <button
                         onClick={toggleOpen}
-                        className="p-2 hover:bg-secondary rounded-md text-muted-foreground transition-colors"
+                        className="p-2 hover:bg-black/10 rounded-md text-muted-foreground transition-colors"
                         title="Close Agent"
                     >
                         <X size={18} />

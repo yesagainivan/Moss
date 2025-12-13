@@ -4,74 +4,74 @@ description: "A refreshing theme inspired by lush forest greens with earthy unde
 
 colors:
   # Primary: Forest Green
-  primary: "#16a34a"
-  primary_dark: "#15803d"
+  primary: "#368953"
+  primary_dark: "#31744a"
 
   # Secondary: Leaf Green
-  secondary: "#22c55e"
-  secondary_dark: "#16a34a"
+  secondary: "#49a967"
+  secondary_dark: "#3f9059"
 
   # Accent: Moss Green
-  accent: "#4ade80"
-  accent_dark: "#22c55e"
+  accent: "#71bb89"
+  accent_dark: "#49a967"
 
   # Backgrounds (Light) - fresh greens
-  background: "#f0fdf4"
-  background_subtle: "#dcfce7"
-  
+  background: "#e7ece9"
+  background_subtle: "#dce1df"
+
   # Surfaces
-  surface: "#bbf7d0"
-  surface_highlight: "#86efac"
+  surface: "#c7e0d1"
+  surface_highlight: "#a0d1b3"
   elevated_surface: "#ffffff"
 
   # Text & Borders
-  foreground: "#14532d"
-  subtle_foreground: "#166534"
-  outline: "#bbf7d0"
-  outline_subtle: "#dcfce7"
+  foreground: "#2c4a37"
+  subtle_foreground: "#325c41"
+  outline: "#c7e0d1"
+  outline_subtle: "#dce1df"
 
 utility:
   alert:
-    background: "#ef4444"
+    background: "#cc7777"
     foreground: "#ffffff"
-    border: "#dc2626"
-    subtle_background: "rgba(239, 68, 68, 0.1)"
+    border: "#b36969"
+    subtle_background: "rgba(204, 119, 119, 0.1)"
   success:
-    background: "#16a34a"
+    background: "#368953"
     foreground: "#ffffff"
-    border: "#15803d"
-    subtle_background: "rgba(22, 163, 74, 0.1)"
+    border: "#31744a"
+    subtle_background: "rgba(54, 137, 83, 0.1)"
   warning:
-    background: "#f59e0b"
+    background: "#c29a50"
     foreground: "#ffffff"
-    border: "#d97706"
-    subtle_background: "rgba(245, 158, 11, 0.1)"
+    border: "#ab8b46"
+    subtle_background: "rgba(194, 154, 80, 0.1)"
   info:
-    background: "#22c55e"
+    background: "#49a967"
     foreground: "#ffffff"
-    border: "#16a34a"
-    subtle_background: "rgba(34, 197, 94, 0.1)"
+    border: "#368953"
+    subtle_background: "rgba(73, 169, 103, 0.1)"
 
 # Dark mode - deep forest
 dark:
   # Backgrounds - forest night
-  background: "#0a1f0f"
-  background_subtle: "#0f2814"
-  
+  background: "#122117"
+  background_subtle: "#182d1f"
+
   # Surfaces - deep forest
-  surface: "#163320"
-  surface_highlight: "#1e4229"
-  elevated_surface: "#275233"
+  surface: "#263f2e"
+  surface_highlight: "#314d3b"
+  elevated_surface: "#405e49"
 
   # Text - bright greens
-  foreground: "#f0fdf4"
-  subtle_foreground: "#86efac"
-  
+  foreground: "#e7ece9"
+  subtle_foreground: "#a0d1b3"
+
   # Borders - subtle greens
-  outline: "rgba(74, 222, 128, 0.15)"
-  outline_subtle: "rgba(74, 222, 128, 0.08)"
+  outline: "rgba(113, 187, 137, 0.15)"
+  outline_subtle: "rgba(113, 187, 137, 0.08)"
 
   # Colors - vibrant greens
-  primary: "#22c55e"
-  secondary: "#4ade80"
-  accent: "#86efac"
+  primary: "#49a967"
+  secondary: "#71bb89"
+  accent: "#a0d1b3"
