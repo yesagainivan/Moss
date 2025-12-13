@@ -515,7 +515,7 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
             // Debounce the heavy serialization and store update
             debouncedUpdate(editor);
         },
-    }, [settings.lineHeight, settings.showDiffPanel, updateNote, debouncedSaveNote, forceSaveNote, vaultPath]);
+    }, [settings.showDiffPanel, updateNote, debouncedSaveNote, forceSaveNote, vaultPath]);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -550,10 +550,18 @@ export const Editor = ({ noteId, initialContent, paneId }: EditorProps) => {
     // Dynamically update editor font size without re-mounting
     // This prevents the "text disappearing" bug
     useEffect(() => {
-        if (editor && editor.view && editor.view.dom) {
-            const editorElement = editor.view.dom;
-            editorElement.style.fontSize = `${settings.editorFontSize}px`;
-            editorElement.style.lineHeight = `${settings.lineHeight}`;
+        // CRITICAL: Check if editor is fully initialized and mounted
+        // The view property might not be available immediately after editor creation
+        // catch is for Tiptap error: "The editor view is not available" which is thrown by the view getter
+        try {
+            if (editor && !editor.isDestroyed && editor.view && editor.view.dom && isReady.current) {
+                const editorElement = editor.view.dom;
+                editorElement.style.fontSize = `${settings.editorFontSize}px`;
+                editorElement.style.lineHeight = `${settings.lineHeight}`;
+            }
+        } catch (e) {
+            // Ignore view access errors during initialization/unmount
+            console.debug('Editor view not ready yet', e);
         }
     }, [editor, settings.editorFontSize, settings.lineHeight]);
 
