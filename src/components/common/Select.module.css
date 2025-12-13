@@ -23,7 +23,7 @@
 
 .trigger:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--accent);
+    box-shadow: 0 0 0 2px var(--primary);
 }
 
 .trigger:hover {
@@ -97,12 +97,12 @@
 }
 
 .optionHighlighted {
-    background: color-mix(in srgb, var(--accent), transparent 90%);
+    background: color-mix(in srgb, var(--primary), transparent 90%);
     color: var(--foreground);
 }
 
 .checkIcon {
     width: 1rem;
     height: 1rem;
-    color: var(--accent);
+    color: var(--primary);
 }

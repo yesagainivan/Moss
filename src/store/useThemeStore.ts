@@ -26,9 +26,9 @@ const DEFAULT_THEME: Theme = {
     description: 'The default Moss theme (Linen/Earth palette)',
     colors: {
         // Light mode colors (match :root in index.css)
-        primary: '#4a3b30', // --color-earth
+        primary: '#6b7f6c', // --color-moss (main brand color)
         secondary: '#e8e2d2', // Slightly darker linen
-        accent: '#6b7f6c', // --color-moss
+        accent: '#4a3b30', // --color-earth (supplementary)
         background: '#f5efe1', // --color-linen
         background_subtle: '#f5efe1',
         surface: '#e8e2d2',
@@ -53,9 +53,10 @@ const DEFAULT_THEME: Theme = {
         subtle_foreground: '#a89b90',
         outline: '#332f2d',
         outline_subtle: '#262322',
-        // primary: '#e8e4dc',
-        primary: '#a1854bff',
+        // accent: '#e8e4dc',
+        accent: '#a1854bff',
         secondary: '#262322',
+        primary: '#8a9b8b', // Lighter moss for dark mode
     }
 };
 
@@ -66,9 +67,9 @@ const MUTED_COFFEE_THEME: Theme = {
     description: 'Warm, cozy coffee tones for a relaxed focus',
     colors: {
         // Coffee theme is inherently dark, so these are the base colors
-        primary: '#c18e6fff',
+        primary: '#d4a373', // Caramel (main brand color)
         secondary: '#b27651ff',
-        accent: '#d4a373', // Caramel
+        accent: '#c18e6fff', // Coffee brown (supplementary)
         background: '#201b18',
         background_subtle: '#181412',
         surface: '#2a2420',
@@ -94,8 +95,9 @@ const MUTED_COFFEE_THEME: Theme = {
         subtle_foreground: '#a89f91',
         outline: '#352b25',
         outline_subtle: '#2a2420',
-        primary: '#e6dccf',
+        accent: '#e6dccf',
         secondary: '#352b25',
+        primary: '#d4a373', // Caramel remains primary in dark mode
     }
 };
 

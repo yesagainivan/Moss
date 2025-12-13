@@ -160,7 +160,7 @@
 
 /* Highlight matched text */
 .highlight {
-    background-color: var(--accent);
+    background-color: var(--primary);
     color: var(--background);
     padding: 1px 3px;
     border-radius: 2px;

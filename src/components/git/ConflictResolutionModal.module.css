@@ -78,7 +78,7 @@
 
 .closeButton:hover {
     background: var(--sidebar-hover);
-    color: var(--accent);
+    color: var(--primary);
 }
 
 /* File List */

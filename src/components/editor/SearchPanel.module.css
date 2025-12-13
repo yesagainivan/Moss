@@ -34,7 +34,7 @@
 }
 
 .searchPanelInput:focus {
-    outline: 2px solid color-mix(in srgb, var(--accent) 50%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--primary) 50%, transparent);
     outline-offset: 0px;
 }
 
@@ -54,7 +54,7 @@
 }
 
 .searchPanelNavBtn:hover:not(:disabled) {
-    background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+    background-color: color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
 .searchPanelNavBtn:disabled {
@@ -69,12 +69,12 @@
 }
 
 .searchPanelToggleBtnActive {
-    background-color: var(--accent);
-    color: var(--accent-foreground);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
 }
 
 .searchPanelToggleBtnInactive:hover {
-    background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+    background-color: color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
 .searchPanelActionBtn {
@@ -82,14 +82,14 @@
     font-size: 0.75rem;
     line-height: 1rem;
     font-weight: 500;
-    background-color: var(--accent);
-    color: var(--accent-foreground);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
     border-radius: 0.25rem;
     white-space: nowrap;
 }
 
 .searchPanelActionBtn:hover:not(:disabled) {
-    background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+    background-color: color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
 .searchPanelActionBtn:disabled {

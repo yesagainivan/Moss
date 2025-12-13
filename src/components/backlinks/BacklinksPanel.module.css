@@ -79,8 +79,8 @@
 }
 
 .card:hover {
-    background: color-mix(in srgb, var(--accent), transparent 90%);
-    border-color: var(--accent);
+    background: color-mix(in srgb, var(--primary), transparent 90%);
+    border-color: var(--primary);
 }
 
 .cardHeader {

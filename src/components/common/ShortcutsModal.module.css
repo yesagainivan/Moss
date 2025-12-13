@@ -66,14 +66,14 @@
 
 .iconWrapper {
     padding: 0.5rem;
-    background-color: color-mix(in srgb, var(--accent), transparent 90%);
+    background-color: color-mix(in srgb, var(--primary), transparent 90%);
     border-radius: 0.5rem;
 }
 
 .icon {
     width: 1.25rem;
     height: 1.25rem;
-    color: var(--accent);
+    color: var(--primary);
 }
 
 .title {
@@ -101,7 +101,7 @@
 }
 
 .closeButton:hover {
-    background-color: color-mix(in srgb, var(--accent), transparent 90%);
+    background-color: color-mix(in srgb, var(--primary), transparent 90%);
     color: var(--foreground);
 }
 
@@ -166,7 +166,7 @@
 }
 
 .shortcutItem:hover .shortcutDescription {
-    color: var(--accent);
+    color: var(--primary);
 }
 
 .keys {

@@ -30,7 +30,7 @@
 
 .wikilink-suggestion-item:hover,
 .wikilink-suggestion-item.is-selected {
-    background-color: color-mix(in srgb, var(--accent), transparent 90%);
+    background-color: color-mix(in srgb, var(--primary), transparent 90%);
 }
 
 .wikilink-suggestion-badge {
@@ -44,8 +44,8 @@
 }
 
 .wikilink-suggestion-badge.recent {
-    background-color: color-mix(in srgb, var(--accent), transparent 85%);
-    color: var(--accent);
+    background-color: color-mix(in srgb, var(--primary), transparent 85%);
+    color: var(--primary);
 }
 
 .wikilink-suggestion-badge.same-folder {
@@ -97,5 +97,5 @@
 
 .dark .wikilink-suggestion-item:hover,
 .dark .wikilink-suggestion-item.is-selected {
-    background-color: color-mix(in srgb, var(--accent), transparent 85%);
+    background-color: color-mix(in srgb, var(--primary), transparent 85%);
 }
