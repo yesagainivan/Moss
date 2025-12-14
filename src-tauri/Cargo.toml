@@ -42,5 +42,6 @@ html2md = "0.2"
 urlencoding = "2.1"
 git2 = "0.18"
 chrono = "0.4"
+openssl = { version = "0.10", features = ["vendored"] }
 
 
