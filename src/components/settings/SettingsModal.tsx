@@ -14,11 +14,12 @@ import { Select } from '../common/Select';
 interface SettingsModalProps {
     isOpen: boolean;
     onClose: () => void;
+    initialTab?: Tab;
 }
 
 type Tab = 'editor' | 'ai' | 'git';
 
-export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
+export const SettingsModal = ({ isOpen, onClose, initialTab = 'editor' }: SettingsModalProps) => {
     const { settings, updateSettings } = useSettingsStore();
     const {
         selectedProvider,
@@ -36,7 +37,7 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
         deleteCustomPrompt,
     } = useAIStore();
 
-    const [activeTab, setActiveTab] = useState<Tab>('editor');
+    const [activeTab, setActiveTab] = useState<Tab>(initialTab);
     const [apiKey, setApiKey] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [isTesting, setIsTesting] = useState(false);
@@ -65,6 +66,13 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
             onClose();
         }, 50); // Match animation duration
     };
+
+    // Reset tab when opened with new initialTab
+    useEffect(() => {
+        if (isOpen) {
+            setActiveTab(initialTab);
+        }
+    }, [isOpen, initialTab]);
 
     // Load API key when provider changes
     useEffect(() => {

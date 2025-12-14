@@ -35,8 +35,14 @@ export const Toolbar = () => {
 
 
     // Listen for settings shortcut
+    const [settingsTab, setSettingsTab] = useState<'editor' | 'ai' | 'git'>('editor');
+
     useEffect(() => {
-        const handleOpenSettings = () => {
+        const handleOpenSettings = (e: Event) => {
+            const customEvent = e as CustomEvent;
+            if (customEvent.detail?.tab) {
+                setSettingsTab(customEvent.detail.tab);
+            }
             setShowSettings(true);
         };
         window.addEventListener('open-settings-modal', handleOpenSettings);
@@ -165,6 +171,7 @@ export const Toolbar = () => {
             <SettingsModal
                 isOpen={showSettings}
                 onClose={() => setShowSettings(false)}
+                initialTab={settingsTab}
             />
 
             <AICommandMenu

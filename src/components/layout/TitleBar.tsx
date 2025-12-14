@@ -1,5 +1,5 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { openUrl } from '@tauri-apps/plugin-opener';
+
 import { useState, useEffect } from 'react';
 import { useGitHubStore } from '../../store/useGitHubStore';
 import styles from './TitleBar.module.css';
@@ -39,9 +39,7 @@ export const TitleBar = () => {
 
     const handleProfileClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (user?.html_url) {
-            openUrl(user.html_url);
-        }
+        window.dispatchEvent(new CustomEvent('open-settings-modal', { detail: { tab: 'git' } }));
     };
 
     return (
