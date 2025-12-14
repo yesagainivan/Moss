@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import * as Diff from 'diff';
+import styles from './DiffContainer.module.css';
 
 interface DiffContainerProps {
     originalText: string;
@@ -43,90 +44,103 @@ export const DiffContainer = ({
     return (
         <div
             ref={containerRef}
-            className="diff-container grain-overlay"
-            style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 1000,
-            }}
+            className={styles.container}
             onKeyDown={handleKeyDown}
             tabIndex={-1}
         >
             {/* Header */}
-            <div className="diff-header">
-                <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm">AI Assistant</span>
+            <div className={styles.header}>
+                <div className={styles.titleGroup}>
+                    <span className={styles.title}>AI Suggestion</span>
                     {isStreaming && (
-                        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                        <div className={styles.statusBadge}>
+                            <Loader2 className={styles.loadingIcon} />
+                            <span>Generating...</span>
+                        </div>
                     )}
                 </div>
-                <button
-                    onClick={onDiscard}
-                    className="p-1 hover:bg-secondary rounded transition-colors"
-                    aria-label="Close"
-                >
-                    <X className="w-4 h-4" />
-                </button>
-            </div>
-
-            {/* Diff Content - Side by Side */}
-            <div className="diff-content">
-                <div className="diff-pane">
-                    <div className="diff-pane-label">Original</div>
-                    <div className="diff-pane-text diff-original">
-                        {originalText || <span className="text-muted-foreground italic">Empty</span>}
+                <div className={styles.shortcuts}>
+                    <div className="hidden sm:block">
+                        <kbd className={styles.key}>⌘ + ⏎</kbd> Accept
+                        <span className="mx-1">•</span>
+                        <kbd className={styles.key}>Esc</kbd> Discard
                     </div>
                 </div>
-                <div className="diff-pane">
-                    <div className="diff-pane-label">Generated</div>
-                    <div className="diff-pane-text diff-generated">
+            </div>
+
+            {/* Split View */}
+            <div className={styles.splitView}>
+                {/* Original Pane */}
+                <div className={`${styles.pane} ${styles.originalPane}`}>
+                    <div className={styles.paneHeader}>
+                        <span>Original</span>
+                    </div>
+                    <div className={styles.paneContent}>
+                        {originalText || <span className={styles.emptyText}>Empty selection</span>}
+                    </div>
+                </div>
+
+                {/* Generated Pane */}
+                <div className={`${styles.pane} ${styles.generatedPane}`}>
+                    <div className={styles.paneHeader}>
+                        <span>Suggested</span>
+                    </div>
+                    <div className={styles.paneContent}>
                         {generatedText ? (
                             <>
                                 {diffs.map((part, index) => {
                                     if (part.added) {
                                         return (
-                                            <span key={index} className="diff-add">
+                                            <span key={index} className={styles.added}>
                                                 {part.value}
                                             </span>
                                         );
                                     } else if (part.removed) {
                                         return null; // Don't show removed parts in generated view
                                     } else {
-                                        return <span key={index}>{part.value}</span>;
+                                        return <span key={index} className={styles.unchanged}>{part.value}</span>;
                                     }
                                 })}
                             </>
                         ) : (
-                            <span className="text-muted-foreground italic">
-                                {isStreaming ? 'Generating...' : 'No output'}
+                            <span className={`${styles.emptyText} ${styles.thinking} ${isStreaming ? styles.pulse : ''}`}>
+                                {isStreaming ? 'Thinking...' : 'No output'}
                             </span>
                         )}
+                        {/* Invisible element to scroll to bottom */}
+                        <div ref={(el) => {
+                            if (el && isStreaming) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                            }
+                        }} />
                     </div>
                 </div>
             </div>
 
-            {/* Actions */}
-            <div className="diff-actions">
+            {/* Footer Actions */}
+            <div className={styles.footer}>
                 <button
                     onClick={onDiscard}
-                    className="diff-button diff-button-secondary"
+                    className={`${styles.button} ${styles.discardButton}`}
                 >
                     Discard
                 </button>
                 <button
                     onClick={onAccept}
                     disabled={isStreaming}
-                    className="diff-button diff-button-primary"
+                    className={`${styles.button} ${styles.acceptButton}`}
                 >
-                    Accept {!isStreaming && '✓'}
+                    {isStreaming ? (
+                        <>
+                            <Loader2 className={styles.loadingIcon} />
+                            <span>Generating</span>
+                        </>
+                    ) : (
+                        <>
+                            <span>Accept Changes</span>
+                        </>
+                    )}
                 </button>
-            </div>
-
-            {/* Keyboard hint */}
-            <div className="diff-hint">
-                <kbd>Cmd/Ctrl+Enter</kbd> Accept • <kbd>Esc</kbd> Discard
             </div>
         </div>
     );
