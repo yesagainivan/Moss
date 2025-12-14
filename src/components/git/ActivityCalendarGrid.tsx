@@ -11,7 +11,7 @@ interface ActivityCalendarGridProps {
 interface DayActivity {
     date: Date;
     userCommits: number;
-    ambreCommits: number;
+    mosaicCommits: number;
     totalChanges: number; // insertions + deletions
 }
 
@@ -79,8 +79,8 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
             const changes = commit.stats ? (commit.stats.insertions + commit.stats.deletions) : 0;
 
             if (existing) {
-                if (commit.is_ambre) {
-                    existing.ambreCommits += 1;
+                if (commit.is_mosaic) {
+                    existing.mosaicCommits += 1;
                 } else {
                     existing.userCommits += 1;
                 }
@@ -88,8 +88,8 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
             } else {
                 activityMap.set(dateKey, {
                     date: commitDate,
-                    userCommits: commit.is_ambre ? 0 : 1,
-                    ambreCommits: commit.is_ambre ? 1 : 0,
+                    userCommits: commit.is_mosaic ? 0 : 1,
+                    mosaicCommits: commit.is_mosaic ? 1 : 0,
                     totalChanges: changes,
                 });
             }
@@ -109,7 +109,7 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
             const activity = dailyActivity.get(dateKey) || {
                 date: new Date(currentDate),
                 userCommits: 0,
-                ambreCommits: 0,
+                mosaicCommits: 0,
                 totalChanges: 0,
             };
 
@@ -131,7 +131,7 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
                 currentWeek.push({
                     date: new Date(currentDate),
                     userCommits: 0,
-                    ambreCommits: 0,
+                    mosaicCommits: 0,
                     totalChanges: 0,
                 });
                 currentDate.setDate(currentDate.getDate() + 1);
@@ -144,7 +144,7 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
 
     // Calculate intensity level (0-4) based on commit count
     const getIntensityLevel = (activity: DayActivity): number => {
-        const totalCommits = activity.userCommits + activity.ambreCommits;
+        const totalCommits = activity.userCommits + activity.mosaicCommits;
         if (totalCommits === 0) return 0;
         if (totalCommits === 1) return 1;
         if (totalCommits <= 3) return 2;
@@ -157,7 +157,7 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
         if (intensity === 0) return styles.intensity0;
 
         const hasUser = activity.userCommits > 0;
-        const hasMosaic = activity.ambreCommits > 0;
+        const hasMosaic = activity.mosaicCommits > 0;
 
         if (hasUser && hasMosaic) {
             // Mixed - use blend
@@ -171,7 +171,7 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
     };
 
     const handleDayClick = (activity: DayActivity, event: React.MouseEvent) => {
-        if (activity.userCommits === 0 && activity.ambreCommits === 0) {
+        if (activity.userCommits === 0 && activity.mosaicCommits === 0) {
             setSelectedDay(null);
             return;
         }
@@ -277,7 +277,7 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
                                                 key={dayIdx}
                                                 className={`${styles.dayCell} ${colorClass}`}
                                                 onClick={(e) => handleDayClick(day, e)}
-                                                title={`${day.date.toLocaleDateString()}: ${day.userCommits + day.ambreCommits} commits`}
+                                                title={`${day.date.toLocaleDateString()}: ${day.userCommits + day.mosaicCommits} commits`}
                                             />
                                         );
                                     })}
@@ -326,12 +326,12 @@ export const ActivityCalendarGrid = ({ commits, timeRange }: ActivityCalendarGri
                             })}
                         </div>
                         <div className={styles.popoverStats}>
-                            <strong>{selectedDay.userCommits + selectedDay.ambreCommits}</strong> commits
+                            <strong>{selectedDay.userCommits + selectedDay.mosaicCommits}</strong> commits
                             {selectedDay.userCommits > 0 && (
-                                <span> ({selectedDay.userCommits} by you{selectedDay.ambreCommits > 0 ? `, ${selectedDay.ambreCommits} by Mosaic` : ''})</span>
+                                <span> ({selectedDay.userCommits} by you{selectedDay.mosaicCommits > 0 ? `, ${selectedDay.mosaicCommits} by Mosaic` : ''})</span>
                             )}
-                            {selectedDay.userCommits === 0 && selectedDay.ambreCommits > 0 && (
-                                <span> ({selectedDay.ambreCommits} by Mosaic)</span>
+                            {selectedDay.userCommits === 0 && selectedDay.mosaicCommits > 0 && (
+                                <span> ({selectedDay.mosaicCommits} by Mosaic)</span>
                             )}
                         </div>
                         {selectedDay.totalChanges > 0 && (

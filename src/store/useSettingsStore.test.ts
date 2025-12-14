@@ -6,7 +6,9 @@ describe('useSettingsStore', () => {
         localStorage.clear();
         useSettingsStore.setState({
             settings: {
-                fontSize: 16,
+                uiFontSize: 14,
+                editorFontSize: 16,
+                sidebarPosition: 'right',
                 lineHeight: 1.6,
                 autoSaveDelay: 1000,
                 spellCheck: true,

@@ -94,8 +94,8 @@ export const ActivityCalendar = ({ isOpen, onClose }: ActivityCalendarProps) => 
         const filteredCommits = commits.filter(c => c.timestamp * 1000 >= cutoff.getTime());
 
         const totalCommits = filteredCommits.length;
-        const userCommits = filteredCommits.filter(c => !c.is_ambre).length;
-        const ambreCommits = filteredCommits.filter(c => c.is_ambre).length;
+        const userCommits = filteredCommits.filter(c => !c.is_mosaic).length;
+        const ambreCommits = filteredCommits.filter(c => c.is_mosaic).length;
 
         // Calculate streak
         // Sort commits by date descending
@@ -276,14 +276,14 @@ export const ActivityCalendar = ({ isOpen, onClose }: ActivityCalendarProps) => 
                                                 className={`${styles.activityItem} ${isClickable ? styles.clickable : ''}`}
                                                 onClick={() => isClickable && handleActivityClick(commit)}
                                             >
-                                                <div className={`${styles.activityIcon} ${commit.is_ambre ? styles.iconMosaic : styles.iconUser}`}>
+                                                <div className={`${styles.activityIcon} ${commit.is_mosaic ? styles.iconMosaic : styles.iconUser}`}>
                                                     <GitCommit className="w-4 h-4" />
                                                 </div>
                                                 <div className={styles.activityContent}>
                                                     <div className={styles.activityMessage}>{commit.message}</div>
                                                     <div className={styles.activityMeta}>
                                                         <span className={styles.activityAuthor}>
-                                                            {commit.is_ambre ? 'Mosaic' : 'You'}
+                                                            {commit.is_mosaic ? 'Mosaic' : 'You'}
                                                         </span>
                                                         <span className={styles.activityDot}>•</span>
                                                         <span className={styles.activityTime}>
