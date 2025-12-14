@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type AIProvider = 'gemini' | 'cerebras' | 'openrouter' | null;
+export type AIProvider = 'gemini' | 'cerebras' | 'openrouter' | 'ollama' | null;
 
 export interface CustomPrompt {
     id: string;
@@ -173,7 +173,7 @@ Need me to pull out any specific details?"
 `;
 
 export interface AIState {
-    selectedProvider: 'gemini' | 'cerebras' | 'openrouter' | null;
+    selectedProvider: 'gemini' | 'cerebras' | 'openrouter' | 'ollama' | null;
     isStreaming: boolean;
     streamedText: string;
     models: Record<string, string[]>;
@@ -181,7 +181,7 @@ export interface AIState {
     systemPrompt: string; // This is the CUSTOM prompt content
     useDefaultSystemPrompt: boolean;
     customPrompts: CustomPrompt[];
-    setProvider: (provider: 'gemini' | 'cerebras' | 'openrouter' | null) => void;
+    setProvider: (provider: 'gemini' | 'cerebras' | 'openrouter' | 'ollama' | null) => void;
     setModel: (model: string) => void;
     setSystemPrompt: (prompt: string) => void;
     setUseDefaultSystemPrompt: (useDefault: boolean) => void;
@@ -216,6 +216,7 @@ const DEFAULT_MODELS = {
         'z-ai/glm-4.5-air:free',
         'alibaba/tongyi-deepresearch-30b-a3b:free',
     ],
+    ollama: ['llama3.2', 'llama3.1', 'mistral', 'gemma2', 'qwen2.5', 'phi3.5', 'deepseek-r1'],
 };
 
 export const useAIStore = create<AIState>()(
@@ -231,10 +232,28 @@ export const useAIStore = create<AIState>()(
             customPrompts: DEFAULT_PROMPTS,
 
             setProvider: (provider) =>
-                set((state) => ({
-                    selectedProvider: provider,
-                    selectedModel: provider ? state.models[provider][0] : null,
-                })),
+                set((state) => {
+                    // Handle migration: Ensure models for the selected provider exist
+                    // If the state was hydrated from storage, it might lack new providers
+                    const currentModels = state.models;
+                    let modelsToUse = currentModels;
+
+                    if (provider && !currentModels[provider]) {
+                        // If missing in state, initialize from defaults
+                        if (provider in DEFAULT_MODELS) {
+                            modelsToUse = {
+                                ...currentModels,
+                                [provider]: DEFAULT_MODELS[provider as keyof typeof DEFAULT_MODELS]
+                            };
+                        }
+                    }
+
+                    return {
+                        selectedProvider: provider,
+                        models: modelsToUse,
+                        selectedModel: provider ? modelsToUse[provider]?.[0] : null,
+                    };
+                }),
 
             setModel: (model) => set({ selectedModel: model }),
 

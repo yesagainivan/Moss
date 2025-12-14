@@ -652,7 +652,8 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                 options={[
                                                     { value: 'gemini', label: 'Google Gemini (Free Tier Available)' },
                                                     { value: 'cerebras', label: 'Cerebras (Fast Inference)' },
-                                                    { value: 'openrouter', label: 'OpenRouter (Claude, GPT-4, etc.)' }
+                                                    { value: 'openrouter', label: 'OpenRouter (Claude, GPT-4, etc.)' },
+                                                    { value: 'ollama', label: 'Ollama (Local)' }
                                                 ]}
                                                 placeholder="Select a provider..."
                                             />
@@ -723,15 +724,20 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                 {/* API Key */}
                                                 <div>
                                                     <label className="block text-sm font-medium text-foreground mb-2">
-                                                        API Key
+                                                        {selectedProvider === 'ollama' ? 'Host URL' : 'API Key'}
                                                     </label>
                                                     <div className="flex gap-2">
                                                         <input
-                                                            type="password"
+                                                            type={selectedProvider === 'ollama' ? 'text' : 'password'}
                                                             value={apiKey}
                                                             onChange={(e) => setApiKey(e.target.value)}
-                                                            placeholder={`Enter your ${selectedProvider === 'gemini' ? 'Gemini' : selectedProvider === 'cerebras' ? 'Cerebras' : 'OpenRouter'} API Key`}
-                                                            className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent"
+                                                            placeholder={
+                                                                selectedProvider === 'gemini' ? "Enter your Gemini API Key" :
+                                                                    selectedProvider === 'cerebras' ? "Enter your Cerebras API Key" :
+                                                                        selectedProvider === 'openrouter' ? "Enter your OpenRouter API Key" :
+                                                                            "http://localhost:11434 (default)"
+                                                            }
+                                                            className="flex-1 bg-background border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent placeholder:text-muted-foreground"
                                                         />
                                                         <button
                                                             onClick={handleSaveKey}
@@ -742,7 +748,9 @@ export const SettingsModal = ({ isOpen, onClose }: SettingsModalProps) => {
                                                         </button>
                                                     </div>
                                                     <p className="text-xs text-muted-foreground mt-2">
-                                                        Your API key is stored securely in your system's keychain.
+                                                        {selectedProvider === 'ollama'
+                                                            ? "Enter your Ollama host URL. Leave empty to use default (http://localhost:11434)."
+                                                            : "Your API key is stored securely in your system's keychain."}
                                                     </p>
                                                 </div>
 

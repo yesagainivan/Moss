@@ -14,7 +14,8 @@ mod watcher;
 mod wikipedia;
 
 use ai::{
-    cerebras::CerebrasProvider, gemini::GeminiProvider, openrouter::OpenRouterProvider, AIProvider,
+    cerebras::CerebrasProvider, gemini::GeminiProvider, ollama::OllamaProvider,
+    openrouter::OpenRouterProvider, AIProvider,
 };
 use futures::StreamExt;
 use keyring::Entry;
@@ -69,12 +70,17 @@ async fn delete_api_key(provider: String) -> Result<(), String> {
 
 #[tauri::command]
 async fn test_ai_connection(provider: String) -> Result<bool, String> {
-    let api_key = get_api_key(provider.clone()).await?;
+    let api_key = match get_api_key(provider.clone()).await {
+        Ok(key) => key,
+        Err(_) if provider == "ollama" => "".to_string(),
+        Err(e) => return Err(e),
+    };
 
     let provider_impl: Box<dyn AIProvider> = match provider.as_str() {
         "gemini" => Box::new(GeminiProvider::new(api_key)),
         "cerebras" => Box::new(CerebrasProvider::new(api_key)),
         "openrouter" => Box::new(OpenRouterProvider::new(api_key)),
+        "ollama" => Box::new(OllamaProvider::new(api_key)),
         _ => return Err(format!("Unknown provider: {}", provider)),
     };
 
@@ -90,14 +96,17 @@ async fn ai_rewrite_text(
     instruction: String,
     context: String,
 ) -> Result<(), String> {
-    let api_key = get_api_key(provider.clone())
-        .await
-        .map_err(|e| e.to_string())?;
+    let api_key = match get_api_key(provider.clone()).await {
+        Ok(key) => key,
+        Err(_) if provider == "ollama" => "".to_string(),
+        Err(e) => return Err(e.to_string()),
+    };
 
     let ai_provider: Box<dyn AIProvider> = match provider.as_str() {
         "gemini" => Box::new(GeminiProvider::new(api_key).with_model(model)),
         "cerebras" => Box::new(CerebrasProvider::new(api_key).with_model(model)),
         "openrouter" => Box::new(OpenRouterProvider::new(api_key).with_model(model)),
+        "ollama" => Box::new(OllamaProvider::new(api_key).with_model(model)),
         _ => return Err("Invalid provider".to_string()),
     };
 

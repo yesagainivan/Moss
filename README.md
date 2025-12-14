@@ -2,6 +2,8 @@
 
 > Your second brain, elegantly simple.
 
+**[🌐 Visit the Website](https://yesagainivan.github.io/Moss/)**
+
 Moss is a modern, fast, and beautiful note-taking application built for those who love Markdown. It combines the speed of a local-first app with the power of Git syncing and AI assistance.
 
 ## ✨ Features

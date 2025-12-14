@@ -4,6 +4,7 @@ use std::pin::Pin;
 
 pub mod cerebras;
 pub mod gemini;
+pub mod ollama;
 pub mod openrouter;
 
 pub type StreamResult = Result<Pin<Box<dyn Stream<Item = Result<String, String>> + Send>>, String>;
