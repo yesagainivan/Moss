@@ -17,6 +17,43 @@ export const AgentMessageItem: React.FC<AgentMessageProps> = ({ message, isLast 
     const isUser = message.role === 'user';
     const isTool = message.role === 'tool';
 
+    // Optimize rendering: Throttle content updates during streaming
+    // We store the rendered HTML to avoid re-parsing on every frame
+    const [displayHtml, setDisplayHtml] = React.useState<string>('');
+    const contentRef = React.useRef<string>(message.content || '');
+
+    // Process wikilinks and markdown
+    const processAndRender = (text: string) => {
+        if (!text) return '';
+        const processed = text.replace(/\[\[(.*?)\]\]/g, (_, title) => {
+            if (title.includes('|')) {
+                const [target, alias] = title.split('|');
+                return `[${alias}](#wikilink:${encodeURIComponent(target)})`;
+            }
+            return `[${title}](#wikilink:${encodeURIComponent(title)})`;
+        });
+        return marked(processed, { async: false }) as string;
+    };
+
+    React.useEffect(() => {
+        // If content hasn't changed effectively, skip
+        if (contentRef.current === message.content && displayHtml) return;
+        contentRef.current = message.content || '';
+
+        // Immediate update if not streaming or first render
+        if (!message.isStreaming || !displayHtml) {
+            setDisplayHtml(processAndRender(message.content || ''));
+            return;
+        }
+
+        // Throttle updates during streaming
+        const timeout = setTimeout(() => {
+            setDisplayHtml(processAndRender(message.content || ''));
+        }, 100); // 100ms throttle
+
+        return () => clearTimeout(timeout);
+    }, [message.content, message.isStreaming]);
+
     const handleWikilinkClick = (title: string) => {
         // Normalize target: remove extension, lowercase
         const normalize = (s: string) => s.toLowerCase().replace(/\.md$/, '');
@@ -55,17 +92,7 @@ export const AgentMessageItem: React.FC<AgentMessageProps> = ({ message, isLast 
         }
     };
 
-    const processContent = (content: string) => {
-        if (!content) return '';
-        return content.replace(/\[\[(.*?)\]\]/g, (_, title) => {
-            // Handle aliased links [[Title|Alias]]
-            if (title.includes('|')) {
-                const [target, alias] = title.split('|');
-                return `[${alias}](#wikilink:${encodeURIComponent(target)})`;
-            }
-            return `[${title}](#wikilink:${encodeURIComponent(title)})`;
-        });
-    };
+
 
     if (isTool) {
         // Render tool results
@@ -169,7 +196,7 @@ export const AgentMessageItem: React.FC<AgentMessageProps> = ({ message, isLast 
                 <div
                     className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-foreground prose-headings:text-foreground prose-strong:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-pre:bg-secondary prose-pre:p-2 prose-pre:rounded-md prose-code:text-foreground prose-code:bg-secondary/50 prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none"
                     dangerouslySetInnerHTML={{
-                        __html: marked(processContent(message.content || ''), { async: false }) as string,
+                        __html: displayHtml,
                     }}
                     onClick={(e) => {
                         const target = e.target as HTMLElement;

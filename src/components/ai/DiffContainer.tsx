@@ -38,8 +38,22 @@ export const DiffContainer = ({
         }
     };
 
-    // Calculate unified diff for inline display
-    const diffs = Diff.diffWords(originalText, generatedText);
+    // State for diffs to allow throttling
+    const [diffs, setDiffs] = React.useState<Diff.Change[]>([]);
+
+    // Throttle the expensive diff calculation
+    useEffect(() => {
+        // Initial calculation
+        if (!diffs.length) {
+            setDiffs(Diff.diffWords(originalText, generatedText));
+        }
+
+        const calculateDiff = setTimeout(() => {
+            setDiffs(Diff.diffWords(originalText, generatedText));
+        }, 100); // 100ms debounce/throttle-ish behavior for smooth updates
+
+        return () => clearTimeout(calculateDiff);
+    }, [originalText, generatedText]);
 
     return (
         <div
