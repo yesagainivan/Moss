@@ -35,6 +35,21 @@ Moss is built with a modern stack designed for performance and experience:
 
 ### Installation
 
+**For macOS (Apple Silicon & Intel):**
+
+1.  Download the `.dmg` or `.app` from the [Releases](https://github.com/yesagainivan/Moss/releases) page.
+2.  Drag the app to your Applications folder.
+3.  **Important:** Since the app is not yet signed with a paid Apple Developer certificate, macOS will prevent it from opening by default.
+    - **Right-click** on the Moss app icon.
+    - Select **Open**.
+    - Click **Open** in the dialog box that appears.
+    - You only need to do this once.
+
+*Alternatively, if you are comfortable with the terminal, you can remove the quarantine attribute:*
+```bash
+xattr -cr /Applications/Moss.app
+```
+
 1.  Clone the repository:
     ```bash
     git clone https://github.com/yesagainivan/Moss.git
