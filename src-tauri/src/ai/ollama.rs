@@ -160,11 +160,6 @@ impl AIProvider for OllamaProvider {
     async fn get_embedding(&self, text: &str) -> Result<Vec<f32>, String> {
         let url = format!("{}/api/embeddings", self.host);
 
-        let body = json!({
-            "model": "nomic-embed-text", // Standard embedding model for Ollama usually
-            "prompt": text
-        });
-
         // Fallback to self.model if specific embedding model isn't desired,
         // but typically embeddings require specific models.
         // For now let's try to use the current model, many LLMs can generate embeddings too.
