@@ -318,14 +318,14 @@ export const AgentChat: React.FC = () => {
 
             {/* Input */}
             <div className="p-4 border-t border-border bg-background">
-                <div className="flex items-end bg-card border border-border rounded-xl focus-within:border-secondary/50 focus-within:ring-1 focus-within:ring-accent transition-all">
+                <div className="flex items-end bg-card border border-border rounded-xl focus-within:border-secondary/50 focus-within:ring-1 focus-within:ring-accent transition-all relative">
                     <textarea
                         ref={inputRef}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Ask Mosaic..."
-                        className="flex-1 bg-transparent border-none focus:ring-0 py-3 pl-4 pr-2 text-sm resize-none outline-none max-h-[120px] min-h-[48px] text-foreground placeholder:text-muted-foreground focus:border-red"
+                        className="flex-1 bg-transparent border-none focus:ring-0 py-3.5 pl-4 pr-2 text-sm resize-none outline-none max-h-[120px] min-h-[48px] text-foreground placeholder:text-muted-foreground focus:border-red leading-relaxed"
                         rows={1}
                         style={{
                             height: 'auto',
